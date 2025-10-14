@@ -176,6 +176,26 @@
             line-height: 1.4;
         }
         
+        /* Hover coordinates display */
+        .hover-coords {
+            background: rgba(102, 126, 234, 0.95);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        /* Layer control styling */
+        .leaflet-control-layers {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        .leaflet-control-layers-toggle {
+            background-size: 20px 20px;
+        }
+        
         @media (max-width: 768px) {
             #container {
                 flex-direction: column;
@@ -213,7 +233,7 @@
 <body>
     <div id="header">
         <h1>🌍 Interactive Geography Map</h1>
-        <p>Click anywhere on the map to explore coordinates and locations</p>
+        <p>Move your mouse to see coordinates • Click to explore locations • Switch map layers</p>
     </div>
     
     <div id="container">
@@ -221,7 +241,25 @@
         
         <div id="sidebar">
             <div class="info-section">
-                <h2>📍 Current Location</h2>
+                <h2>🖱️ Live Coordinates</h2>
+                <div class="coordinates-display">
+                    <div class="coord-box">
+                        <div class="info-item">
+                            <div class="info-label">Latitude</div>
+                            <div class="info-value" id="hover-latitude">Move mouse over map</div>
+                        </div>
+                    </div>
+                    <div class="coord-box">
+                        <div class="info-item">
+                            <div class="info-label">Longitude</div>
+                            <div class="info-value" id="hover-longitude">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h2>📍 Clicked Location</h2>
                 <div id="location-info">
                     <div class="info-item">
                         <div class="info-label">Click on the map to see location details</div>
@@ -230,7 +268,7 @@
             </div>
             
             <div class="info-section">
-                <h2>🗺️ Coordinates</h2>
+                <h2>🗺️ Clicked Coordinates</h2>
                 <div class="coordinates-display">
                     <div class="coord-box">
                         <div class="info-item">
@@ -252,10 +290,11 @@
                 <div id="instructions">
                     <strong>How to use:</strong>
                     <ul>
-                        <li>Click anywhere on the map to see coordinates and location information</li>
+                        <li>Move your mouse to see live coordinates</li>
+                        <li>Click anywhere to get location details</li>
+                        <li>Use the layer control (top right) to switch map types</li>
                         <li>Use your touchpad to pan around the map</li>
                         <li>Scroll to zoom in and out</li>
-                        <li>Use the + and - buttons to zoom</li>
                     </ul>
                 </div>
             </div>
@@ -271,11 +310,40 @@
         // Initialize the map centered on a default location (world view)
         const map = L.map('map').setView([20, 0], 2);
         
-        // Add OpenStreetMap tile layer
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // Define different tile layers
+        const streetMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        });
+        
+        const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        });
+        
+        const topoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17,
+            attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+        });
+        
+        const terrainMap = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
+            maxZoom: 18,
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        
+        // Add default layer (street map)
+        streetMap.addTo(map);
+        
+        // Create base layers object for layer control
+        const baseMaps = {
+            "Street Map": streetMap,
+            "Satellite": satelliteMap,
+            "Topographic": topoMap,
+            "Terrain": terrainMap
+        };
+        
+        // Add layer control to map
+        L.control.layers(baseMaps).addTo(map);
         
         // Variable to store the current marker
         let currentMarker = null;
@@ -292,6 +360,21 @@
             const direction = isLat ? (value >= 0 ? 'N' : 'S') : (value >= 0 ? 'E' : 'W');
             return `${Math.abs(value).toFixed(6)}° ${direction}`;
         }
+        
+        // Update hover coordinates as mouse moves
+        map.on('mousemove', function(e) {
+            const lat = e.latlng.lat;
+            const lon = e.latlng.lng;
+            
+            document.getElementById('hover-latitude').textContent = formatCoordinate(lat, true);
+            document.getElementById('hover-longitude').textContent = formatCoordinate(lon, false);
+        });
+        
+        // Clear hover coordinates when mouse leaves map
+        map.on('mouseout', function() {
+            document.getElementById('hover-latitude').textContent = 'Move mouse over map';
+            document.getElementById('hover-longitude').textContent = '--';
+        });
         
         // Function to get location name from coordinates using Nominatim
         async function getLocationName(lat, lon) {
@@ -501,7 +584,8 @@
         
         // Log map initialization
         console.log('Interactive Geography Map initialized successfully');
-        console.log('Map is ready for student use');
+        console.log('Map layers: Street, Satellite, Topographic, Terrain');
+        console.log('Features: Live hover coordinates, click for details, multiple layers');
     </script>
 </body>
 </html>
