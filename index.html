@@ -176,24 +176,21 @@
             line-height: 1.4;
         }
         
-        /* Hover coordinates display */
-        .hover-coords {
-            background: rgba(102, 126, 234, 0.95);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        /* Layer control styling */
+        /* Enhanced layer control styling */
         .leaflet-control-layers {
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            padding: 10px;
         }
         
-        .leaflet-control-layers-toggle {
-            background-size: 20px 20px;
+        .leaflet-control-layers-expanded {
+            padding: 15px;
+            background: white;
+        }
+        
+        .leaflet-control-layers-separator {
+            margin: 8px 0;
+            border-top: 1px solid #ddd;
         }
         
         @media (max-width: 768px) {
@@ -233,7 +230,7 @@
 <body>
     <div id="header">
         <h1>🌍 Interactive Geography Map</h1>
-        <p>Move your mouse to see coordinates • Click to explore locations • Switch map layers</p>
+        <p>Move your mouse to see coordinates • Click to explore locations • Switch map layers & overlays</p>
     </div>
     
     <div id="container">
@@ -292,8 +289,9 @@
                     <ul>
                         <li>Move your mouse to see live coordinates</li>
                         <li>Click anywhere to get location details</li>
-                        <li>Use the layer control (top right) to switch map types</li>
-                        <li>Use your touchpad to pan around the map</li>
+                        <li>Use layer control (top right) to switch base maps</li>
+                        <li>Toggle overlays for additional information</li>
+                        <li>Use touchpad to pan around the map</li>
                         <li>Scroll to zoom in and out</li>
                     </ul>
                 </div>
@@ -308,27 +306,77 @@
     
     <script>
         // Initialize the map centered on a default location (world view)
-        const map = L.map('map').setView([20, 0], 2);
+        const map = L.map('map', {
+            preferCanvas: true,  // Use canvas for better performance
+            zoomControl: true
+        }).setView([20, 0], 2);
         
-        // Define different tile layers
+        // Define different BASE tile layers with optimized settings
         const streetMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            updateWhenIdle: false,
+            updateWhenZooming: false,
+            keepBuffer: 2
         });
         
         const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            attribution: 'Tiles &copy; Esri',
+            updateWhenIdle: false,
+            keepBuffer: 2
         });
         
         const topoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
             maxZoom: 17,
-            attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+            attribution: 'Map data: &copy; <a href="https://openstreetmap.org">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
+            updateWhenIdle: false,
+            keepBuffer: 2
         });
         
-        const terrainMap = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
+        const terrainMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 13,
+            attribution: 'Tiles &copy; Esri',
+            updateWhenIdle: false,
+            keepBuffer: 2
+        });
+        
+        const physicalMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 8,
+            attribution: 'Tiles &copy; Esri',
+            updateWhenIdle: false,
+            keepBuffer: 2
+        });
+        
+        // Define OVERLAY layers (can be toggled on/off)
+        const boundariesOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: 'Boundaries &copy; Esri',
+            opacity: 0.7
+        });
+        
+        const labelsOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Reference_Overlay/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: 'Labels &copy; Esri',
+            opacity: 0.8
+        });
+        
+        const transportOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: 'Transport &copy; Esri',
+            opacity: 0.7
+        });
+        
+        const hillshadeOverlay = L.tileLayer('https://tiles.wmflabs.org/hillshading/{z}/{x}/{y}.png', {
             maxZoom: 18,
-            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution: 'Hillshading: <a href="https://github.com/der-stefan/OpenTopoMap">OpenTopoMap</a>',
+            opacity: 0.5
+        });
+        
+        const railwayOverlay = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: 'Railway: <a href="https://www.openrailwaymap.org/">OpenRailwayMap</a>',
+            opacity: 0.7
         });
         
         // Add default layer (street map)
@@ -336,14 +384,27 @@
         
         // Create base layers object for layer control
         const baseMaps = {
-            "Street Map": streetMap,
-            "Satellite": satelliteMap,
-            "Topographic": topoMap,
-            "Terrain": terrainMap
+            "🗺️ Street Map": streetMap,
+            "🛰️ Satellite": satelliteMap,
+            "⛰️ Topographic": topoMap,
+            "🏔️ Terrain Relief": terrainMap,
+            "🌍 Physical": physicalMap
         };
         
-        // Add layer control to map
-        L.control.layers(baseMaps).addTo(map);
+        // Create overlay layers object
+        const overlayMaps = {
+            "🏛️ Boundaries & Places": boundariesOverlay,
+            "🏷️ Labels": labelsOverlay,
+            "🚗 Transportation": transportOverlay,
+            "⛰️ Hillshade": hillshadeOverlay,
+            "🚂 Railways": railwayOverlay
+        };
+        
+        // Add layer control to map with both base maps and overlays
+        L.control.layers(baseMaps, overlayMaps, {
+            collapsed: false,
+            position: 'topright'
+        }).addTo(map);
         
         // Variable to store the current marker
         let currentMarker = null;
@@ -584,8 +645,9 @@
         
         // Log map initialization
         console.log('Interactive Geography Map initialized successfully');
-        console.log('Map layers: Street, Satellite, Topographic, Terrain');
-        console.log('Features: Live hover coordinates, click for details, multiple layers');
+        console.log('Base layers: Street, Satellite, Topographic, Terrain, Physical');
+        console.log('Overlays: Boundaries, Labels, Transportation, Hillshade, Railways');
+        console.log('Features: Live hover coordinates, click for details, multiple layers & overlays');
     </script>
 </body>
 </html>
