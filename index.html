@@ -230,7 +230,7 @@
 <body>
     <div id="header">
         <h1>🌍 Interactive Geography Map</h1>
-        <p>Move your mouse to see coordinates • Click to explore locations • Switch map layers & overlays</p>
+        <p>Move your mouse to see coordinates • Click to explore locations • All labels available in English!</p>
     </div>
     
     <div id="container">
@@ -289,8 +289,8 @@
                     <ul>
                         <li>Move your mouse to see live coordinates</li>
                         <li>Click anywhere to get location details</li>
-                        <li>Use layer control (top right) to switch base maps</li>
-                        <li>Toggle overlays for additional information</li>
+                        <li>Use layer control (top right) to switch maps</li>
+                        <li><strong>For English labels: Choose "Street (English)" or toggle "English Labels" overlay</strong></li>
                         <li>Use touchpad to pan around the map</li>
                         <li>Scroll to zoom in and out</li>
                     </ul>
@@ -312,11 +312,21 @@
         }).setView([20, 0], 2);
         
         // Define different BASE tile layers with optimized settings
+        
+        // ENGLISH LABELS VERSION - Uses CartoDB which shows English names worldwide
+        const streetMapEnglish = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            updateWhenIdle: false,
+            keepBuffer: 2
+        });
+        
+        // Standard OpenStreetMap (shows local language names)
         const streetMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             updateWhenIdle: false,
-            updateWhenZooming: false,
             keepBuffer: 2
         });
         
@@ -349,16 +359,19 @@
         });
         
         // Define OVERLAY layers (can be toggled on/off)
+        
+        // ENGLISH LABELS OVERLAY - Can be added to any base map
+        const englishLabelsOverlay = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            opacity: 1.0
+        });
+        
         const boundariesOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
             attribution: 'Boundaries &copy; Esri',
             opacity: 0.7
-        });
-        
-        const labelsOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Reference_Overlay/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19,
-            attribution: 'Labels &copy; Esri',
-            opacity: 0.8
         });
         
         const transportOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
@@ -379,12 +392,13 @@
             opacity: 0.7
         });
         
-        // Add default layer (street map)
-        streetMap.addTo(map);
+        // Add default layer (English street map)
+        streetMapEnglish.addTo(map);
         
         // Create base layers object for layer control
         const baseMaps = {
-            "🗺️ Street Map": streetMap,
+            "🗺️ Street (English) ⭐": streetMapEnglish,
+            "🗺️ Street (Local Language)": streetMap,
             "🛰️ Satellite": satelliteMap,
             "⛰️ Topographic": topoMap,
             "🏔️ Terrain Relief": terrainMap,
@@ -393,8 +407,8 @@
         
         // Create overlay layers object
         const overlayMaps = {
+            "🔤 English Labels (for Satellite/Terrain)": englishLabelsOverlay,
             "🏛️ Boundaries & Places": boundariesOverlay,
-            "🏷️ Labels": labelsOverlay,
             "🚗 Transportation": transportOverlay,
             "⛰️ Hillshade": hillshadeOverlay,
             "🚂 Railways": railwayOverlay
@@ -455,11 +469,13 @@
             }
             
             try {
+                // Request with accept-language=en to get English names
                 const response = await fetch(
-                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`,
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1&accept-language=en`,
                     {
                         headers: {
-                            'User-Agent': 'Geography Education Map Application for Students'
+                            'User-Agent': 'Geography Education Map Application for Students',
+                            'Accept-Language': 'en'
                         }
                     }
                 );
@@ -615,7 +631,7 @@
                 </div>
             `;
             
-            // Fetch location name
+            // Fetch location name (in English)
             const locationData = await getLocationName(lat, lon);
             
             // Update popup with location information
@@ -645,9 +661,9 @@
         
         // Log map initialization
         console.log('Interactive Geography Map initialized successfully');
-        console.log('Base layers: Street, Satellite, Topographic, Terrain, Physical');
-        console.log('Overlays: Boundaries, Labels, Transportation, Hillshade, Railways');
-        console.log('Features: Live hover coordinates, click for details, multiple layers & overlays');
+        console.log('Base layers: Street (English), Street (Local), Satellite, Topographic, Terrain, Physical');
+        console.log('Overlays: English Labels, Boundaries, Transportation, Hillshade, Railways');
+        console.log('Features: English labels available, live hover coordinates, click for details');
     </script>
 </body>
 </html>
