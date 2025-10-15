@@ -1188,12 +1188,12 @@
         }
         
         // Save state
-        function saveState() {
+        window.saveState = function() {
             localStorage.setItem('geoDetectiveState', JSON.stringify(gameState));
         }
         
         // Add XP with notification
-        function addXP(amount, reason) {
+        window.addXP = function(amount, reason) {
             gameState.totalXP += amount;
             document.getElementById('total-xp').textContent = gameState.totalXP;
             showNotification(`+${amount} XP! ${reason}`);
@@ -1201,7 +1201,7 @@
         }
         
         // Show notification
-        function showNotification(message) {
+        window.showNotification = function(message) {
             const notif = document.getElementById('notification');
             notif.textContent = message;
             notif.classList.add('active');
@@ -1211,7 +1211,7 @@
         }
         
         // Update all displays
-        function updateAllDisplays() {
+        window.updateAllDisplays = function() {
             document.getElementById('total-xp').textContent = gameState.totalXP;
             document.getElementById('mystery-score').textContent = gameState.mystery.score;
             document.getElementById('mystery-streak').textContent = gameState.mystery.streak;
@@ -1223,7 +1223,7 @@
         }
         
         // Switch mode
-        function switchMode(mode) {
+        window.switchMode = function(mode) {
             gameState.currentMode = mode;
             
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
@@ -1238,7 +1238,7 @@
         }
         
         // Format coordinates
-        function formatCoord(value, isLat) {
+        window.formatCoord = function(value, isLat) {
             const dir = isLat ? (value >= 0 ? 'N' : 'S') : (value >= 0 ? 'E' : 'W');
             return `${Math.abs(value).toFixed(4)}° ${dir}`;
         }
@@ -1317,14 +1317,14 @@
             { lat: 1.3521, lon: 103.8198, name: "Singapore", hint: "Island city-state, Southeast Asia", continent: "Asia", zoom: 11 }
         ];
         
-        function startMysteryGame() {
+        window.startMysteryGame = function() {
             document.getElementById('mystery-intro').style.display = 'none';
             document.getElementById('mystery-game').style.display = 'block';
             gameState.mystery.active = true;
             startMystery();
         }
         
-        function startMystery() {
+        window.startMystery = function() {
             if (gameState.mystery.timer) clearInterval(gameState.mystery.timer);
             
             gameState.mystery.current = mysteryLocations[Math.floor(Math.random() * mysteryLocations.length)];
@@ -1366,7 +1366,7 @@
             }, 1000);
         }
         
-        function checkMysteryAnswer(lat, lon) {
+        window.checkMysteryAnswer = function(lat, lon) {
             if (!gameState.mystery.current) return;
             
             const distance = Math.sqrt(
@@ -1401,7 +1401,7 @@
             }
         }
         
-        function skipMystery() {
+        window.skipMystery = function() {
             if (!gameState.mystery.current) return;
             clearInterval(gameState.mystery.timer);
             addXP(-5, 'Mystery skipped');
@@ -1424,7 +1424,7 @@
             { desc: "Find the Great Wall of China", lat: 40.4319, lon: 116.5704, tolerance: 200, type: "landmark" }
         ];
         
-        function startScavengerGame() {
+        window.startScavengerGame = function() {
             document.getElementById('scavenger-intro').style.display = 'none';
             document.getElementById('scavenger-game').style.display = 'block';
             gameState.scavenger.active = true;
@@ -1433,7 +1433,7 @@
             renderScavengerList();
         }
         
-        function renderScavengerList() {
+        window.renderScavengerList = function() {
             const html = gameState.scavenger.challenges.map((c, idx) => `
                 <div class="challenge-item ${c.completed ? 'completed' : ''}">
                     <span class="challenge-text">${c.completed ? '✅' : '⭕'} ${c.desc}</span>
@@ -1448,7 +1448,7 @@
                 `${gameState.scavenger.completed}/${gameState.scavenger.challenges.length}`;
         }
         
-        function checkScavengerAnswer(lat, lon) {
+        window.checkScavengerAnswer = function(lat, lon) {
             for (let i = 0; i < gameState.scavenger.challenges.length; i++) {
                 const c = gameState.scavenger.challenges[i];
                 if (c.completed) continue;
@@ -1476,7 +1476,7 @@
             showNotification('❌ Not quite! Try another location.');
         }
         
-        function resetScavenger() {
+        window.resetScavenger = function() {
             gameState.scavenger.challenges = scavengerChallenges.map(c => ({ ...c, completed: false }));
             gameState.scavenger.completed = 0;
             renderScavengerList();
@@ -1496,7 +1496,7 @@
             { lat: 51.1789, lon: -1.8262, name: "Stonehenge", country: "UK", zoom: 16, options: ["UK", "Ireland", "France", "Germany"] }
         ];
         
-        function startGuessGame() {
+        window.startGuessGame = function() {
             document.getElementById('guess-intro').style.display = 'none';
             document.getElementById('guess-game').style.display = 'block';
             gameState.guess.active = true;
@@ -1506,7 +1506,7 @@
             nextGuessRound();
         }
         
-        function nextGuessRound() {
+        window.nextGuessRound = function() {
             if (gameState.guess.round >= 5) {
                 gameState.guess.active = false;
                 addXP(50, 'Guess Game Complete!');
@@ -1529,7 +1529,7 @@
             document.getElementById('guess-options').innerHTML = optionsHtml;
         }
         
-        function checkGuess(answer) {
+        window.checkGuess = function(answer) {
             if (!gameState.guess.current) return;
             
             const buttons = document.querySelectorAll('#guess-options .answer-btn');
@@ -1558,7 +1558,7 @@
         }
         
         // MISSIONS
-        function renderMissions() {
+        window.renderMissions = function() {
             const html = gameState.missions.map(m => {
                 const progress = Math.min((m.progress / m.target) * 100, 100);
                 const isComplete = m.progress >= m.target;
@@ -1583,14 +1583,14 @@
         // CREATE HEIST
         let heistLocation = null;
         
-        function setHeistLocation(lat, lon) {
+        window.setHeistLocation = function(lat, lon) {
             heistLocation = { lat, lon };
             document.getElementById('heist-coords').textContent = `${formatCoord(lat, true)}, ${formatCoord(lon, false)}`;
             if (currentMarker) geoMap.removeLayer(currentMarker);
             currentMarker = L.marker([lat, lon]).addTo(geoMap);
         }
         
-        function saveHeist() {
+        window.saveHeist = function() {
             const name = document.getElementById('heist-name').value;
             const clue1 = document.getElementById('clue1').value;
             const clue2 = document.getElementById('clue2').value;
@@ -1621,7 +1621,7 @@
             if (currentMarker) geoMap.removeLayer(currentMarker);
         }
         
-        function loadHeists() {
+        window.loadHeists = function() {
             if (gameState.heists.length === 0) {
                 showNotification('No saved heists yet!');
                 return;
@@ -1641,7 +1641,7 @@
             document.getElementById('saved-heists-section').style.display = 'block';
         }
         
-        function viewHeist(id) {
+        window.viewHeist = function(id) {
             const heist = gameState.heists.find(h => h.id === id);
             if (!heist) return;
             
@@ -1654,7 +1654,7 @@
         
         // ============ ALASKA ADVENTURE FUNCTIONS ============
         
-        function calculateDistance(lat1, lon1, lat2, lon2) {
+        window.calculateDistance = function(lat1, lon1, lat2, lon2) {
             const R = 3959; // Earth's radius in miles
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -1665,7 +1665,7 @@
             return Math.round(R * c);
         }
         
-        function startAlaskaGame() {
+        window.startAlaskaGame = function() {
             gameState.alaska.active = true;
             gameState.alaska.locations = alaskaLocations.map(loc => ({
                 ...loc,
@@ -1683,7 +1683,7 @@
             showNotification('🏔️ Alaska Adventure Started! Find all 10 locations!');
         }
         
-        function updateAlaskaDisplay() {
+        window.updateAlaskaDisplay = function() {
             const found = gameState.alaska.found;
             const total = alaskaLocations.length;
             const percent = (found / total) * 100;
@@ -1720,7 +1720,7 @@
             checkAlaskaAchievements();
         }
         
-        function checkAlaskaAchievements() {
+        window.checkAlaskaAchievements = function() {
             const badges = document.querySelectorAll('#alaska-badges .badge');
             const found = gameState.alaska.locations.filter(l => l.found);
             
@@ -1761,7 +1761,7 @@
             }
         }
         
-        function resetAlaska() {
+        window.resetAlaska = function() {
             gameState.alaska.active = false;
             gameState.alaska.found = 0;
             gameState.alaska.locations = [];
@@ -1772,7 +1772,7 @@
             saveState();
         }
         
-        function checkAlaskaLocation(lat, lon) {
+        window.checkAlaskaLocation = function(lat, lon) {
             const TOLERANCE = 50; // miles
             
             for (let i = 0; i < gameState.alaska.locations.length; i++) {
@@ -1829,7 +1829,7 @@
         }
         
         // TUTORIALS
-        function showTutorial(mode) {
+        window.showTutorial = function(mode) {
             const tutorials = {
                 mystery: `
                     <h2>🎯 MYSTERY CHALLENGE TUTORIAL</h2>
@@ -1954,7 +1954,7 @@
             document.getElementById('tutorial-overlay').classList.add('active');
         }
         
-        function closeTutorial() {
+        window.closeTutorial = function() {
             document.getElementById('tutorial-overlay').classList.remove('active');
         }
         
