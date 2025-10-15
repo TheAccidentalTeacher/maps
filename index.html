@@ -579,6 +579,51 @@
                 height: calc(100vh - 460px);
             }
         }
+        
+        /* Population Density Legend */
+        .population-legend {
+            position: absolute;
+            bottom: 30px;
+            right: 10px;
+            background: rgba(10, 14, 39, 0.95);
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            z-index: 1000;
+            font-size: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: none;
+        }
+        
+        .population-legend.active {
+            display: block;
+        }
+        
+        .population-legend h4 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            color: #667eea;
+            font-weight: 700;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 30px;
+            height: 15px;
+            border-radius: 3px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .legend-label {
+            font-size: 11px;
+            color: #ccc;
+        }
     </style>
 </head>
 <body>
@@ -603,6 +648,31 @@
     
     <div id="container">
         <div id="map"></div>
+        
+        <!-- Population Density Legend -->
+        <div class="population-legend" id="pop-legend">
+            <h4>👥 Population Density</h4>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #8B0000;"></div>
+                <span class="legend-label">Very High (>1000/km²)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FF4500;"></div>
+                <span class="legend-label">High (250-1000/km²)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FFA500;"></div>
+                <span class="legend-label">Medium (100-250/km²)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FFD700;"></div>
+                <span class="legend-label">Low (25-100/km²)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FFFACD;"></div>
+                <span class="legend-label">Very Low (<25/km²)</span>
+            </div>
+        </div>
         
         <div id="sidebar">
             <!-- EXPLORE MODE -->
@@ -1087,9 +1157,18 @@
         });
         
         const populationDensityOverlay = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/GPW_Population_Density_2020/default/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png', {
-            maxZoom: 7,
+            maxZoom: 18,
+            maxNativeZoom: 7,
             attribution: 'Population Density: NASA SEDAC GPW v4',
             opacity: 0.65
+        });
+        
+        // Show/hide legend when population density layer is toggled
+        populationDensityOverlay.on('add', function() {
+            document.getElementById('pop-legend').classList.add('active');
+        });
+        populationDensityOverlay.on('remove', function() {
+            document.getElementById('pop-legend').classList.remove('active');
         });
         
         streetMapEnglish.addTo(geoMap);
