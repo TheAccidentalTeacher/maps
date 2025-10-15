@@ -1086,10 +1086,10 @@
             opacity: 1.0
         });
         
-        const populationDensityOverlay = L.tileLayer('https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/World_Population_Density/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19,
-            attribution: 'Population Density &copy; Esri',
-            opacity: 0.6
+        const populationDensityOverlay = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/GPW_Population_Density_2020/default/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png', {
+            maxZoom: 7,
+            attribution: 'Population Density: NASA SEDAC GPW v4',
+            opacity: 0.65
         });
         
         streetMapEnglish.addTo(geoMap);
