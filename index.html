@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Geography Map</title>
+    <title>Geographic Detective Academy - Interactive Map</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -21,32 +21,69 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             height: 100vh;
             overflow: hidden;
-            background: #f0f0f0;
+            background: #0f0f23;
         }
         
         #header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 12px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             z-index: 1000;
             position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         #header h1 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
-            margin-bottom: 5px;
         }
         
-        #header p {
+        #header .detective-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 14px;
-            opacity: 0.9;
+            font-weight: 600;
+        }
+        
+        #game-modes {
+            background: #1a1a2e;
+            padding: 10px 20px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .mode-btn {
+            background: #2a2a3e;
+            color: white;
+            border: 2px solid #667eea;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        
+        .mode-btn:hover {
+            background: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .mode-btn.active {
+            background: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
         }
         
         #container {
             display: flex;
-            height: calc(100vh - 85px);
+            height: calc(100vh - 110px);
         }
         
         #map {
@@ -55,43 +92,58 @@
         }
         
         #sidebar {
-            width: 320px;
-            background: white;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            width: 340px;
+            background: #1a1a2e;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.5);
             padding: 20px;
             overflow-y: auto;
             z-index: 999;
+            color: white;
+        }
+        
+        .game-panel {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .game-panel.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .info-section {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            background: #2a2a3e;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #667eea;
         }
         
         .info-section h2 {
             font-size: 16px;
             font-weight: 600;
-            color: #333;
+            color: #ffd700;
             margin-bottom: 12px;
             padding-bottom: 8px;
             border-bottom: 2px solid #667eea;
         }
         
         .info-item {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             padding: 10px;
-            background: #f8f9fa;
+            background: rgba(102, 126, 234, 0.1);
             border-radius: 6px;
-            transition: background 0.2s;
-        }
-        
-        .info-item:hover {
-            background: #e9ecef;
+            border-left: 3px solid #667eea;
         }
         
         .info-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            color: #666;
+            color: #aaa;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 4px;
@@ -99,8 +151,166 @@
         
         .info-value {
             font-size: 14px;
-            color: #333;
+            color: white;
             font-weight: 500;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .timer {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffd700;
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .score {
+            font-size: 20px;
+            font-weight: 700;
+            color: #00ff00;
+            text-align: center;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #2a2a3e;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin: 4px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a1a2e;
+        }
+        
+        .badge.locked {
+            background: #444;
+            color: #888;
+        }
+        
+        .challenge-item {
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .challenge-item.completed {
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 3px solid #00ff00;
+        }
+        
+        .hint-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #ffd700;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .answer-btn {
+            background: #2a2a3e;
+            color: white;
+            border: 2px solid #667eea;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        
+        .answer-btn:hover {
+            background: #667eea;
+        }
+        
+        .answer-btn.correct {
+            background: #00ff00;
+            color: #000;
+            border-color: #00ff00;
+        }
+        
+        .answer-btn.incorrect {
+            background: #ff0000;
+            color: white;
+            border-color: #ff0000;
+        }
+        
+        .easter-egg-67 {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a1a2e;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+            z-index: 10000;
+            display: none;
+            animation: bounce 0.5s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         
         .coordinates-display {
@@ -112,85 +322,17 @@
             flex: 1;
         }
         
-        #instructions {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 12px;
-            border-radius: 4px;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #856404;
+        #sidebar::-webkit-scrollbar {
+            width: 6px;
         }
         
-        #instructions strong {
-            display: block;
-            margin-bottom: 8px;
-            color: #533f03;
+        #sidebar::-webkit-scrollbar-track {
+            background: #1a1a2e;
         }
         
-        #instructions ul {
-            margin-left: 20px;
-            margin-top: 8px;
-        }
-        
-        #instructions li {
-            margin-bottom: 4px;
-        }
-        
-        .loading {
-            color: #667eea;
-            font-style: italic;
-        }
-        
-        .error {
-            color: #dc3545;
-            font-size: 12px;
-        }
-        
-        .leaflet-popup-content-wrapper {
-            border-radius: 8px;
-            box-shadow: 0 3px 14px rgba(0,0,0,0.2);
-        }
-        
-        .leaflet-popup-content {
-            margin: 15px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-        
-        .popup-title {
-            font-weight: 600;
-            font-size: 14px;
-            color: #667eea;
-            margin-bottom: 8px;
-        }
-        
-        .popup-coords {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 8px;
-        }
-        
-        .popup-location {
-            font-size: 13px;
-            color: #333;
-            line-height: 1.4;
-        }
-        
-        /* Enhanced layer control styling */
-        .leaflet-control-layers {
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            padding: 10px;
-        }
-        
-        .leaflet-control-layers-expanded {
-            padding: 15px;
-            background: white;
-        }
-        
-        .leaflet-control-layers-separator {
-            margin: 8px 0;
-            border-top: 1px solid #ddd;
+        #sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
         }
         
         @media (max-width: 768px) {
@@ -200,103 +342,210 @@
             
             #sidebar {
                 width: 100%;
-                height: 250px;
+                height: 300px;
             }
             
             #map {
-                height: calc(100vh - 335px);
+                height: calc(100vh - 410px);
             }
-        }
-        
-        /* Custom scrollbar for sidebar */
-        #sidebar::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        #sidebar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        #sidebar::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 3px;
-        }
-        
-        #sidebar::-webkit-scrollbar-thumb:hover {
-            background: #764ba2;
         }
     </style>
 </head>
 <body>
     <div id="header">
-        <h1>🌍 Interactive Geography Map</h1>
-        <p>Move your mouse to see coordinates • Click to explore locations • All labels available in English!</p>
+        <h1>🕵️ Geographic Detective Academy</h1>
+        <div class="detective-badge">🏆 <span id="total-score">0</span> XP</div>
+    </div>
+    
+    <div id="game-modes">
+        <button class="mode-btn active" onclick="switchMode('explore')">🗺️ Explore</button>
+        <button class="mode-btn" onclick="switchMode('mystery')">🎯 Mystery Challenge</button>
+        <button class="mode-btn" onclick="switchMode('scavenger')">🌍 Scavenger Hunt</button>
+        <button class="mode-btn" onclick="switchMode('guess')">📸 Guess Location</button>
+        <button class="mode-btn" onclick="switchMode('missions')">🏆 Detective Missions</button>
+        <button class="mode-btn" onclick="switchMode('create')">🗺️ Create Heist</button>
     </div>
     
     <div id="container">
         <div id="map"></div>
         
         <div id="sidebar">
-            <div class="info-section">
-                <h2>🖱️ Live Coordinates</h2>
-                <div class="coordinates-display">
-                    <div class="coord-box">
-                        <div class="info-item">
-                            <div class="info-label">Latitude</div>
-                            <div class="info-value" id="hover-latitude">Move mouse over map</div>
+            <!-- EXPLORE MODE -->
+            <div id="explore-panel" class="game-panel active">
+                <div class="info-section">
+                    <h2>🖱️ Live Coordinates</h2>
+                    <div class="coordinates-display">
+                        <div class="coord-box">
+                            <div class="info-item">
+                                <div class="info-label">Latitude</div>
+                                <div class="info-value" id="hover-latitude">Move mouse</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="coord-box">
-                        <div class="info-item">
-                            <div class="info-label">Longitude</div>
-                            <div class="info-value" id="hover-longitude">--</div>
+                        <div class="coord-box">
+                            <div class="info-item">
+                                <div class="info-label">Longitude</div>
+                                <div class="info-value" id="hover-longitude">--</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="info-section">
-                <h2>📍 Clicked Location</h2>
-                <div id="location-info">
+                
+                <div class="info-section">
+                    <h2>📍 Clicked Location</h2>
+                    <div id="location-info">
+                        <div class="info-item">
+                            <div class="info-label">Click map to investigate</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h2>ℹ️ Instructions</h2>
                     <div class="info-item">
-                        <div class="info-label">Click on the map to see location details</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="info-section">
-                <h2>🗺️ Clicked Coordinates</h2>
-                <div class="coordinates-display">
-                    <div class="coord-box">
-                        <div class="info-item">
-                            <div class="info-label">Latitude</div>
-                            <div class="info-value" id="latitude">--</div>
-                        </div>
-                    </div>
-                    <div class="coord-box">
-                        <div class="info-item">
-                            <div class="info-label">Longitude</div>
-                            <div class="info-value" id="longitude">--</div>
+                        <div class="info-value" style="font-size: 12px; line-height: 1.6;">
+                            <strong>🎮 Game Modes:</strong><br>
+                            • <strong>Mystery Challenge:</strong> Find random locations<br>
+                            • <strong>Scavenger Hunt:</strong> Complete geographic challenges<br>
+                            • <strong>Guess Location:</strong> Identify places from satellite<br>
+                            • <strong>Detective Missions:</strong> Track your progress<br>
+                            • <strong>Create Heist:</strong> Make your own mysteries<br><br>
+                            <strong>🗺️ Map Controls:</strong><br>
+                            • Use layer control (top right) for different maps<br>
+                            • Toggle English Labels for readable names<br>
+                            • Scroll to zoom, drag to pan
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="info-section">
-                <h2>ℹ️ Instructions</h2>
-                <div id="instructions">
-                    <strong>How to use:</strong>
-                    <ul>
-                        <li>Move your mouse to see live coordinates</li>
-                        <li>Click anywhere to get location details</li>
-                        <li>Use layer control (top right) to switch maps</li>
-                        <li><strong>For English labels: Choose "Street (English)" or toggle "English Labels" overlay</strong></li>
-                        <li>Use touchpad to pan around the map</li>
-                        <li>Scroll to zoom in and out</li>
-                    </ul>
+            <!-- MYSTERY CHALLENGE MODE -->
+            <div id="mystery-panel" class="game-panel">
+                <div class="info-section">
+                    <h2>🎯 Mystery Location Challenge</h2>
+                    <div class="timer" id="mystery-timer">60</div>
+                    <div class="score">Score: <span id="mystery-score">0</span> | Streak: <span id="mystery-streak">0</span></div>
+                    
+                    <div id="mystery-coords" class="info-item" style="text-align: center; font-size: 18px; font-weight: 700; color: #ffd700;">
+                        Click "New Mystery" to start!
+                    </div>
+                    
+                    <div id="mystery-hints" style="display: none;">
+                        <div class="hint-box">
+                            <strong>🔍 Hint:</strong> <span id="hint-text"></span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="startMystery()">🎲 New Mystery Location</button>
+                    <button class="btn" onclick="revealMystery()" id="reveal-btn" disabled>🔓 Reveal Answer (-10 XP)</button>
+                </div>
+                
+                <div class="info-section">
+                    <h2>📊 Your Stats</h2>
+                    <div class="info-item">
+                        <div class="info-label">Total Solved</div>
+                        <div class="info-value" id="mysteries-solved">0</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Best Streak</div>
+                        <div class="info-value" id="best-streak">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SCAVENGER HUNT MODE -->
+            <div id="scavenger-panel" class="game-panel">
+                <div class="info-section">
+                    <h2>🌍 Geographic Scavenger Hunt</h2>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="scavenger-progress" style="width: 0%">0/10</div>
+                    </div>
+                    
+                    <div id="scavenger-list"></div>
+                    
+                    <button class="btn" onclick="startScavengerHunt()">🎯 Start New Hunt</button>
+                </div>
+                
+                <div class="info-section">
+                    <h2>🏆 Achievements</h2>
+                    <div id="achievement-badges">
+                        <span class="badge locked">🏜️ Desert Explorer</span>
+                        <span class="badge locked">⛰️ Mountain Master</span>
+                        <span class="badge locked">🌊 Ocean Navigator</span>
+                        <span class="badge locked">🏙️ City Finder</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- GUESS LOCATION MODE -->
+            <div id="guess-panel" class="game-panel">
+                <div class="info-section">
+                    <h2>📸 Guess the Location</h2>
+                    <div class="score">Score: <span id="guess-score">0</span>/5</div>
+                    
+                    <div id="guess-question" class="info-item" style="text-align: center;">
+                        <div class="info-value" id="guess-prompt">Click "New Challenge" to start!</div>
+                    </div>
+                    
+                    <div id="guess-options" class="answer-options"></div>
+                    
+                    <button class="btn" onclick="startGuessGame()">🎲 New Challenge</button>
+                </div>
+                
+                <div class="info-section">
+                    <h2>📊 Stats</h2>
+                    <div class="info-item">
+                        <div class="info-label">Correct Answers</div>
+                        <div class="info-value" id="guess-correct">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DETECTIVE MISSIONS MODE -->
+            <div id="missions-panel" class="game-panel">
+                <div class="info-section">
+                    <h2>🏆 Detective Missions</h2>
+                    <div id="missions-list"></div>
+                </div>
+            </div>
+            
+            <!-- CREATE HEIST MODE -->
+            <div id="create-panel" class="game-panel">
+                <div class="info-section">
+                    <h2>🗺️ Create Your Own Heist</h2>
+                    <div class="info-item">
+                        <div class="info-label">Heist Name</div>
+                        <input type="text" id="heist-name" placeholder="The Mystery of..." style="width: 100%; padding: 8px; border-radius: 4px; background: #2a2a3e; border: 1px solid #667eea; color: white;">
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Click map to set target location</div>
+                        <div class="info-value" id="heist-coords">No location set</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Clue 1</div>
+                        <input type="text" id="clue1" placeholder="Hint about the location..." style="width: 100%; padding: 8px; border-radius: 4px; background: #2a2a3e; border: 1px solid #667eea; color: white;">
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Clue 2</div>
+                        <input type="text" id="clue2" placeholder="Another hint..." style="width: 100%; padding: 8px; border-radius: 4px; background: #2a2a3e; border: 1px solid #667eea; color: white;">
+                    </div>
+                    
+                    <button class="btn" onclick="saveHeist()">💾 Save Heist</button>
+                    <button class="btn" onclick="loadHeists()">📂 Load Saved Heists</button>
+                </div>
+                
+                <div class="info-section" id="saved-heists-section" style="display: none;">
+                    <h2>📂 Your Heists</h2>
+                    <div id="saved-heists-list"></div>
                 </div>
             </div>
         </div>
+    </div>
+    
+    <div class="easter-egg-67" id="easter-egg">
+        🎉 You found the 67! +67 XP!
     </div>
     
     <!-- Leaflet JavaScript -->
@@ -305,365 +554,490 @@
         crossorigin=""></script>
     
     <script>
-        // Initialize the map centered on a default location (world view)
+        // Initialize the map
         const map = L.map('map', {
-            preferCanvas: true,  // Use canvas for better performance
+            preferCanvas: true,
             zoomControl: true
         }).setView([20, 0], 2);
         
-        // Define different BASE tile layers with optimized settings
-        
-        // ENGLISH LABELS VERSION - Uses CartoDB which shows English names worldwide
+        // Define base layers
         const streetMapEnglish = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: 'abcd',
-            updateWhenIdle: false,
-            keepBuffer: 2
-        });
-        
-        // Standard OpenStreetMap (shows local language names)
-        const streetMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            updateWhenIdle: false,
-            keepBuffer: 2
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            subdomains: 'abcd'
         });
         
         const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
-            attribution: 'Tiles &copy; Esri',
-            updateWhenIdle: false,
-            keepBuffer: 2
+            attribution: 'Tiles &copy; Esri'
         });
         
         const topoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
             maxZoom: 17,
-            attribution: 'Map data: &copy; <a href="https://openstreetmap.org">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
-            updateWhenIdle: false,
-            keepBuffer: 2
+            attribution: '&copy; OpenStreetMap, SRTM | OpenTopoMap'
         });
         
         const terrainMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 13,
-            attribution: 'Tiles &copy; Esri',
-            updateWhenIdle: false,
-            keepBuffer: 2
+            attribution: 'Tiles &copy; Esri'
         });
         
-        const physicalMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 8,
-            attribution: 'Tiles &copy; Esri',
-            updateWhenIdle: false,
-            keepBuffer: 2
-        });
-        
-        // Define OVERLAY layers (can be toggled on/off)
-        
-        // ENGLISH LABELS OVERLAY - Can be added to any base map
+        // Define overlays
         const englishLabelsOverlay = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
             maxZoom: 19,
-            attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd',
             opacity: 1.0
         });
         
         const boundariesOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
-            attribution: 'Boundaries &copy; Esri',
             opacity: 0.7
         });
         
-        const transportOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19,
-            attribution: 'Transport &copy; Esri',
-            opacity: 0.7
-        });
-        
-        const hillshadeOverlay = L.tileLayer('https://tiles.wmflabs.org/hillshading/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: 'Hillshading: <a href="https://github.com/der-stefan/OpenTopoMap">OpenTopoMap</a>',
-            opacity: 0.5
-        });
-        
-        const railwayOverlay = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: 'Railway: <a href="https://www.openrailwaymap.org/">OpenRailwayMap</a>',
-            opacity: 0.7
-        });
-        
-        // Add default layer (English street map)
         streetMapEnglish.addTo(map);
         
-        // Create base layers object for layer control
         const baseMaps = {
             "🗺️ Street (English) ⭐": streetMapEnglish,
-            "🗺️ Street (Local Language)": streetMap,
             "🛰️ Satellite": satelliteMap,
             "⛰️ Topographic": topoMap,
-            "🏔️ Terrain Relief": terrainMap,
-            "🌍 Physical": physicalMap
+            "🏔️ Terrain Relief": terrainMap
         };
         
-        // Create overlay layers object
         const overlayMaps = {
-            "🔤 English Labels (for Satellite/Terrain)": englishLabelsOverlay,
-            "🏛️ Boundaries & Places": boundariesOverlay,
-            "🚗 Transportation": transportOverlay,
-            "⛰️ Hillshade": hillshadeOverlay,
-            "🚂 Railways": railwayOverlay
+            "🔤 English Labels": englishLabelsOverlay,
+            "🏛️ Boundaries & Places": boundariesOverlay
         };
         
-        // Add layer control to map with both base maps and overlays
         L.control.layers(baseMaps, overlayMaps, {
-            collapsed: false,
+            collapsed: true,
             position: 'topright'
         }).addTo(map);
         
-        // Variable to store the current marker
-        let currentMarker = null;
-        
-        // Cache for geocoding results to reduce API calls
-        const geocodeCache = new Map();
-        
-        // Throttle mechanism for API calls
-        let lastApiCall = 0;
-        const API_THROTTLE_MS = 1000; // 1 second between calls
-        
-        // Function to format coordinates
-        function formatCoordinate(value, isLat) {
-            const direction = isLat ? (value >= 0 ? 'N' : 'S') : (value >= 0 ? 'E' : 'W');
-            return `${Math.abs(value).toFixed(6)}° ${direction}`;
-        }
-        
-        // Update hover coordinates as mouse moves
-        map.on('mousemove', function(e) {
-            const lat = e.latlng.lat;
-            const lon = e.latlng.lng;
-            
-            document.getElementById('hover-latitude').textContent = formatCoordinate(lat, true);
-            document.getElementById('hover-longitude').textContent = formatCoordinate(lon, false);
-        });
-        
-        // Clear hover coordinates when mouse leaves map
-        map.on('mouseout', function() {
-            document.getElementById('hover-latitude').textContent = 'Move mouse over map';
-            document.getElementById('hover-longitude').textContent = '--';
-        });
-        
-        // Function to get location name from coordinates using Nominatim
-        async function getLocationName(lat, lon) {
-            // Create cache key
-            const cacheKey = `${lat.toFixed(4)},${lon.toFixed(4)}`;
-            
-            // Check cache first
-            if (geocodeCache.has(cacheKey)) {
-                return geocodeCache.get(cacheKey);
-            }
-            
-            // Throttle API calls
-            const now = Date.now();
-            const timeSinceLastCall = now - lastApiCall;
-            if (timeSinceLastCall < API_THROTTLE_MS) {
-                await new Promise(resolve => setTimeout(resolve, API_THROTTLE_MS - timeSinceLastCall));
-            }
-            
-            try {
-                // Request with accept-language=en to get English names
-                const response = await fetch(
-                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1&accept-language=en`,
-                    {
-                        headers: {
-                            'User-Agent': 'Geography Education Map Application for Students',
-                            'Accept-Language': 'en'
-                        }
-                    }
-                );
-                
-                lastApiCall = Date.now();
-                
-                if (!response.ok) {
-                    throw new Error('Geocoding request failed');
-                }
-                
-                const data = await response.json();
-                
-                // Extract relevant location information
-                const address = data.address || {};
-                const locationParts = [];
-                
-                // Build location string from available address components
-                if (address.city) locationParts.push(address.city);
-                else if (address.town) locationParts.push(address.town);
-                else if (address.village) locationParts.push(address.village);
-                else if (address.hamlet) locationParts.push(address.hamlet);
-                
-                if (address.state) locationParts.push(address.state);
-                if (address.country) locationParts.push(address.country);
-                
-                const locationName = locationParts.length > 0 
-                    ? locationParts.join(', ') 
-                    : data.display_name || 'Location information not available';
-                
-                const result = {
-                    name: locationName,
-                    fullAddress: data.display_name,
-                    details: address
-                };
-                
-                // Cache the result
-                geocodeCache.set(cacheKey, result);
-                
-                return result;
-            } catch (error) {
-                console.error('Error fetching location:', error);
-                return {
-                    name: 'Unable to fetch location information',
-                    fullAddress: 'Please try again',
-                    details: {},
-                    error: true
-                };
-            }
-        }
-        
-        // Function to update the sidebar with location information
-        function updateSidebar(lat, lon, locationData) {
-            // Update coordinates
-            document.getElementById('latitude').textContent = formatCoordinate(lat, true);
-            document.getElementById('longitude').textContent = formatCoordinate(lon, false);
-            
-            // Update location info
-            const locationInfoDiv = document.getElementById('location-info');
-            
-            if (locationData.error) {
-                locationInfoDiv.innerHTML = `
-                    <div class="info-item">
-                        <div class="error">${locationData.name}</div>
-                    </div>
-                `;
-            } else {
-                const details = locationData.details;
-                let detailsHTML = '';
-                
-                // Add specific location details if available
-                if (details.city || details.town || details.village) {
-                    detailsHTML += `
-                        <div class="info-item">
-                            <div class="info-label">City/Town</div>
-                            <div class="info-value">${details.city || details.town || details.village}</div>
-                        </div>
-                    `;
-                }
-                
-                if (details.state || details.region) {
-                    detailsHTML += `
-                        <div class="info-item">
-                            <div class="info-label">State/Region</div>
-                            <div class="info-value">${details.state || details.region}</div>
-                        </div>
-                    `;
-                }
-                
-                if (details.country) {
-                    detailsHTML += `
-                        <div class="info-item">
-                            <div class="info-label">Country</div>
-                            <div class="info-value">${details.country}</div>
-                        </div>
-                    `;
-                }
-                
-                if (details.postcode) {
-                    detailsHTML += `
-                        <div class="info-item">
-                            <div class="info-label">Postal Code</div>
-                            <div class="info-value">${details.postcode}</div>
-                        </div>
-                    `;
-                }
-                
-                // If no specific details, show the full address
-                if (!detailsHTML) {
-                    detailsHTML = `
-                        <div class="info-item">
-                            <div class="info-label">Location</div>
-                            <div class="info-value">${locationData.name}</div>
-                        </div>
-                    `;
-                }
-                
-                locationInfoDiv.innerHTML = detailsHTML;
-            }
-        }
-        
-        // Handle map clicks
-        map.on('click', async function(e) {
-            const lat = e.latlng.lat;
-            const lon = e.latlng.lng;
-            
-            // Remove previous marker if it exists
-            if (currentMarker) {
-                map.removeLayer(currentMarker);
-            }
-            
-            // Add new marker
-            currentMarker = L.marker([lat, lon]).addTo(map);
-            
-            // Show loading state in popup
-            const loadingPopup = L.popup()
-                .setLatLng([lat, lon])
-                .setContent(`
-                    <div class="popup-title">📍 Location Details</div>
-                    <div class="popup-coords">
-                        <strong>Coordinates:</strong><br>
-                        ${formatCoordinate(lat, true)}, ${formatCoordinate(lon, false)}
-                    </div>
-                    <div class="popup-location loading">Loading location information...</div>
-                `)
-                .openOn(map);
-            
-            // Update sidebar with coordinates immediately
-            document.getElementById('latitude').textContent = formatCoordinate(lat, true);
-            document.getElementById('longitude').textContent = formatCoordinate(lon, false);
-            document.getElementById('location-info').innerHTML = `
-                <div class="info-item">
-                    <div class="loading">Loading location information...</div>
-                </div>
-            `;
-            
-            // Fetch location name (in English)
-            const locationData = await getLocationName(lat, lon);
-            
-            // Update popup with location information
-            const popupContent = `
-                <div class="popup-title">📍 Location Details</div>
-                <div class="popup-coords">
-                    <strong>Coordinates:</strong><br>
-                    ${formatCoordinate(lat, true)}, ${formatCoordinate(lon, false)}
-                </div>
-                <div class="popup-location">
-                    <strong>Location:</strong><br>
-                    ${locationData.name}
-                </div>
-            `;
-            
-            currentMarker.bindPopup(popupContent).openPopup();
-            
-            // Update sidebar
-            updateSidebar(lat, lon, locationData);
-        });
-        
-        // Add scale control
         L.control.scale({
             imperial: true,
             metric: true
         }).addTo(map);
         
-        // Log map initialization
-        console.log('Interactive Geography Map initialized successfully');
-        console.log('Base layers: Street (English), Street (Local), Satellite, Topographic, Terrain, Physical');
-        console.log('Overlays: English Labels, Boundaries, Transportation, Hillshade, Railways');
-        console.log('Features: English labels available, live hover coordinates, click for details');
+        // Game state
+        let gameState = {
+            totalScore: 0,
+            mysteryScore: 0,
+            mysteryStreak: 0,
+            bestStreak: 0,
+            mysteriesSolved: 0,
+            guessScore: 0,
+            guessCorrect: 0,
+            currentMode: 'explore',
+            currentMystery: null,
+            mysteryTimer: null,
+            scavengerHunt: [],
+            scavengerCompleted: 0,
+            missions: [
+                { id: 1, name: "Master Coordinates", desc: "Plot 10 locations", progress: 0, target: 10, xp: 100 },
+                { id: 2, name: "Terrain Expert", desc: "Identify 5 landforms", progress: 0, target: 5, xp: 150 },
+                { id: 3, name: "Climate Detective", desc: "Match 8 climate zones", progress: 0, target: 8, xp: 200 },
+                { id: 4, name: "Layer Master", desc: "Use all map layers", progress: 0, target: 5, xp: 250 }
+            ],
+            heists: [],
+            easterEggFound: false
+        };
+        
+        // Load saved state
+        if (localStorage.getItem('geoDetectiveState')) {
+            const saved = JSON.parse(localStorage.getItem('geoDetectiveState'));
+            gameState = { ...gameState, ...saved };
+            updateScoreDisplay();
+        }
+        
+        // Save state
+        function saveState() {
+            localStorage.setItem('geoDetectiveState', JSON.stringify(gameState));
+        }
+        
+        // Update score display
+        function updateScoreDisplay() {
+            document.getElementById('total-score').textContent = gameState.totalScore;
+            document.getElementById('mystery-score').textContent = gameState.mysteryScore;
+            document.getElementById('mystery-streak').textContent = gameState.mysteryStreak;
+            document.getElementById('best-streak').textContent = gameState.bestStreak;
+            document.getElementById('mysteries-solved').textContent = gameState.mysteriesSolved;
+            document.getElementById('guess-score').textContent = gameState.guessScore;
+            document.getElementById('guess-correct').textContent = gameState.guessCorrect;
+        }
+        
+        // Add XP
+        function addXP(amount) {
+            gameState.totalScore += amount;
+            updateScoreDisplay();
+            saveState();
+        }
+        
+        // Switch game mode
+        function switchMode(mode) {
+            gameState.currentMode = mode;
+            
+            // Update button states
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update panels
+            document.querySelectorAll('.game-panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById(mode + '-panel').classList.add('active');
+            
+            // Mode-specific setup
+            if (mode === 'missions') {
+                renderMissions();
+            } else if (mode === 'create') {
+                setupCreateMode();
+            }
+        }
+        
+        // Format coordinates
+        function formatCoordinate(value, isLat) {
+            const direction = isLat ? (value >= 0 ? 'N' : 'S') : (value >= 0 ? 'E' : 'W');
+            return `${Math.abs(value).toFixed(6)}° ${direction}`;
+        }
+        
+        // Mouse move handler
+        map.on('mousemove', function(e) {
+            document.getElementById('hover-latitude').textContent = formatCoordinate(e.latlng.lat, true);
+            document.getElementById('hover-longitude').textContent = formatCoordinate(e.latlng.lng, false);
+        });
+        
+        // Click handler
+        let currentMarker = null;
+        map.on('click', function(e) {
+            const lat = e.latlng.lat;
+            const lon = e.latlng.lng;
+            
+            if (gameState.currentMode === 'mystery') {
+                checkMysteryAnswer(lat, lon);
+            } else if (gameState.currentMode === 'create') {
+                setHeistLocation(lat, lon);
+            } else {
+                showLocationInfo(lat, lon);
+            }
+        });
+        
+        async function showLocationInfo(lat, lon) {
+            if (currentMarker) map.removeLayer(currentMarker);
+            currentMarker = L.marker([lat, lon]).addTo(map);
+            
+            document.getElementById('location-info').innerHTML = '<div class="info-item"><div class="info-label">Loading...</div></div>';
+            
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1&accept-language=en`,
+                    { headers: { 'User-Agent': 'Geographic Detective Academy' } }
+                );
+                const data = await response.json();
+                const address = data.address || {};
+                
+                let html = '';
+                if (address.city || address.town) html += `<div class="info-item"><div class="info-label">City</div><div class="info-value">${address.city || address.town}</div></div>`;
+                if (address.country) html += `<div class="info-item"><div class="info-label">Country</div><div class="info-value">${address.country}</div></div>`;
+                html += `<div class="info-item"><div class="info-label">Coordinates</div><div class="info-value">${formatCoordinate(lat, true)}, ${formatCoordinate(lon, false)}</div></div>`;
+                
+                document.getElementById('location-info').innerHTML = html;
+            } catch (error) {
+                document.getElementById('location-info').innerHTML = '<div class="info-item"><div class="info-label">Error loading location</div></div>';
+            }
+        }
+        
+        // MYSTERY CHALLENGE
+        const mysteryLocations = [
+            { lat: 40.7128, lon: -74.0060, name: "New York City", hint: "Major US city on the east coast", continent: "North America" },
+            { lat: 51.5074, lon: -0.1278, name: "London", hint: "Capital of the United Kingdom", continent: "Europe" },
+            { lat: 35.6762, lon: 139.6503, name: "Tokyo", hint: "Capital of Japan", continent: "Asia" },
+            { lat: -33.8688, lon: 151.2093, name: "Sydney", hint: "Famous Australian harbor city", continent: "Australia" },
+            { lat: 48.8566, lon: 2.3522, name: "Paris", hint: "City of Light in France", continent: "Europe" },
+            { lat: 55.7558, lon: 37.6173, name: "Moscow", hint: "Capital of Russia", continent: "Europe" },
+            { lat: -23.5505, lon: -46.6333, name: "São Paulo", hint: "Largest city in Brazil", continent: "South America" },
+            { lat: 30.0444, lon: 31.2357, name: "Cairo", hint: "Ancient Egyptian capital", continent: "Africa" },
+            { lat: 19.4326, lon: -99.1332, name: "Mexico City", hint: "Capital of Mexico", continent: "North America" },
+            { lat: 1.3521, lon: 103.8198, name: "Singapore", hint: "Island city-state in Southeast Asia", continent: "Asia" }
+        ];
+        
+        function startMystery() {
+            if (gameState.mysteryTimer) clearInterval(gameState.mysteryTimer);
+            
+            gameState.currentMystery = mysteryLocations[Math.floor(Math.random() * mysteryLocations.length)];
+            
+            document.getElementById('mystery-coords').textContent = 
+                `${formatCoordinate(gameState.currentMystery.lat, true)}, ${formatCoordinate(gameState.currentMystery.lon, false)}`;
+            
+            document.getElementById('mystery-hints').style.display = 'none';
+            document.getElementById('reveal-btn').disabled = false;
+            
+            let timeLeft = 60;
+            document.getElementById('mystery-timer').textContent = timeLeft;
+            
+            gameState.mysteryTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('mystery-timer').textContent = timeLeft;
+                
+                if (timeLeft === 30) {
+                    document.getElementById('mystery-hints').style.display = 'block';
+                    document.getElementById('hint-text').textContent = `Continent: ${gameState.currentMystery.continent}`;
+                }
+                
+                if (timeLeft === 15) {
+                    document.getElementById('hint-text').textContent = gameState.currentMystery.hint;
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(gameState.mysteryTimer);
+                    alert('⏰ Time\'s up! Try again!');
+                    gameState.mysteryStreak = 0;
+                    updateScoreDisplay();
+                }
+            }, 1000);
+        }
+        
+        function checkMysteryAnswer(lat, lon) {
+            if (!gameState.currentMystery) return;
+            
+            const distance = Math.sqrt(
+                Math.pow(lat - gameState.currentMystery.lat, 2) + 
+                Math.pow(lon - gameState.currentMystery.lon, 2)
+            );
+            
+            if (distance < 5) { // Within ~5 degrees
+                clearInterval(gameState.mysteryTimer);
+                const xp = 50 + gameState.mysteryStreak * 10;
+                addXP(xp);
+                gameState.mysteryScore += xp;
+                gameState.mysteryStreak++;
+                gameState.mysteriesSolved++;
+                if (gameState.mysteryStreak > gameState.bestStreak) {
+                    gameState.bestStreak = gameState.mysteryStreak;
+                }
+                updateScoreDisplay();
+                alert(`🎉 Correct! It was ${gameState.currentMystery.name}! +${xp} XP`);
+                gameState.currentMystery = null;
+            } else {
+                alert('❌ Not quite! Try again or use hints!');
+            }
+        }
+        
+        function revealMystery() {
+            if (!gameState.currentMystery) return;
+            clearInterval(gameState.mysteryTimer);
+            addXP(-10);
+            alert(`The answer was: ${gameState.currentMystery.name}`);
+            map.setView([gameState.currentMystery.lat, gameState.currentMystery.lon], 8);
+            if (currentMarker) map.removeLayer(currentMarker);
+            currentMarker = L.marker([gameState.currentMystery.lat, gameState.currentMystery.lon]).addTo(map);
+            gameState.mysteryStreak = 0;
+            gameState.currentMystery = null;
+            updateScoreDisplay();
+        }
+        
+        // SCAVENGER HUNT
+        const scavengerChallenges = [
+            { type: "desert", desc: "Find a desert (arid region)", coords: [31.7917, 7.0926], name: "Sahara Desert" },
+            { type: "mountain", desc: "Find a mountain range", coords: [27.9881, 86.9250], name: "Mount Everest" },
+            { type: "ocean", desc: "Click on the Pacific Ocean", coords: [0, -140], name: "Pacific Ocean" },
+            { type: "city", desc: "Find Paris, France", coords: [48.8566, 2.3522], name: "Paris" },
+            { type: "river", desc: "Find the Amazon River", coords: [-3.4653, -62.2159], name: "Amazon River" },
+            { type: "island", desc: "Find Madagascar", coords: [-18.7669, 46.8691], name: "Madagascar" },
+            { type: "capital", desc: "Find Beijing, China", coords: [39.9042, 116.4074], name: "Beijing" },
+            { type: "lake", desc: "Find the Great Lakes", coords: [45.0, -84.0], name: "Great Lakes" },
+            { type: "peninsula", desc: "Find the Arabian Peninsula", coords: [23.8859, 45.0792], name: "Arabian Peninsula" },
+            { type: "volcano", desc: "Find Mount Fuji, Japan", coords: [35.3606, 138.7274], name: "Mount Fuji" }
+        ];
+        
+        function startScavengerHunt() {
+            gameState.scavengerHunt = scavengerChallenges.slice(0, 10).map(c => ({ ...c, completed: false }));
+            gameState.scavengerCompleted = 0;
+            renderScavengerList();
+        }
+        
+        function renderScavengerList() {
+            const html = gameState.scavengerHunt.map((challenge, idx) => `
+                <div class="challenge-item ${challenge.completed ? 'completed' : ''}">
+                    <span>${challenge.completed ? '✅' : '⭕'} ${challenge.desc}</span>
+                    ${challenge.completed ? '<span>+20 XP</span>' : ''}
+                </div>
+            `).join('');
+            document.getElementById('scavenger-list').innerHTML = html;
+            
+            const progress = (gameState.scavengerCompleted / gameState.scavengerHunt.length) * 100;
+            document.getElementById('scavenger-progress').style.width = progress + '%';
+            document.getElementById('scavenger-progress').textContent = `${gameState.scavengerCompleted}/${gameState.scavengerHunt.length}`;
+        }
+        
+        // GUESS LOCATION GAME
+        const guessLocations = [
+            { coords: [27.1751, 78.0421], name: "Taj Mahal, India", options: ["India", "Pakistan", "Bangladesh", "Nepal"] },
+            { coords: [41.8902, 12.4922], name: "Colosseum, Rome", options: ["Italy", "Greece", "Spain", "France"] },
+            { coords: [-13.1631, -72.5450], name: "Machu Picchu, Peru", options: ["Peru", "Chile", "Bolivia", "Ecuador"] },
+            { coords: [29.9792, 31.1342], name: "Pyramids of Giza", options: ["Egypt", "Sudan", "Libya", "Tunisia"] },
+            { coords: [-22.9519, -43.2105], name: "Christ the Redeemer, Brazil", options: ["Brazil", "Argentina", "Colombia", "Venezuela"] }
+        ];
+        
+        let currentGuess = null;
+        
+        function startGuessGame() {
+            currentGuess = guessLocations[Math.floor(Math.random() * guessLocations.length)];
+            map.setView(currentGuess.coords, 15);
+            
+            document.getElementById('guess-prompt').textContent = "Where is this location?";
+            
+            const optionsHtml = currentGuess.options.map(option => 
+                `<button class="answer-btn" onclick="checkGuess('${option}')">${option}</button>`
+            ).join('');
+            document.getElementById('guess-options').innerHTML = optionsHtml;
+        }
+        
+        function checkGuess(answer) {
+            if (!currentGuess) return;
+            
+            const buttons = document.querySelectorAll('#guess-options .answer-btn');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === currentGuess.options[0]) {
+                    btn.classList.add('correct');
+                } else if (btn.textContent === answer && answer !== currentGuess.options[0]) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            
+            if (answer === currentGuess.options[0]) {
+                addXP(30);
+                gameState.guessScore++;
+                gameState.guessCorrect++;
+                updateScoreDisplay();
+                setTimeout(() => alert('🎉 Correct! +30 XP'), 100);
+            } else {
+                setTimeout(() => alert(`❌ Incorrect! It was ${currentGuess.options[0]}`), 100);
+            }
+            
+            currentGuess = null;
+        }
+        
+        // DETECTIVE MISSIONS
+        function renderMissions() {
+            const html = gameState.missions.map(mission => {
+                const progress = (mission.progress / mission.target) * 100;
+                return `
+                    <div class="info-item">
+                        <div class="info-label">${mission.name}</div>
+                        <div class="info-value" style="font-size: 12px;">${mission.desc}</div>
+                        <div class="progress-bar" style="margin-top: 8px;">
+                            <div class="progress-fill" style="width: ${progress}%">${mission.progress}/${mission.target}</div>
+                        </div>
+                        <div style="text-align: right; margin-top: 4px; font-size: 11px; color: #ffd700;">
+                            ${mission.progress >= mission.target ? '✅ Complete!' : `Reward: ${mission.xp} XP`}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('missions-list').innerHTML = html;
+        }
+        
+        // CREATE HEIST MODE
+        let heistLocation = null;
+        
+        function setupCreateMode() {
+            // Reset form
+            document.getElementById('heist-name').value = '';
+            document.getElementById('heist-coords').textContent = 'No location set';
+            document.getElementById('clue1').value = '';
+            document.getElementById('clue2').value = '';
+            heistLocation = null;
+        }
+        
+        function setHeistLocation(lat, lon) {
+            heistLocation = { lat, lon };
+            document.getElementById('heist-coords').textContent = `${formatCoordinate(lat, true)}, ${formatCoordinate(lon, false)}`;
+            if (currentMarker) map.removeLayer(currentMarker);
+            currentMarker = L.marker([lat, lon]).addTo(map);
+        }
+        
+        function saveHeist() {
+            const name = document.getElementById('heist-name').value;
+            const clue1 = document.getElementById('clue1').value;
+            const clue2 = document.getElementById('clue2').value;
+            
+            if (!name || !heistLocation || !clue1) {
+                alert('⚠️ Please fill in heist name, location, and at least one clue!');
+                return;
+            }
+            
+            const heist = {
+                id: Date.now(),
+                name,
+                location: heistLocation,
+                clues: [clue1, clue2].filter(c => c),
+                created: new Date().toLocaleDateString()
+            };
+            
+            gameState.heists.push(heist);
+            saveState();
+            addXP(50);
+            alert('🎉 Heist saved! +50 XP');
+            setupCreateMode();
+        }
+        
+        function loadHeists() {
+            if (gameState.heists.length === 0) {
+                alert('No saved heists yet! Create one first.');
+                return;
+            }
+            
+            const html = gameState.heists.map(heist => `
+                <div class="info-item">
+                    <div class="info-label">${heist.name}</div>
+                    <div class="info-value" style="font-size: 11px;">
+                        Created: ${heist.created}<br>
+                        Clues: ${heist.clues.length}
+                    </div>
+                    <button class="btn" style="margin-top: 8px; padding: 6px;" onclick="viewHeist(${heist.id})">🔍 View</button>
+                </div>
+            `).join('');
+            
+            document.getElementById('saved-heists-list').innerHTML = html;
+            document.getElementById('saved-heists-section').style.display = 'block';
+        }
+        
+        function viewHeist(id) {
+            const heist = gameState.heists.find(h => h.id === id);
+            if (!heist) return;
+            
+            map.setView([heist.location.lat, heist.location.lon], 8);
+            if (currentMarker) map.removeLayer(currentMarker);
+            currentMarker = L.marker([heist.location.lat, heist.location.lon]).addTo(map);
+            
+            alert(`🕵️ ${heist.name}\n\nClues:\n${heist.clues.map((c, i) => `${i + 1}. ${c}`).join('\n')}`);
+        }
+        
+        // EASTER EGG 67
+        function checkEasterEgg(lat, lon) {
+            // Check if coordinates contain 67
+            if (!gameState.easterEggFound && (lat.toFixed(4).includes('67') || lon.toFixed(4).includes('67'))) {
+                gameState.easterEggFound = true;
+                addXP(67);
+                document.getElementById('easter-egg').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('easter-egg').style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // Add easter egg check to map clicks
+        map.on('click', function(e) {
+            checkEasterEgg(e.latlng.lat, e.latlng.lng);
+        });
+        
+        // Initialize
+        updateScoreDisplay();
+        renderMissions();
+        
+        console.log('🕵️ Geographic Detective Academy initialized!');
+        console.log('🎮 5 game modes ready');
+        console.log('🏆 Mission system active');
+        console.log('🔍 Easter egg 67 hidden somewhere...');
     </script>
 </body>
 </html>
