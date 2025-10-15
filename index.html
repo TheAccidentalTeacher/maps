@@ -628,6 +628,13 @@
                 </div>
                 
                 <div class="section">
+                    <h2>📍 DISTANCE FROM GLENNALLEN</h2>
+                    <div id="distance-display" style="color: #aaa; font-size: 14px; line-height: 1.6;">
+                        Click anywhere on the map to see how far it is from your hometown!
+                    </div>
+                </div>
+                
+                <div class="section">
                     <h2>🎮 GAME MODES</h2>
                     <p style="color: #aaa; line-height: 1.6; margin-bottom: 12px;">
                         Choose a game mode above to start earning XP and completing challenges!
@@ -931,12 +938,6 @@
                     </div>
                 </div>
                 
-                <div class="section">
-                    <h2>📍 DISTANCE FROM GLENNALLEN</h2>
-                    <div id="distance-display" style="color: #aaa; font-size: 14px; line-height: 1.6;">
-                        Click anywhere on the map to see how far it is from your hometown!
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -1085,6 +1086,12 @@
             opacity: 1.0
         });
         
+        const populationDensityOverlay = L.tileLayer('https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/World_Population_Density/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: 'Population Density &copy; Esri',
+            opacity: 0.6
+        });
+        
         streetMapEnglish.addTo(geoMap);
         
         const baseMaps = {
@@ -1110,7 +1117,8 @@
             "🚂 Railways": railwayOverlay,
             "⛰️ Hillshade": hillshadeOverlay,
             "🌊 Ocean Features & Names": oceanReferenceOverlay,
-            "🎨 Terrain Labels": watercolorLabelsOverlay
+            "🎨 Terrain Labels": watercolorLabelsOverlay,
+            "👥 Population Density": populationDensityOverlay
         };
         
         L.control.layers(baseMaps, overlayMaps, {
