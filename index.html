@@ -598,6 +598,7 @@
         <button class="mode-btn" onclick="switchMode('guess')">📸 GUESS</button>
         <button class="mode-btn" onclick="switchMode('missions')">🏆 MISSIONS</button>
         <button class="mode-btn" onclick="switchMode('create')">🗺️ CREATE</button>
+        <button class="mode-btn" onclick="switchMode('alaska')">🏔️ ALASKA</button>
     </div>
     
     <div id="container">
@@ -865,6 +866,78 @@
                     <div id="saved-heists-list"></div>
                 </div>
             </div>
+            
+            <!-- ALASKA ADVENTURE MODE -->
+            <div id="alaska-panel" class="game-panel">
+                <div class="section">
+                    <h2>🏔️ ALASKA ADVENTURE</h2>
+                    
+                    <div id="alaska-game" style="display: none;">
+                        <div class="score-display">
+                            Found: <span id="alaska-found">0</span>/10 | Distance from Home: <span id="distance-home">--</span> mi
+                        </div>
+                        
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="alaska-progress" style="width: 0%">0/10</div>
+                        </div>
+                        
+                        <div id="alaska-list" style="margin: 16px 0;"></div>
+                        
+                        <div class="hint-box" style="margin-top: 16px;">
+                            <strong>🎯 PRO TIP:</strong> Use Satellite and Terrain layers to help find mountains and rivers!
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="resetAlaska()">🔄 NEW ADVENTURE</button>
+                    </div>
+                    
+                    <div id="alaska-intro">
+                        <div class="why-play">
+                            <strong style="font-size: 16px; color: #ffd700;">WHY PLAY THIS?</strong>
+                            <p style="margin-top: 8px; color: #ddd;">
+                                Explore YOUR home state! Start from Glennallen and discover Alaska's incredible geography. See how your hometown connects to the Last Frontier's most amazing places!
+                            </p>
+                        </div>
+                        
+                        <div style="background: rgba(102, 126, 234, 0.1); padding: 14px; border-radius: 8px; margin: 12px 0; font-size: 14px; line-height: 1.8; color: #ddd;">
+                            <strong style="color: #ffd700;">HOW TO PLAY:</strong><br>
+                            1️⃣ Find 10 famous Alaska locations starting from Glennallen<br>
+                            2️⃣ Click on each location when you find it<br>
+                            3️⃣ Learn cool facts about each place<br>
+                            4️⃣ See how far everything is from home!<br>
+                            5️⃣ Earn 30 XP for each location + bonus for completing all!
+                        </div>
+                        
+                        <div style="background: rgba(255, 215, 0, 0.15); border: 2px solid #ffd700; padding: 14px; border-radius: 10px; margin: 12px 0; font-size: 13px; line-height: 1.6; color: #ddd;">
+                            <strong style="color: #ffd700;">🏠 STARTING FROM HOME:</strong><br>
+                            Glennallen, Alaska<br>
+                            Population: ~500<br>
+                            Gateway to Wrangell-St. Elias National Park<br>
+                            Crossroads of Glenn & Richardson Highways
+                        </div>
+                        
+                        <button class="btn" onclick="startAlaskaGame()">🎮 START ALASKA ADVENTURE</button>
+                        <button class="btn btn-secondary" onclick="showTutorial('alaska')">📚 FULL TUTORIAL</button>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>🏆 ALASKA ACHIEVEMENTS</h2>
+                    <div id="alaska-badges">
+                        <span class="badge locked">🏔️ Mountain Master</span>
+                        <span class="badge locked">🌊 River Runner</span>
+                        <span class="badge locked">🏞️ Park Explorer</span>
+                        <span class="badge locked">🏛️ City Finder</span>
+                        <span class="badge locked">❄️ Alaska Expert</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>📍 DISTANCE FROM GLENNALLEN</h2>
+                    <div id="distance-display" style="color: #aaa; font-size: 14px; line-height: 1.6;">
+                        Click anywhere on the map to see how far it is from your hometown!
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -1072,7 +1145,29 @@
                 { id: 3, name: "Visual Detective", desc: "Get 5 correct in Guess Game", progress: 0, target: 5, xp: 200 },
                 { id: 4, name: "Master Creator", desc: "Create 3 heists", progress: 0, target: 3, xp: 250 }
             ],
-            heists: []
+            heists: [],
+            alaska: {
+                locations: [],
+                found: 0,
+                active: false
+            }
+        };
+        
+        // Glennallen home coordinates
+        const GLENNALLEN = { lat: 62.1089, lon: -145.5467 };
+        
+        // Alaska Adventure locations
+        const alaskaLocations = [
+            { name: "Glennallen", lat: 62.1089, lon: -145.5467, fact: "🏠 Your hometown! Gateway to Wrangell-St. Elias National Park", type: "city" },
+            { name: "Wrangell-St. Elias National Park", lat: 61.7104, lon: -142.9857, fact: "🏞️ Largest US National Park - 6 times bigger than Yellowstone!", type: "park" },
+            { name: "Mount Wrangell", lat: 62.0059, lon: -144.0187, fact: "🌋 Active volcano, 14,163 feet tall", type: "mountain" },
+            { name: "Copper River", lat: 61.0444, lon: -145.4064, fact: "🌊 290 miles long, famous for world-class salmon", type: "river" },
+            { name: "Anchorage", lat: 61.2181, lon: -149.9003, fact: "🏛️ Largest city in Alaska, 189 miles from Glennallen", type: "city" },
+            { name: "Denali (Mt. McKinley)", lat: 63.0692, lon: -151.0070, fact: "🏔️ Highest peak in North America - 20,310 feet!", type: "mountain" },
+            { name: "Valdez", lat: 61.1308, lon: -146.3483, fact: "⚓ Ice-free port, end of Trans-Alaska Pipeline", type: "city" },
+            { name: "Fairbanks", lat: 64.8378, lon: -147.7164, fact: "❄️ Alaska's second-largest city, known for Northern Lights", type: "city" },
+            { name: "Juneau", lat: 58.3019, lon: -134.4197, fact: "🏔️ Alaska's capital - only accessible by boat or plane!", type: "city" },
+            { name: "Kenai Fjords National Park", lat: 59.8117, lon: -149.9594, fact: "🧊 Glaciers, fjords, and incredible wildlife", type: "park" }
         };
         
         // Load saved state
@@ -1150,10 +1245,23 @@
             const lat = e.latlng.lat;
             const lon = e.latlng.lng;
             
+            // Always show distance from Glennallen
+            const distFromHome = calculateDistance(GLENNALLEN.lat, GLENNALLEN.lon, lat, lon);
+            const distDisplay = document.getElementById('distance-display');
+            if (distDisplay) {
+                distDisplay.innerHTML = `
+                    <strong style="color: #ffd700;">🏠 Distance from Glennallen:</strong><br>
+                    <span style="font-size: 24px; color: #00ff7f;">${distFromHome.toLocaleString()}</span> miles<br>
+                    <span style="font-size: 12px; color: #888;">Coordinates: ${formatCoord(lat, true)}, ${formatCoord(lon, false)}</span>
+                `;
+            }
+            
             if (gameState.mystery.active) {
                 checkMysteryAnswer(lat, lon);
             } else if (gameState.scavenger.active) {
                 checkScavengerAnswer(lat, lon);
+            } else if (gameState.alaska.active) {
+                checkAlaskaLocation(lat, lon);
             } else if (gameState.currentMode === 'create') {
                 setHeistLocation(lat, lon);
             } else {
@@ -1534,6 +1642,182 @@
             showNotification(`📍 ${heist.name}`);
         }
         
+        // ============ ALASKA ADVENTURE FUNCTIONS ============
+        
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 3959; // Earth's radius in miles
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return Math.round(R * c);
+        }
+        
+        function startAlaskaGame() {
+            gameState.alaska.active = true;
+            gameState.alaska.locations = alaskaLocations.map(loc => ({
+                ...loc,
+                found: false
+            }));
+            gameState.alaska.found = 0;
+            
+            document.getElementById('alaska-intro').style.display = 'none';
+            document.getElementById('alaska-game').style.display = 'block';
+            
+            // Zoom to Alaska
+            map.setView([64, -152], 5);
+            
+            updateAlaskaDisplay();
+            showNotification('🏔️ Alaska Adventure Started! Find all 10 locations!');
+        }
+        
+        function updateAlaskaDisplay() {
+            const found = gameState.alaska.found;
+            const total = alaskaLocations.length;
+            const percent = (found / total) * 100;
+            
+            document.getElementById('alaska-found').textContent = found;
+            document.getElementById('alaska-progress').style.width = percent + '%';
+            document.getElementById('alaska-progress').textContent = `${found}/${total}`;
+            
+            const html = gameState.alaska.locations.map((loc, i) => {
+                if (loc.found) {
+                    return `
+                        <div class="challenge-item" style="background: rgba(0, 255, 127, 0.1); border-left: 4px solid #00ff7f;">
+                            <div>
+                                <strong style="color: #00ff7f;">✅ ${loc.name}</strong><br>
+                                <span style="font-size: 12px; color: #aaa;">${loc.fact}</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="challenge-item">
+                            <div>
+                                <strong style="color: #888;">❌ ${loc.name}</strong><br>
+                                <span style="font-size: 12px; color: #666;">Not found yet...</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+            
+            document.getElementById('alaska-list').innerHTML = html;
+            
+            // Check for achievements
+            checkAlaskaAchievements();
+        }
+        
+        function checkAlaskaAchievements() {
+            const badges = document.querySelectorAll('#alaska-badges .badge');
+            const found = gameState.alaska.locations.filter(l => l.found);
+            
+            // Mountain Master - find all mountains
+            const mountains = found.filter(l => l.type === 'mountain');
+            if (mountains.length >= 2) {
+                badges[0].classList.remove('locked');
+                badges[0].classList.add('unlocked');
+            }
+            
+            // River Runner - find river
+            const rivers = found.filter(l => l.type === 'river');
+            if (rivers.length >= 1) {
+                badges[1].classList.remove('locked');
+                badges[1].classList.add('unlocked');
+            }
+            
+            // Park Explorer - find all parks
+            const parks = found.filter(l => l.type === 'park');
+            if (parks.length >= 2) {
+                badges[2].classList.remove('locked');
+                badges[2].classList.add('unlocked');
+            }
+            
+            // City Finder - find all cities
+            const cities = found.filter(l => l.type === 'city');
+            if (cities.length >= 4) {
+                badges[3].classList.remove('locked');
+                badges[3].classList.add('unlocked');
+            }
+            
+            // Alaska Expert - find all locations
+            if (found.length === alaskaLocations.length) {
+                badges[4].classList.remove('locked');
+                badges[4].classList.add('unlocked');
+                showNotification('🏆 ALASKA EXPERT UNLOCKED! +200 XP BONUS!');
+                addXP(200);
+            }
+        }
+        
+        function resetAlaska() {
+            gameState.alaska.active = false;
+            gameState.alaska.found = 0;
+            gameState.alaska.locations = [];
+            
+            document.getElementById('alaska-intro').style.display = 'block';
+            document.getElementById('alaska-game').style.display = 'none';
+            
+            saveState();
+        }
+        
+        function checkAlaskaLocation(lat, lon) {
+            const TOLERANCE = 50; // miles
+            
+            for (let i = 0; i < gameState.alaska.locations.length; i++) {
+                const loc = gameState.alaska.locations[i];
+                if (loc.found) continue;
+                
+                const dist = calculateDistance(lat, lon, loc.lat, loc.lon);
+                
+                if (dist <= TOLERANCE) {
+                    // Found it!
+                    loc.found = true;
+                    gameState.alaska.found++;
+                    
+                    if (currentMarker) map.removeLayer(currentMarker);
+                    currentMarker = L.marker([loc.lat, loc.lon]).addTo(map);
+                    
+                    showNotification(`✅ FOUND: ${loc.name}! +30 XP`);
+                    addXP(30, loc.name);
+                    
+                    // Update distance display
+                    const distFromHome = calculateDistance(GLENNALLEN.lat, GLENNALLEN.lon, loc.lat, loc.lon);
+                    document.getElementById('distance-home').textContent = distFromHome.toLocaleString();
+                    
+                    updateAlaskaDisplay();
+                    saveState();
+                    
+                    // Check if completed
+                    if (gameState.alaska.found === alaskaLocations.length) {
+                        setTimeout(() => {
+                            showNotification('🎉 ALASKA ADVENTURE COMPLETE! You found all 10 locations!');
+                        }, 2500);
+                    }
+                    
+                    return;
+                }
+            }
+            
+            // Not found - show hint
+            let closest = null;
+            let closestDist = Infinity;
+            
+            for (let loc of gameState.alaska.locations) {
+                if (loc.found) continue;
+                const dist = calculateDistance(lat, lon, loc.lat, loc.lon);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closest = loc;
+                }
+            }
+            
+            if (closest) {
+                showNotification(`❌ Not quite! Closest unfound: ${closest.name} (${Math.round(closestDist)} mi away)`);
+            }
+        }
+        
         // TUTORIALS
         function showTutorial(mode) {
             const tutorials = {
@@ -1605,6 +1889,54 @@
                         <li>🌍 Use continent knowledge to eliminate wrong answers</li>
                     </ul>
                     <button class="btn" onclick="closeTutorial()">GOT IT! LET'S GUESS</button>
+                `,
+                alaska: `
+                    <h2>🏔️ ALASKA ADVENTURE TUTORIAL</h2>
+                    <div class="why-play">
+                        <strong>WHY PLAY THIS?</strong>
+                        <p>Explore YOUR home state from a global perspective! Discover Alaska's incredible geography and see how Glennallen connects to the Last Frontier's most amazing places. Build local pride and geographic literacy!</p>
+                    </div>
+                    <h3>HOW TO PLAY:</h3>
+                    <ul>
+                        <li><strong>Step 1:</strong> Click "START ALASKA ADVENTURE" to begin</li>
+                        <li><strong>Step 2:</strong> The map zooms to Alaska - your home state!</li>
+                        <li><strong>Step 3:</strong> Find all 10 famous Alaska locations on the map</li>
+                        <li><strong>Step 4:</strong> Click on each location when you find it (within 50 miles)</li>
+                        <li><strong>Step 5:</strong> Learn cool facts about each place!</li>
+                        <li><strong>Step 6:</strong> See how far everything is from Glennallen</li>
+                        <li><strong>Step 7:</strong> Earn 30 XP per location + 200 XP bonus for completing all!</li>
+                    </ul>
+                    <h3>LOCATIONS TO FIND:</h3>
+                    <ul>
+                        <li>🏠 <strong>Glennallen</strong> - Your hometown!</li>
+                        <li>🏞️ <strong>Wrangell-St. Elias National Park</strong> - Largest US park</li>
+                        <li>🌋 <strong>Mount Wrangell</strong> - Active volcano</li>
+                        <li>🌊 <strong>Copper River</strong> - Famous for salmon</li>
+                        <li>🏛️ <strong>Anchorage</strong> - Alaska's largest city</li>
+                        <li>🏔️ <strong>Denali</strong> - Highest peak in North America</li>
+                        <li>⚓ <strong>Valdez</strong> - Ice-free port</li>
+                        <li>❄️ <strong>Fairbanks</strong> - Northern Lights capital</li>
+                        <li>🏛️ <strong>Juneau</strong> - Alaska's capital</li>
+                        <li>🧊 <strong>Kenai Fjords</strong> - Glaciers and wildlife</li>
+                    </ul>
+                    <h3>PRO TIPS:</h3>
+                    <ul>
+                        <li>🛰️ Switch to Satellite view to see real imagery</li>
+                        <li>⛰️ Use Terrain or Topographic layers to find mountains</li>
+                        <li>🌊 Rivers show up well on satellite view</li>
+                        <li>🏛️ Cities are easier to spot with Street or Boundaries layers</li>
+                        <li>🔍 Zoom in close to find exact locations</li>
+                        <li>🎯 Click within 50 miles to count as "found"</li>
+                    </ul>
+                    <h3>ACHIEVEMENTS:</h3>
+                    <ul>
+                        <li>🏔️ <strong>Mountain Master</strong> - Find both mountains</li>
+                        <li>🌊 <strong>River Runner</strong> - Find the Copper River</li>
+                        <li>🏞️ <strong>Park Explorer</strong> - Find both national parks</li>
+                        <li>🏛️ <strong>City Finder</strong> - Find all 4 cities</li>
+                        <li>❄️ <strong>Alaska Expert</strong> - Complete everything!</li>
+                    </ul>
+                    <button class="btn" onclick="closeTutorial()">GOT IT! LET'S EXPLORE ALASKA</button>
                 `
             };
             
