@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geographic Detective Academy - Interactive Map</title>
+    <title>Geographic Detective Academy</title>
     
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin=""/>
@@ -18,17 +17,17 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             height: 100vh;
             overflow: hidden;
-            background: #0f0f23;
+            background: #0a0e27;
+            color: white;
         }
         
         #header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
             padding: 12px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
             z-index: 1000;
             position: relative;
             display: flex;
@@ -37,48 +36,71 @@
         }
         
         #header h1 {
-            font-size: 22px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
         
-        #header .detective-badge {
-            background: rgba(255,255,255,0.2);
-            padding: 6px 12px;
+        .xp-display {
+            background: rgba(0,0,0,0.3);
+            padding: 8px 16px;
             border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         #game-modes {
-            background: #1a1a2e;
-            padding: 10px 20px;
+            background: #0f1329;
+            padding: 12px 20px;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             overflow-x: auto;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 3px solid #667eea;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
         
         .mode-btn {
-            background: #2a2a3e;
-            color: white;
-            border: 2px solid #667eea;
-            padding: 8px 16px;
-            border-radius: 8px;
+            background: #1a1f3a;
+            color: #aaa;
+            border: 2px solid #2a2f4a;
+            padding: 10px 18px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
             font-size: 13px;
             white-space: nowrap;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            position: relative;
         }
         
         .mode-btn:hover {
-            background: #667eea;
+            background: #2a2f4a;
+            color: white;
+            border-color: #667eea;
             transform: translateY(-2px);
         }
         
         .mode-btn.active {
-            background: #667eea;
-            box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .mode-btn.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .mode-btn.locked::after {
+            content: "🔒";
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 16px;
         }
         
         #container {
@@ -89,250 +111,458 @@
         #map {
             flex: 1;
             height: 100%;
+            position: relative;
         }
         
         #sidebar {
-            width: 340px;
-            background: #1a1a2e;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+            width: 380px;
+            background: #0f1329;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.5);
             padding: 20px;
             overflow-y: auto;
             z-index: 999;
-            color: white;
         }
         
         .game-panel {
             display: none;
-            animation: fadeIn 0.3s;
+            animation: slideIn 0.3s ease-out;
         }
         
         .game-panel.active {
             display: block;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
         
-        .info-section {
-            margin-bottom: 20px;
-            background: #2a2a3e;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #667eea;
+        .section {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1329 100%);
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border: 2px solid #2a2f4a;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         
-        .info-section h2 {
-            font-size: 16px;
-            font-weight: 600;
+        .section h2 {
+            font-size: 18px;
+            font-weight: 700;
             color: #ffd700;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
             border-bottom: 2px solid #667eea;
-        }
-        
-        .info-item {
-            margin-bottom: 10px;
-            padding: 10px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 6px;
-            border-left: 3px solid #667eea;
-        }
-        
-        .info-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-        
-        .info-value {
-            font-size: 14px;
-            color: white;
-            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 14px 24px;
+            border-radius: 10px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: 700;
+            font-size: 15px;
             width: 100%;
-            margin-top: 10px;
-            transition: all 0.3s;
+            margin-top: 12px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
         }
         
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
         }
         
         .btn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
         }
         
-        .timer {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ffd700;
-            text-align: center;
-            padding: 10px;
-            background: rgba(255, 215, 0, 0.1);
-            border-radius: 8px;
-            margin: 10px 0;
+        .btn-secondary {
+            background: #2a2f4a;
+            box-shadow: none;
         }
         
-        .score {
+        .btn-secondary:hover:not(:disabled) {
+            background: #3a3f5a;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        }
+        
+        .timer {
+            font-size: 32px;
+            font-weight: 900;
+            color: #ffd700;
+            text-align: center;
+            padding: 16px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 3px solid #ffd700;
+            border-radius: 12px;
+            margin: 12px 0;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .timer.warning {
+            color: #ff6b6b;
+            border-color: #ff6b6b;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .score-display {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 10px;
+            margin: 12px 0;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 12px 0;
+        }
+        
+        .stat-box {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .stat-value {
             font-size: 20px;
             font-weight: 700;
-            color: #00ff00;
-            text-align: center;
+            color: #ffd700;
         }
         
         .progress-bar {
             width: 100%;
-            height: 20px;
-            background: #2a2a3e;
-            border-radius: 10px;
+            height: 28px;
+            background: #1a1f3a;
+            border-radius: 14px;
             overflow: hidden;
-            margin: 10px 0;
+            margin: 12px 0;
+            border: 2px solid #2a2f4a;
         }
         
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.3s;
+            transition: width 0.5s ease-out;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin: 4px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #1a1a2e;
-        }
-        
-        .badge.locked {
-            background: #444;
-            color: #888;
+            font-size: 13px;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
         
         .challenge-item {
-            padding: 10px;
             background: rgba(102, 126, 234, 0.1);
-            border-radius: 6px;
-            margin-bottom: 8px;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-left: 4px solid #667eea;
+            transition: all 0.2s;
+        }
+        
+        .challenge-item:hover {
+            background: rgba(102, 126, 234, 0.2);
         }
         
         .challenge-item.completed {
-            background: rgba(0, 255, 0, 0.1);
-            border-left: 3px solid #00ff00;
+            background: rgba(0, 255, 127, 0.1);
+            border-left-color: #00ff7f;
         }
         
-        .hint-box {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid #ffd700;
-            padding: 10px;
-            border-radius: 6px;
-            margin: 10px 0;
-            font-size: 13px;
+        .challenge-item.completed .challenge-text {
+            text-decoration: line-through;
+            opacity: 0.7;
         }
         
         .answer-options {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin: 10px 0;
+            gap: 10px;
+            margin: 12px 0;
         }
         
         .answer-btn {
-            background: #2a2a3e;
+            background: #1a1f3a;
             color: white;
-            border: 2px solid #667eea;
-            padding: 10px;
-            border-radius: 6px;
+            border: 2px solid #2a2f4a;
+            padding: 14px 18px;
+            border-radius: 10px;
             cursor: pointer;
             text-align: left;
+            font-size: 14px;
+            font-weight: 600;
             transition: all 0.2s;
+            position: relative;
         }
         
-        .answer-btn:hover {
-            background: #667eea;
+        .answer-btn:hover:not(:disabled) {
+            background: #2a2f4a;
+            border-color: #667eea;
+            transform: translateX(4px);
         }
         
         .answer-btn.correct {
-            background: #00ff00;
+            background: linear-gradient(135deg, #00ff7f 0%, #00d96f 100%);
             color: #000;
-            border-color: #00ff00;
+            border-color: #00ff7f;
+            animation: correctPulse 0.5s;
         }
         
         .answer-btn.incorrect {
-            background: #ff0000;
-            color: white;
-            border-color: #ff0000;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            border-color: #ff6b6b;
+            animation: shake 0.5s;
         }
         
-        .easter-egg-67 {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #1a1a2e;
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-weight: 700;
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .hint-box {
+            background: rgba(255, 215, 0, 0.15);
+            border: 2px solid #ffd700;
+            padding: 14px;
+            border-radius: 10px;
+            margin: 12px 0;
             font-size: 14px;
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+            line-height: 1.6;
+        }
+        
+        .hint-box strong {
+            color: #ffd700;
+        }
+        
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
             z-index: 10000;
             display: none;
-            animation: bounce 0.5s infinite;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
         }
         
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .coordinates-display {
+        .tutorial-overlay.active {
             display: flex;
-            gap: 10px;
         }
         
-        .coord-box {
-            flex: 1;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .tutorial-content {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1329 100%);
+            padding: 32px;
+            border-radius: 16px;
+            max-width: 600px;
+            border: 3px solid #667eea;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .tutorial-content h2 {
+            font-size: 28px;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .tutorial-content h3 {
+            font-size: 20px;
+            color: #667eea;
+            margin: 20px 0 12px 0;
+        }
+        
+        .tutorial-content p, .tutorial-content ul {
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 16px;
+            color: #ddd;
+        }
+        
+        .tutorial-content ul {
+            margin-left: 20px;
+        }
+        
+        .tutorial-content li {
+            margin-bottom: 8px;
+        }
+        
+        .tutorial-content strong {
+            color: #ffd700;
+        }
+        
+        .why-play {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 16px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            margin: 16px 0;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            background: linear-gradient(135deg, #00ff7f 0%, #00d96f 100%);
+            color: #000;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 6px 20px rgba(0, 255, 127, 0.5);
+            z-index: 10001;
+            display: none;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        .notification.active {
+            display: block;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .coords-display {
+            background: #1a1f3a;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffd700;
+            border: 2px solid #667eea;
+            margin: 12px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background: #1a1f3a;
+            border: 2px solid #2a2f4a;
+            color: white;
+            font-size: 14px;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            margin: 6px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #000;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+        }
+        
+        .badge.locked {
+            background: #2a2f4a;
+            color: #666;
+            box-shadow: none;
         }
         
         #sidebar::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
         
         #sidebar::-webkit-scrollbar-track {
-            background: #1a1a2e;
+            background: #0f1329;
         }
         
         #sidebar::-webkit-scrollbar-thumb {
             background: #667eea;
-            border-radius: 3px;
+            border-radius: 4px;
+        }
+        
+        #sidebar::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
         }
         
         @media (max-width: 768px) {
@@ -342,28 +572,32 @@
             
             #sidebar {
                 width: 100%;
-                height: 300px;
+                height: 350px;
             }
             
             #map {
-                height: calc(100vh - 410px);
+                height: calc(100vh - 460px);
             }
         }
     </style>
 </head>
 <body>
     <div id="header">
-        <h1>🕵️ Geographic Detective Academy</h1>
-        <div class="detective-badge">🏆 <span id="total-score">0</span> XP</div>
+        <h1>🕵️ GEOGRAPHIC DETECTIVE ACADEMY</h1>
+        <div class="xp-display">
+            <span>⭐</span>
+            <span id="total-xp">0</span>
+            <span>XP</span>
+        </div>
     </div>
     
     <div id="game-modes">
-        <button class="mode-btn active" onclick="switchMode('explore')">🗺️ Explore</button>
-        <button class="mode-btn" onclick="switchMode('mystery')">🎯 Mystery Challenge</button>
-        <button class="mode-btn" onclick="switchMode('scavenger')">🌍 Scavenger Hunt</button>
-        <button class="mode-btn" onclick="switchMode('guess')">📸 Guess Location</button>
-        <button class="mode-btn" onclick="switchMode('missions')">🏆 Detective Missions</button>
-        <button class="mode-btn" onclick="switchMode('create')">🗺️ Create Heist</button>
+        <button class="mode-btn active" onclick="switchMode('explore')">🗺️ EXPLORE</button>
+        <button class="mode-btn" onclick="switchMode('mystery')">🎯 MYSTERY</button>
+        <button class="mode-btn" onclick="switchMode('scavenger')">🌍 SCAVENGER</button>
+        <button class="mode-btn" onclick="switchMode('guess')">📸 GUESS</button>
+        <button class="mode-btn" onclick="switchMode('missions')">🏆 MISSIONS</button>
+        <button class="mode-btn" onclick="switchMode('create')">🗺️ CREATE</button>
     </div>
     
     <div id="container">
@@ -372,101 +606,146 @@
         <div id="sidebar">
             <!-- EXPLORE MODE -->
             <div id="explore-panel" class="game-panel active">
-                <div class="info-section">
-                    <h2>🖱️ Live Coordinates</h2>
-                    <div class="coordinates-display">
-                        <div class="coord-box">
-                            <div class="info-item">
-                                <div class="info-label">Latitude</div>
-                                <div class="info-value" id="hover-latitude">Move mouse</div>
-                            </div>
+                <div class="section">
+                    <h2>🗺️ FREE EXPLORE</h2>
+                    <p style="color: #aaa; line-height: 1.6; margin-bottom: 12px;">
+                        Click anywhere on the map to see coordinates and location info. Use the layer control (top right) to switch between satellite, terrain, and street views.
+                    </p>
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Latitude</div>
+                            <div class="stat-value" id="hover-lat">--</div>
                         </div>
-                        <div class="coord-box">
-                            <div class="info-item">
-                                <div class="info-label">Longitude</div>
-                                <div class="info-value" id="hover-longitude">--</div>
-                            </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Longitude</div>
+                            <div class="stat-value" id="hover-lon">--</div>
                         </div>
+                    </div>
+                    <div id="location-info" style="color: #aaa; font-size: 14px; margin-top: 12px;">
+                        Click on the map to investigate a location
                     </div>
                 </div>
                 
-                <div class="info-section">
-                    <h2>📍 Clicked Location</h2>
-                    <div id="location-info">
-                        <div class="info-item">
-                            <div class="info-label">Click map to investigate</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="info-section">
-                    <h2>ℹ️ Instructions</h2>
-                    <div class="info-item">
-                        <div class="info-value" style="font-size: 12px; line-height: 1.6;">
-                            <strong>🎮 Game Modes:</strong><br>
-                            • <strong>Mystery Challenge:</strong> Find random locations<br>
-                            • <strong>Scavenger Hunt:</strong> Complete geographic challenges<br>
-                            • <strong>Guess Location:</strong> Identify places from satellite<br>
-                            • <strong>Detective Missions:</strong> Track your progress<br>
-                            • <strong>Create Heist:</strong> Make your own mysteries<br><br>
-                            <strong>🗺️ Map Controls:</strong><br>
-                            • Use layer control (top right) for different maps<br>
-                            • Toggle English Labels for readable names<br>
-                            • Scroll to zoom, drag to pan
-                        </div>
+                <div class="section">
+                    <h2>🎮 GAME MODES</h2>
+                    <p style="color: #aaa; line-height: 1.6; margin-bottom: 12px;">
+                        Choose a game mode above to start earning XP and completing challenges!
+                    </p>
+                    <div style="background: rgba(102, 126, 234, 0.1); padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.6; color: #ddd;">
+                        <strong style="color: #ffd700;">🎯 MYSTERY:</strong> Find locations from coordinates<br>
+                        <strong style="color: #ffd700;">🌍 SCAVENGER:</strong> Complete geographic challenges<br>
+                        <strong style="color: #ffd700;">📸 GUESS:</strong> Identify famous landmarks<br>
+                        <strong style="color: #ffd700;">🏆 MISSIONS:</strong> Track your progress<br>
+                        <strong style="color: #ffd700;">🗺️ CREATE:</strong> Make your own mysteries
                     </div>
                 </div>
             </div>
             
             <!-- MYSTERY CHALLENGE MODE -->
             <div id="mystery-panel" class="game-panel">
-                <div class="info-section">
-                    <h2>🎯 Mystery Location Challenge</h2>
-                    <div class="timer" id="mystery-timer">60</div>
-                    <div class="score">Score: <span id="mystery-score">0</span> | Streak: <span id="mystery-streak">0</span></div>
+                <div class="section">
+                    <h2>🎯 MYSTERY LOCATION CHALLENGE</h2>
                     
-                    <div id="mystery-coords" class="info-item" style="text-align: center; font-size: 18px; font-weight: 700; color: #ffd700;">
-                        Click "New Mystery" to start!
-                    </div>
-                    
-                    <div id="mystery-hints" style="display: none;">
-                        <div class="hint-box">
-                            <strong>🔍 Hint:</strong> <span id="hint-text"></span>
+                    <div id="mystery-game" style="display: none;">
+                        <div class="timer" id="mystery-timer">60</div>
+                        
+                        <div class="score-display">
+                            Score: <span id="mystery-score">0</span> | Streak: <span id="mystery-streak">0</span> 🔥
                         </div>
+                        
+                        <div class="coords-display" id="mystery-coords">
+                            --
+                        </div>
+                        
+                        <div id="mystery-hints" style="display: none;">
+                            <div class="hint-box">
+                                <strong>🔍 HINT:</strong> <span id="hint-text"></span>
+                            </div>
+                        </div>
+                        
+                        <p style="color: #aaa; text-align: center; margin: 12px 0;">
+                            Click on the map where you think these coordinates are!
+                        </p>
+                        
+                        <button class="btn btn-danger" onclick="skipMystery()">⏭️ SKIP (-5 XP)</button>
                     </div>
                     
-                    <button class="btn" onclick="startMystery()">🎲 New Mystery Location</button>
-                    <button class="btn" onclick="revealMystery()" id="reveal-btn" disabled>🔓 Reveal Answer (-10 XP)</button>
+                    <div id="mystery-intro">
+                        <div class="why-play">
+                            <strong style="font-size: 16px; color: #ffd700;">WHY PLAY THIS?</strong>
+                            <p style="margin-top: 8px; color: #ddd;">
+                                Race against time to find mystery locations. Build your streak for massive XP bonuses. Compete with classmates for the highest score!
+                            </p>
+                        </div>
+                        
+                        <div style="background: rgba(102, 126, 234, 0.1); padding: 14px; border-radius: 8px; margin: 12px 0; font-size: 14px; line-height: 1.8; color: #ddd;">
+                            <strong style="color: #ffd700;">HOW TO PLAY:</strong><br>
+                            1️⃣ You'll see coordinates (like 40.7128°N, 74.0060°W)<br>
+                            2️⃣ Find that spot on the map and click it<br>
+                            3️⃣ Get it right within 60 seconds to earn XP<br>
+                            4️⃣ Hints unlock at 30s and 15s if you need help<br>
+                            5️⃣ Build streaks for bonus XP!
+                        </div>
+                        
+                        <button class="btn" onclick="startMysteryGame()">🎮 START MYSTERY CHALLENGE</button>
+                        <button class="btn btn-secondary" onclick="showTutorial('mystery')">📖 FULL TUTORIAL</button>
+                    </div>
                 </div>
                 
-                <div class="info-section">
-                    <h2>📊 Your Stats</h2>
-                    <div class="info-item">
-                        <div class="info-label">Total Solved</div>
-                        <div class="info-value" id="mysteries-solved">0</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Best Streak</div>
-                        <div class="info-value" id="best-streak">0</div>
+                <div class="section">
+                    <h2>📊 YOUR STATS</h2>
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Total Solved</div>
+                            <div class="stat-value" id="mysteries-solved">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Best Streak</div>
+                            <div class="stat-value" id="best-streak">0</div>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <!-- SCAVENGER HUNT MODE -->
             <div id="scavenger-panel" class="game-panel">
-                <div class="info-section">
-                    <h2>🌍 Geographic Scavenger Hunt</h2>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="scavenger-progress" style="width: 0%">0/10</div>
+                <div class="section">
+                    <h2>🌍 SCAVENGER HUNT</h2>
+                    
+                    <div id="scavenger-game" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="scavenger-progress" style="width: 0%">0/10</div>
+                        </div>
+                        
+                        <div id="scavenger-list" style="margin: 16px 0;"></div>
+                        
+                        <button class="btn btn-secondary" onclick="resetScavenger()">🔄 NEW HUNT</button>
                     </div>
                     
-                    <div id="scavenger-list"></div>
-                    
-                    <button class="btn" onclick="startScavengerHunt()">🎯 Start New Hunt</button>
+                    <div id="scavenger-intro">
+                        <div class="why-play">
+                            <strong style="font-size: 16px; color: #ffd700;">WHY PLAY THIS?</strong>
+                            <p style="margin-top: 8px; color: #ddd;">
+                                Explore the entire world! Find deserts, mountains, oceans, and cities. Unlock achievement badges and become a geography master.
+                            </p>
+                        </div>
+                        
+                        <div style="background: rgba(102, 126, 234, 0.1); padding: 14px; border-radius: 8px; margin: 12px 0; font-size: 14px; line-height: 1.8; color: #ddd;">
+                            <strong style="color: #ffd700;">HOW TO PLAY:</strong><br>
+                            1️⃣ You'll get 10 challenges (find a desert, find a mountain, etc.)<br>
+                            2️⃣ Use map layers to help you find each one<br>
+                            3️⃣ Click on the map when you find it<br>
+                            4️⃣ Each correct answer = 20 XP<br>
+                            5️⃣ Complete all 10 to unlock achievement badges!
+                        </div>
+                        
+                        <button class="btn" onclick="startScavengerGame()">🎮 START SCAVENGER HUNT</button>
+                        <button class="btn btn-secondary" onclick="showTutorial('scavenger')">📖 FULL TUTORIAL</button>
+                    </div>
                 </div>
                 
-                <div class="info-section">
-                    <h2>🏆 Achievements</h2>
+                <div class="section">
+                    <h2>🏆 ACHIEVEMENTS</h2>
                     <div id="achievement-badges">
                         <span class="badge locked">🏜️ Desert Explorer</span>
                         <span class="badge locked">⛰️ Mountain Master</span>
@@ -478,89 +757,139 @@
             
             <!-- GUESS LOCATION MODE -->
             <div id="guess-panel" class="game-panel">
-                <div class="info-section">
-                    <h2>📸 Guess the Location</h2>
-                    <div class="score">Score: <span id="guess-score">0</span>/5</div>
+                <div class="section">
+                    <h2>📸 GUESS THE LOCATION</h2>
                     
-                    <div id="guess-question" class="info-item" style="text-align: center;">
-                        <div class="info-value" id="guess-prompt">Click "New Challenge" to start!</div>
+                    <div id="guess-game" style="display: none;">
+                        <div class="score-display">
+                            Round: <span id="guess-round">1</span>/5 | Score: <span id="guess-score">0</span>
+                        </div>
+                        
+                        <div style="background: rgba(102, 126, 234, 0.1); padding: 12px; border-radius: 8px; text-align: center; margin: 12px 0;">
+                            <strong style="color: #ffd700; font-size: 16px;" id="guess-prompt">Look at the satellite view. Where is this?</strong>
+                        </div>
+                        
+                        <div id="guess-options" class="answer-options"></div>
+                        
+                        <button class="btn btn-secondary" onclick="nextGuessRound()" id="next-guess-btn" style="display: none;">➡️ NEXT LOCATION</button>
                     </div>
                     
-                    <div id="guess-options" class="answer-options"></div>
-                    
-                    <button class="btn" onclick="startGuessGame()">🎲 New Challenge</button>
+                    <div id="guess-intro">
+                        <div class="why-play">
+                            <strong style="font-size: 16px; color: #ffd700;">WHY PLAY THIS?</strong>
+                            <p style="margin-top: 8px; color: #ddd;">
+                                Test your world knowledge! Identify famous landmarks from satellite view. Perfect your visual geography skills and impress your friends.
+                            </p>
+                        </div>
+                        
+                        <div style="background: rgba(102, 126, 234, 0.1); padding: 14px; border-radius: 8px; margin: 12px 0; font-size: 14px; line-height: 1.8; color: #ddd;">
+                            <strong style="color: #ffd700;">HOW TO PLAY:</strong><br>
+                            1️⃣ The map will zoom to a famous location<br>
+                            2️⃣ Look at the satellite/terrain view carefully<br>
+                            3️⃣ Choose the correct country from 4 options<br>
+                            4️⃣ Earn 30 XP for each correct answer<br>
+                            5️⃣ Play 5 rounds per game!
+                        </div>
+                        
+                        <button class="btn" onclick="startGuessGame()">🎮 START GUESS GAME</button>
+                        <button class="btn btn-secondary" onclick="showTutorial('guess')">📖 FULL TUTORIAL</button>
+                    </div>
                 </div>
                 
-                <div class="info-section">
-                    <h2>📊 Stats</h2>
-                    <div class="info-item">
-                        <div class="info-label">Correct Answers</div>
-                        <div class="info-value" id="guess-correct">0</div>
+                <div class="section">
+                    <h2>📊 YOUR STATS</h2>
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Correct</div>
+                            <div class="stat-value" id="guess-correct">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Total Played</div>
+                            <div class="stat-value" id="guess-total">0</div>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <!-- DETECTIVE MISSIONS MODE -->
             <div id="missions-panel" class="game-panel">
-                <div class="info-section">
-                    <h2>🏆 Detective Missions</h2>
+                <div class="section">
+                    <h2>🏆 DETECTIVE MISSIONS</h2>
+                    <p style="color: #aaa; margin-bottom: 16px;">
+                        Complete missions to level up your detective skills and earn massive XP rewards!
+                    </p>
                     <div id="missions-list"></div>
                 </div>
             </div>
             
             <!-- CREATE HEIST MODE -->
             <div id="create-panel" class="game-panel">
-                <div class="info-section">
-                    <h2>🗺️ Create Your Own Heist</h2>
-                    <div class="info-item">
-                        <div class="info-label">Heist Name</div>
-                        <input type="text" id="heist-name" placeholder="The Mystery of..." style="width: 100%; padding: 8px; border-radius: 4px; background: #2a2a3e; border: 1px solid #667eea; color: white;">
+                <div class="section">
+                    <h2>🗺️ CREATE YOUR OWN HEIST</h2>
+                    
+                    <div class="why-play" style="margin-bottom: 16px;">
+                        <strong style="font-size: 16px; color: #ffd700;">WHY CREATE?</strong>
+                        <p style="margin-top: 8px; color: #ddd;">
+                            Challenge your classmates! Create tricky mysteries and share them. Earn 50 XP for each heist you create!
+                        </p>
                     </div>
                     
-                    <div class="info-item">
-                        <div class="info-label">Click map to set target location</div>
-                        <div class="info-value" id="heist-coords">No location set</div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="color: #aaa; font-size: 12px; text-transform: uppercase; font-weight: 600;">Heist Name</label>
+                        <input type="text" id="heist-name" class="input-field" placeholder="The Mystery of...">
                     </div>
                     
-                    <div class="info-item">
-                        <div class="info-label">Clue 1</div>
-                        <input type="text" id="clue1" placeholder="Hint about the location..." style="width: 100%; padding: 8px; border-radius: 4px; background: #2a2a3e; border: 1px solid #667eea; color: white;">
+                    <div style="margin-bottom: 12px;">
+                        <label style="color: #aaa; font-size: 12px; text-transform: uppercase; font-weight: 600;">Target Location</label>
+                        <div class="coords-display" id="heist-coords" style="font-size: 14px;">
+                            Click on map to set location
+                        </div>
                     </div>
                     
-                    <div class="info-item">
-                        <div class="info-label">Clue 2</div>
-                        <input type="text" id="clue2" placeholder="Another hint..." style="width: 100%; padding: 8px; border-radius: 4px; background: #2a2a3e; border: 1px solid #667eea; color: white;">
+                    <div style="margin-bottom: 12px;">
+                        <label style="color: #aaa; font-size: 12px; text-transform: uppercase; font-weight: 600;">Clue 1</label>
+                        <input type="text" id="clue1" class="input-field" placeholder="Hint about the location...">
                     </div>
                     
-                    <button class="btn" onclick="saveHeist()">💾 Save Heist</button>
-                    <button class="btn" onclick="loadHeists()">📂 Load Saved Heists</button>
+                    <div style="margin-bottom: 12px;">
+                        <label style="color: #aaa; font-size: 12px; text-transform: uppercase; font-weight: 600;">Clue 2 (Optional)</label>
+                        <input type="text" id="clue2" class="input-field" placeholder="Another hint...">
+                    </div>
+                    
+                    <button class="btn" onclick="saveHeist()">💾 SAVE HEIST (+50 XP)</button>
+                    <button class="btn btn-secondary" onclick="loadHeists()">📂 VIEW SAVED HEISTS</button>
                 </div>
                 
-                <div class="info-section" id="saved-heists-section" style="display: none;">
-                    <h2>📂 Your Heists</h2>
+                <div class="section" id="saved-heists-section" style="display: none;">
+                    <h2>📂 YOUR HEISTS</h2>
                     <div id="saved-heists-list"></div>
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="easter-egg-67" id="easter-egg">
-        🎉 You found the 67! +67 XP!
+    <!-- Tutorial Overlay -->
+    <div id="tutorial-overlay" class="tutorial-overlay">
+        <div class="tutorial-content" id="tutorial-content">
+            <!-- Tutorial content will be inserted here -->
+        </div>
     </div>
     
-    <!-- Leaflet JavaScript -->
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+    
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
     
     <script>
-        // Initialize the map
+        // Initialize map
         const map = L.map('map', {
             preferCanvas: true,
             zoomControl: true
         }).setView([20, 0], 2);
         
-        // Define base layers
+        // Base layers
         const streetMapEnglish = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             maxZoom: 19,
             attribution: '&copy; OpenStreetMap &copy; CARTO',
@@ -574,7 +903,7 @@
         
         const topoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
             maxZoom: 17,
-            attribution: '&copy; OpenStreetMap, SRTM | OpenTopoMap'
+            attribution: '&copy; OpenStreetMap, SRTM'
         });
         
         const terrainMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
@@ -582,30 +911,23 @@
             attribution: 'Tiles &copy; Esri'
         });
         
-        // Define overlays
         const englishLabelsOverlay = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
             maxZoom: 19,
             subdomains: 'abcd',
             opacity: 1.0
         });
         
-        const boundariesOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19,
-            opacity: 0.7
-        });
-        
         streetMapEnglish.addTo(map);
         
         const baseMaps = {
-            "🗺️ Street (English) ⭐": streetMapEnglish,
+            "🗺️ Street (English)": streetMapEnglish,
             "🛰️ Satellite": satelliteMap,
             "⛰️ Topographic": topoMap,
-            "🏔️ Terrain Relief": terrainMap
+            "🏔️ Terrain": terrainMap
         };
         
         const overlayMaps = {
-            "🔤 English Labels": englishLabelsOverlay,
-            "🏛️ Boundaries & Places": boundariesOverlay
+            "🔤 English Labels": englishLabelsOverlay
         };
         
         L.control.layers(baseMaps, overlayMaps, {
@@ -620,33 +942,44 @@
         
         // Game state
         let gameState = {
-            totalScore: 0,
-            mysteryScore: 0,
-            mysteryStreak: 0,
-            bestStreak: 0,
-            mysteriesSolved: 0,
-            guessScore: 0,
-            guessCorrect: 0,
+            totalXP: 0,
             currentMode: 'explore',
-            currentMystery: null,
-            mysteryTimer: null,
-            scavengerHunt: [],
-            scavengerCompleted: 0,
+            mystery: {
+                score: 0,
+                streak: 0,
+                bestStreak: 0,
+                solved: 0,
+                current: null,
+                timer: null,
+                active: false
+            },
+            scavenger: {
+                challenges: [],
+                completed: 0,
+                active: false
+            },
+            guess: {
+                score: 0,
+                correct: 0,
+                total: 0,
+                round: 0,
+                current: null,
+                active: false
+            },
             missions: [
-                { id: 1, name: "Master Coordinates", desc: "Plot 10 locations", progress: 0, target: 10, xp: 100 },
-                { id: 2, name: "Terrain Expert", desc: "Identify 5 landforms", progress: 0, target: 5, xp: 150 },
-                { id: 3, name: "Climate Detective", desc: "Match 8 climate zones", progress: 0, target: 8, xp: 200 },
-                { id: 4, name: "Layer Master", desc: "Use all map layers", progress: 0, target: 5, xp: 250 }
+                { id: 1, name: "Master Coordinates", desc: "Complete 10 Mystery Challenges", progress: 0, target: 10, xp: 100 },
+                { id: 2, name: "Terrain Expert", desc: "Complete a Scavenger Hunt", progress: 0, target: 1, xp: 150 },
+                { id: 3, name: "Visual Detective", desc: "Get 5 correct in Guess Game", progress: 0, target: 5, xp: 200 },
+                { id: 4, name: "Master Creator", desc: "Create 3 heists", progress: 0, target: 3, xp: 250 }
             ],
-            heists: [],
-            easterEggFound: false
+            heists: []
         };
         
         // Load saved state
         if (localStorage.getItem('geoDetectiveState')) {
             const saved = JSON.parse(localStorage.getItem('geoDetectiveState'));
             gameState = { ...gameState, ...saved };
-            updateScoreDisplay();
+            updateAllDisplays();
         }
         
         // Save state
@@ -654,54 +987,61 @@
             localStorage.setItem('geoDetectiveState', JSON.stringify(gameState));
         }
         
-        // Update score display
-        function updateScoreDisplay() {
-            document.getElementById('total-score').textContent = gameState.totalScore;
-            document.getElementById('mystery-score').textContent = gameState.mysteryScore;
-            document.getElementById('mystery-streak').textContent = gameState.mysteryStreak;
-            document.getElementById('best-streak').textContent = gameState.bestStreak;
-            document.getElementById('mysteries-solved').textContent = gameState.mysteriesSolved;
-            document.getElementById('guess-score').textContent = gameState.guessScore;
-            document.getElementById('guess-correct').textContent = gameState.guessCorrect;
-        }
-        
-        // Add XP
-        function addXP(amount) {
-            gameState.totalScore += amount;
-            updateScoreDisplay();
+        // Add XP with notification
+        function addXP(amount, reason) {
+            gameState.totalXP += amount;
+            document.getElementById('total-xp').textContent = gameState.totalXP;
+            showNotification(`+${amount} XP! ${reason}`);
             saveState();
         }
         
-        // Switch game mode
+        // Show notification
+        function showNotification(message) {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.classList.add('active');
+            setTimeout(() => {
+                notif.classList.remove('active');
+            }, 2000);
+        }
+        
+        // Update all displays
+        function updateAllDisplays() {
+            document.getElementById('total-xp').textContent = gameState.totalXP;
+            document.getElementById('mystery-score').textContent = gameState.mystery.score;
+            document.getElementById('mystery-streak').textContent = gameState.mystery.streak;
+            document.getElementById('best-streak').textContent = gameState.mystery.bestStreak;
+            document.getElementById('mysteries-solved').textContent = gameState.mystery.solved;
+            document.getElementById('guess-score').textContent = gameState.guess.score;
+            document.getElementById('guess-correct').textContent = gameState.guess.correct;
+            document.getElementById('guess-total').textContent = gameState.guess.total;
+        }
+        
+        // Switch mode
         function switchMode(mode) {
             gameState.currentMode = mode;
             
-            // Update button states
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
-            // Update panels
             document.querySelectorAll('.game-panel').forEach(panel => panel.classList.remove('active'));
             document.getElementById(mode + '-panel').classList.add('active');
             
-            // Mode-specific setup
             if (mode === 'missions') {
                 renderMissions();
-            } else if (mode === 'create') {
-                setupCreateMode();
             }
         }
         
         // Format coordinates
-        function formatCoordinate(value, isLat) {
-            const direction = isLat ? (value >= 0 ? 'N' : 'S') : (value >= 0 ? 'E' : 'W');
-            return `${Math.abs(value).toFixed(6)}° ${direction}`;
+        function formatCoord(value, isLat) {
+            const dir = isLat ? (value >= 0 ? 'N' : 'S') : (value >= 0 ? 'E' : 'W');
+            return `${Math.abs(value).toFixed(4)}° ${dir}`;
         }
         
-        // Mouse move handler
+        // Mouse move
         map.on('mousemove', function(e) {
-            document.getElementById('hover-latitude').textContent = formatCoordinate(e.latlng.lat, true);
-            document.getElementById('hover-longitude').textContent = formatCoordinate(e.latlng.lng, false);
+            document.getElementById('hover-lat').textContent = formatCoord(e.latlng.lat, true);
+            document.getElementById('hover-lon').textContent = formatCoord(e.latlng.lng, false);
         });
         
         // Click handler
@@ -710,8 +1050,10 @@
             const lat = e.latlng.lat;
             const lon = e.latlng.lng;
             
-            if (gameState.currentMode === 'mystery') {
+            if (gameState.mystery.active) {
                 checkMysteryAnswer(lat, lon);
+            } else if (gameState.scavenger.active) {
+                checkScavengerAnswer(lat, lon);
             } else if (gameState.currentMode === 'create') {
                 setHeistLocation(lat, lon);
             } else {
@@ -723,7 +1065,7 @@
             if (currentMarker) map.removeLayer(currentMarker);
             currentMarker = L.marker([lat, lon]).addTo(map);
             
-            document.getElementById('location-info').innerHTML = '<div class="info-item"><div class="info-label">Loading...</div></div>';
+            document.getElementById('location-info').innerHTML = 'Loading...';
             
             try {
                 const response = await fetch(
@@ -731,204 +1073,288 @@
                     { headers: { 'User-Agent': 'Geographic Detective Academy' } }
                 );
                 const data = await response.json();
-                const address = data.address || {};
+                const addr = data.address || {};
                 
-                let html = '';
-                if (address.city || address.town) html += `<div class="info-item"><div class="info-label">City</div><div class="info-value">${address.city || address.town}</div></div>`;
-                if (address.country) html += `<div class="info-item"><div class="info-label">Country</div><div class="info-value">${address.country}</div></div>`;
-                html += `<div class="info-item"><div class="info-label">Coordinates</div><div class="info-value">${formatCoordinate(lat, true)}, ${formatCoordinate(lon, false)}</div></div>`;
+                let info = `<strong>${formatCoord(lat, true)}, ${formatCoord(lon, false)}</strong><br>`;
+                if (addr.city || addr.town) info += `${addr.city || addr.town}, `;
+                if (addr.country) info += addr.country;
                 
-                document.getElementById('location-info').innerHTML = html;
+                document.getElementById('location-info').innerHTML = info;
             } catch (error) {
-                document.getElementById('location-info').innerHTML = '<div class="info-item"><div class="info-label">Error loading location</div></div>';
+                document.getElementById('location-info').innerHTML = 'Error loading location';
             }
         }
         
         // MYSTERY CHALLENGE
         const mysteryLocations = [
-            { lat: 40.7128, lon: -74.0060, name: "New York City", hint: "Major US city on the east coast", continent: "North America" },
-            { lat: 51.5074, lon: -0.1278, name: "London", hint: "Capital of the United Kingdom", continent: "Europe" },
-            { lat: 35.6762, lon: 139.6503, name: "Tokyo", hint: "Capital of Japan", continent: "Asia" },
-            { lat: -33.8688, lon: 151.2093, name: "Sydney", hint: "Famous Australian harbor city", continent: "Australia" },
-            { lat: 48.8566, lon: 2.3522, name: "Paris", hint: "City of Light in France", continent: "Europe" },
-            { lat: 55.7558, lon: 37.6173, name: "Moscow", hint: "Capital of Russia", continent: "Europe" },
-            { lat: -23.5505, lon: -46.6333, name: "São Paulo", hint: "Largest city in Brazil", continent: "South America" },
-            { lat: 30.0444, lon: 31.2357, name: "Cairo", hint: "Ancient Egyptian capital", continent: "Africa" },
-            { lat: 19.4326, lon: -99.1332, name: "Mexico City", hint: "Capital of Mexico", continent: "North America" },
-            { lat: 1.3521, lon: 103.8198, name: "Singapore", hint: "Island city-state in Southeast Asia", continent: "Asia" }
+            { lat: 40.7128, lon: -74.0060, name: "New York City", hint: "Major US city, financial capital", continent: "North America", zoom: 10 },
+            { lat: 51.5074, lon: -0.1278, name: "London", hint: "UK capital, River Thames", continent: "Europe", zoom: 10 },
+            { lat: 35.6762, lon: 139.6503, name: "Tokyo", hint: "Japan's capital, largest metro area", continent: "Asia", zoom: 10 },
+            { lat: -33.8688, lon: 151.2093, name: "Sydney", hint: "Famous harbor, Opera House", continent: "Australia", zoom: 10 },
+            { lat: 48.8566, lon: 2.3522, name: "Paris", hint: "City of Light, Eiffel Tower", continent: "Europe", zoom: 10 },
+            { lat: 55.7558, lon: 37.6173, name: "Moscow", hint: "Russia's capital, Red Square", continent: "Europe", zoom: 10 },
+            { lat: -23.5505, lon: -46.6333, name: "São Paulo", hint: "Largest city in South America", continent: "South America", zoom: 10 },
+            { lat: 30.0444, lon: 31.2357, name: "Cairo", hint: "Ancient capital, pyramids nearby", continent: "Africa", zoom: 10 },
+            { lat: 19.4326, lon: -99.1332, name: "Mexico City", hint: "Aztec heritage, high altitude", continent: "North America", zoom: 10 },
+            { lat: 1.3521, lon: 103.8198, name: "Singapore", hint: "Island city-state, Southeast Asia", continent: "Asia", zoom: 11 }
         ];
         
+        function startMysteryGame() {
+            document.getElementById('mystery-intro').style.display = 'none';
+            document.getElementById('mystery-game').style.display = 'block';
+            gameState.mystery.active = true;
+            startMystery();
+        }
+        
         function startMystery() {
-            if (gameState.mysteryTimer) clearInterval(gameState.mysteryTimer);
+            if (gameState.mystery.timer) clearInterval(gameState.mystery.timer);
             
-            gameState.currentMystery = mysteryLocations[Math.floor(Math.random() * mysteryLocations.length)];
+            gameState.mystery.current = mysteryLocations[Math.floor(Math.random() * mysteryLocations.length)];
             
             document.getElementById('mystery-coords').textContent = 
-                `${formatCoordinate(gameState.currentMystery.lat, true)}, ${formatCoordinate(gameState.currentMystery.lon, false)}`;
+                `${formatCoord(gameState.mystery.current.lat, true)}, ${formatCoord(gameState.mystery.current.lon, false)}`;
             
             document.getElementById('mystery-hints').style.display = 'none';
-            document.getElementById('reveal-btn').disabled = false;
             
             let timeLeft = 60;
-            document.getElementById('mystery-timer').textContent = timeLeft;
+            const timerEl = document.getElementById('mystery-timer');
+            timerEl.textContent = timeLeft;
+            timerEl.classList.remove('warning');
             
-            gameState.mysteryTimer = setInterval(() => {
+            gameState.mystery.timer = setInterval(() => {
                 timeLeft--;
-                document.getElementById('mystery-timer').textContent = timeLeft;
+                timerEl.textContent = timeLeft;
+                
+                if (timeLeft <= 10) {
+                    timerEl.classList.add('warning');
+                }
                 
                 if (timeLeft === 30) {
                     document.getElementById('mystery-hints').style.display = 'block';
-                    document.getElementById('hint-text').textContent = `Continent: ${gameState.currentMystery.continent}`;
+                    document.getElementById('hint-text').textContent = `Continent: ${gameState.mystery.current.continent}`;
                 }
                 
                 if (timeLeft === 15) {
-                    document.getElementById('hint-text').textContent = gameState.currentMystery.hint;
+                    document.getElementById('hint-text').textContent = gameState.mystery.current.hint;
                 }
                 
                 if (timeLeft <= 0) {
-                    clearInterval(gameState.mysteryTimer);
-                    alert('⏰ Time\'s up! Try again!');
-                    gameState.mysteryStreak = 0;
-                    updateScoreDisplay();
+                    clearInterval(gameState.mystery.timer);
+                    showNotification('⏰ Time\'s up! Streak reset.');
+                    gameState.mystery.streak = 0;
+                    updateAllDisplays();
+                    startMystery();
                 }
             }, 1000);
         }
         
         function checkMysteryAnswer(lat, lon) {
-            if (!gameState.currentMystery) return;
+            if (!gameState.mystery.current) return;
             
             const distance = Math.sqrt(
-                Math.pow(lat - gameState.currentMystery.lat, 2) + 
-                Math.pow(lon - gameState.currentMystery.lon, 2)
+                Math.pow((lat - gameState.mystery.current.lat) * 111, 2) + 
+                Math.pow((lon - gameState.mystery.current.lon) * 111 * Math.cos(lat * Math.PI / 180), 2)
             );
             
-            if (distance < 5) { // Within ~5 degrees
-                clearInterval(gameState.mysteryTimer);
-                const xp = 50 + gameState.mysteryStreak * 10;
-                addXP(xp);
-                gameState.mysteryScore += xp;
-                gameState.mysteryStreak++;
-                gameState.mysteriesSolved++;
-                if (gameState.mysteryStreak > gameState.bestStreak) {
-                    gameState.bestStreak = gameState.mysteryStreak;
+            if (distance < 500) { // Within 500km
+                clearInterval(gameState.mystery.timer);
+                const baseXP = 50;
+                const streakBonus = gameState.mystery.streak * 10;
+                const totalXP = baseXP + streakBonus;
+                
+                addXP(totalXP, `Correct! ${gameState.mystery.current.name}`);
+                gameState.mystery.score += totalXP;
+                gameState.mystery.streak++;
+                gameState.mystery.solved++;
+                
+                if (gameState.mystery.streak > gameState.mystery.bestStreak) {
+                    gameState.mystery.bestStreak = gameState.mystery.streak;
                 }
-                updateScoreDisplay();
-                alert(`🎉 Correct! It was ${gameState.currentMystery.name}! +${xp} XP`);
-                gameState.currentMystery = null;
+                
+                // Update mission progress
+                gameState.missions[0].progress++;
+                
+                updateAllDisplays();
+                saveState();
+                
+                setTimeout(() => startMystery(), 1500);
             } else {
-                alert('❌ Not quite! Try again or use hints!');
+                showNotification('❌ Not quite! Keep trying!');
             }
         }
         
-        function revealMystery() {
-            if (!gameState.currentMystery) return;
-            clearInterval(gameState.mysteryTimer);
-            addXP(-10);
-            alert(`The answer was: ${gameState.currentMystery.name}`);
-            map.setView([gameState.currentMystery.lat, gameState.currentMystery.lon], 8);
-            if (currentMarker) map.removeLayer(currentMarker);
-            currentMarker = L.marker([gameState.currentMystery.lat, gameState.currentMystery.lon]).addTo(map);
-            gameState.mysteryStreak = 0;
-            gameState.currentMystery = null;
-            updateScoreDisplay();
+        function skipMystery() {
+            if (!gameState.mystery.current) return;
+            clearInterval(gameState.mystery.timer);
+            addXP(-5, 'Mystery skipped');
+            gameState.mystery.streak = 0;
+            updateAllDisplays();
+            startMystery();
         }
         
         // SCAVENGER HUNT
         const scavengerChallenges = [
-            { type: "desert", desc: "Find a desert (arid region)", coords: [31.7917, 7.0926], name: "Sahara Desert" },
-            { type: "mountain", desc: "Find a mountain range", coords: [27.9881, 86.9250], name: "Mount Everest" },
-            { type: "ocean", desc: "Click on the Pacific Ocean", coords: [0, -140], name: "Pacific Ocean" },
-            { type: "city", desc: "Find Paris, France", coords: [48.8566, 2.3522], name: "Paris" },
-            { type: "river", desc: "Find the Amazon River", coords: [-3.4653, -62.2159], name: "Amazon River" },
-            { type: "island", desc: "Find Madagascar", coords: [-18.7669, 46.8691], name: "Madagascar" },
-            { type: "capital", desc: "Find Beijing, China", coords: [39.9042, 116.4074], name: "Beijing" },
-            { type: "lake", desc: "Find the Great Lakes", coords: [45.0, -84.0], name: "Great Lakes" },
-            { type: "peninsula", desc: "Find the Arabian Peninsula", coords: [23.8859, 45.0792], name: "Arabian Peninsula" },
-            { type: "volcano", desc: "Find Mount Fuji, Japan", coords: [35.3606, 138.7274], name: "Mount Fuji" }
+            { desc: "Find the Sahara Desert", lat: 23.4162, lon: 25.6628, tolerance: 1000, type: "desert" },
+            { desc: "Find Mount Everest", lat: 27.9881, lon: 86.9250, tolerance: 200, type: "mountain" },
+            { desc: "Find the Amazon River", lat: -3.4653, lon: -62.2159, tolerance: 500, type: "river" },
+            { desc: "Find Paris, France", lat: 48.8566, lon: 2.3522, tolerance: 100, type: "city" },
+            { desc: "Find the Great Barrier Reef", lat: -18.2871, lon: 147.6992, tolerance: 300, type: "reef" },
+            { desc: "Find Tokyo, Japan", lat: 35.6762, lon: 139.6503, tolerance: 100, type: "city" },
+            { desc: "Find the Grand Canyon", lat: 36.1069, lon: -112.1129, tolerance: 200, type: "canyon" },
+            { desc: "Find the Nile River", lat: 26.8206, lon: 30.8025, tolerance: 500, type: "river" },
+            { desc: "Find Antarctica", lat: -82.8628, lon: 135.0000, tolerance: 2000, type: "continent" },
+            { desc: "Find the Great Wall of China", lat: 40.4319, lon: 116.5704, tolerance: 200, type: "landmark" }
         ];
         
-        function startScavengerHunt() {
-            gameState.scavengerHunt = scavengerChallenges.slice(0, 10).map(c => ({ ...c, completed: false }));
-            gameState.scavengerCompleted = 0;
+        function startScavengerGame() {
+            document.getElementById('scavenger-intro').style.display = 'none';
+            document.getElementById('scavenger-game').style.display = 'block';
+            gameState.scavenger.active = true;
+            gameState.scavenger.challenges = scavengerChallenges.map(c => ({ ...c, completed: false }));
+            gameState.scavenger.completed = 0;
             renderScavengerList();
         }
         
         function renderScavengerList() {
-            const html = gameState.scavengerHunt.map((challenge, idx) => `
-                <div class="challenge-item ${challenge.completed ? 'completed' : ''}">
-                    <span>${challenge.completed ? '✅' : '⭕'} ${challenge.desc}</span>
-                    ${challenge.completed ? '<span>+20 XP</span>' : ''}
+            const html = gameState.scavenger.challenges.map((c, idx) => `
+                <div class="challenge-item ${c.completed ? 'completed' : ''}">
+                    <span class="challenge-text">${c.completed ? '✅' : '⭕'} ${c.desc}</span>
+                    ${c.completed ? '<span style="color: #00ff7f; font-weight: 700;">+20 XP</span>' : ''}
                 </div>
             `).join('');
             document.getElementById('scavenger-list').innerHTML = html;
             
-            const progress = (gameState.scavengerCompleted / gameState.scavengerHunt.length) * 100;
+            const progress = (gameState.scavenger.completed / gameState.scavenger.challenges.length) * 100;
             document.getElementById('scavenger-progress').style.width = progress + '%';
-            document.getElementById('scavenger-progress').textContent = `${gameState.scavengerCompleted}/${gameState.scavengerHunt.length}`;
+            document.getElementById('scavenger-progress').textContent = 
+                `${gameState.scavenger.completed}/${gameState.scavenger.challenges.length}`;
         }
         
-        // GUESS LOCATION GAME
+        function checkScavengerAnswer(lat, lon) {
+            for (let i = 0; i < gameState.scavenger.challenges.length; i++) {
+                const c = gameState.scavenger.challenges[i];
+                if (c.completed) continue;
+                
+                const distance = Math.sqrt(
+                    Math.pow((lat - c.lat) * 111, 2) + 
+                    Math.pow((lon - c.lon) * 111 * Math.cos(lat * Math.PI / 180), 2)
+                );
+                
+                if (distance < c.tolerance) {
+                    c.completed = true;
+                    gameState.scavenger.completed++;
+                    addXP(20, c.desc + ' found!');
+                    renderScavengerList();
+                    
+                    if (gameState.scavenger.completed === gameState.scavenger.challenges.length) {
+                        addXP(100, 'Scavenger Hunt Complete!');
+                        gameState.missions[1].progress = 1;
+                        saveState();
+                    }
+                    return;
+                }
+            }
+            
+            showNotification('❌ Not quite! Try another location.');
+        }
+        
+        function resetScavenger() {
+            gameState.scavenger.challenges = scavengerChallenges.map(c => ({ ...c, completed: false }));
+            gameState.scavenger.completed = 0;
+            renderScavengerList();
+        }
+        
+        // GUESS GAME
         const guessLocations = [
-            { coords: [27.1751, 78.0421], name: "Taj Mahal, India", options: ["India", "Pakistan", "Bangladesh", "Nepal"] },
-            { coords: [41.8902, 12.4922], name: "Colosseum, Rome", options: ["Italy", "Greece", "Spain", "France"] },
-            { coords: [-13.1631, -72.5450], name: "Machu Picchu, Peru", options: ["Peru", "Chile", "Bolivia", "Ecuador"] },
-            { coords: [29.9792, 31.1342], name: "Pyramids of Giza", options: ["Egypt", "Sudan", "Libya", "Tunisia"] },
-            { coords: [-22.9519, -43.2105], name: "Christ the Redeemer, Brazil", options: ["Brazil", "Argentina", "Colombia", "Venezuela"] }
+            { lat: 27.1751, lon: 78.0421, name: "Taj Mahal", country: "India", zoom: 15, options: ["India", "Pakistan", "Bangladesh", "Nepal"] },
+            { lat: 41.8902, lon: 12.4922, name: "Colosseum", country: "Italy", zoom: 16, options: ["Italy", "Greece", "Spain", "France"] },
+            { lat: -13.1631, lon: -72.5450, name: "Machu Picchu", country: "Peru", zoom: 14, options: ["Peru", "Chile", "Bolivia", "Ecuador"] },
+            { lat: 29.9792, lon: 31.1342, name: "Pyramids of Giza", country: "Egypt", zoom: 15, options: ["Egypt", "Sudan", "Libya", "Tunisia"] },
+            { lat: -22.9519, lon: -43.2105, name: "Christ the Redeemer", country: "Brazil", zoom: 15, options: ["Brazil", "Argentina", "Colombia", "Venezuela"] },
+            { lat: 40.6892, lon: -74.0445, name: "Statue of Liberty", country: "USA", zoom: 16, options: ["USA", "Canada", "France", "UK"] },
+            { lat: 25.1972, lon: 55.2744, name: "Burj Khalifa", country: "UAE", zoom: 16, options: ["UAE", "Saudi Arabia", "Qatar", "Kuwait"] },
+            { lat: -25.3444, lon: 131.0369, name: "Uluru", country: "Australia", zoom: 13, options: ["Australia", "New Zealand", "South Africa", "Namibia"] },
+            { lat: 43.7230, lon: 10.3966, name: "Leaning Tower of Pisa", country: "Italy", zoom: 17, options: ["Italy", "France", "Spain", "Greece"] },
+            { lat: 51.1789, lon: -1.8262, name: "Stonehenge", country: "UK", zoom: 16, options: ["UK", "Ireland", "France", "Germany"] }
         ];
         
-        let currentGuess = null;
-        
         function startGuessGame() {
-            currentGuess = guessLocations[Math.floor(Math.random() * guessLocations.length)];
-            map.setView(currentGuess.coords, 15);
+            document.getElementById('guess-intro').style.display = 'none';
+            document.getElementById('guess-game').style.display = 'block';
+            gameState.guess.active = true;
+            gameState.guess.round = 0;
+            gameState.guess.score = 0;
+            document.getElementById('guess-score').textContent = '0';
+            nextGuessRound();
+        }
+        
+        function nextGuessRound() {
+            if (gameState.guess.round >= 5) {
+                gameState.guess.active = false;
+                addXP(50, 'Guess Game Complete!');
+                document.getElementById('guess-intro').style.display = 'block';
+                document.getElementById('guess-game').style.display = 'none';
+                return;
+            }
             
-            document.getElementById('guess-prompt').textContent = "Where is this location?";
+            gameState.guess.round++;
+            gameState.guess.current = guessLocations[Math.floor(Math.random() * guessLocations.length)];
             
-            const optionsHtml = currentGuess.options.map(option => 
+            document.getElementById('guess-round').textContent = gameState.guess.round;
+            document.getElementById('next-guess-btn').style.display = 'none';
+            
+            map.setView([gameState.guess.current.lat, gameState.guess.current.lon], gameState.guess.current.zoom);
+            
+            const optionsHtml = gameState.guess.current.options.map(option => 
                 `<button class="answer-btn" onclick="checkGuess('${option}')">${option}</button>`
             ).join('');
             document.getElementById('guess-options').innerHTML = optionsHtml;
         }
         
         function checkGuess(answer) {
-            if (!currentGuess) return;
+            if (!gameState.guess.current) return;
             
             const buttons = document.querySelectorAll('#guess-options .answer-btn');
             buttons.forEach(btn => {
                 btn.disabled = true;
-                if (btn.textContent === currentGuess.options[0]) {
+                if (btn.textContent === gameState.guess.current.country) {
                     btn.classList.add('correct');
-                } else if (btn.textContent === answer && answer !== currentGuess.options[0]) {
+                } else if (btn.textContent === answer) {
                     btn.classList.add('incorrect');
                 }
             });
             
-            if (answer === currentGuess.options[0]) {
-                addXP(30);
-                gameState.guessScore++;
-                gameState.guessCorrect++;
-                updateScoreDisplay();
-                setTimeout(() => alert('🎉 Correct! +30 XP'), 100);
-            } else {
-                setTimeout(() => alert(`❌ Incorrect! It was ${currentGuess.options[0]}`), 100);
+            if (answer === gameState.guess.current.country) {
+                addXP(30, 'Correct!');
+                gameState.guess.score += 30;
+                gameState.guess.correct++;
+                gameState.missions[2].progress++;
+                document.getElementById('guess-score').textContent = gameState.guess.score;
             }
             
-            currentGuess = null;
+            gameState.guess.total++;
+            updateAllDisplays();
+            saveState();
+            
+            document.getElementById('next-guess-btn').style.display = 'block';
         }
         
-        // DETECTIVE MISSIONS
+        // MISSIONS
         function renderMissions() {
-            const html = gameState.missions.map(mission => {
-                const progress = (mission.progress / mission.target) * 100;
+            const html = gameState.missions.map(m => {
+                const progress = Math.min((m.progress / m.target) * 100, 100);
+                const isComplete = m.progress >= m.target;
                 return `
-                    <div class="info-item">
-                        <div class="info-label">${mission.name}</div>
-                        <div class="info-value" style="font-size: 12px;">${mission.desc}</div>
-                        <div class="progress-bar" style="margin-top: 8px;">
-                            <div class="progress-fill" style="width: ${progress}%">${mission.progress}/${mission.target}</div>
+                    <div class="section" style="margin-bottom: 12px;">
+                        <h3 style="color: ${isComplete ? '#00ff7f' : '#ffd700'}; font-size: 16px; margin-bottom: 8px;">
+                            ${isComplete ? '✅' : '🎯'} ${m.name}
+                        </h3>
+                        <p style="color: #aaa; font-size: 13px; margin-bottom: 10px;">${m.desc}</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%">${m.progress}/${m.target}</div>
                         </div>
-                        <div style="text-align: right; margin-top: 4px; font-size: 11px; color: #ffd700;">
-                            ${mission.progress >= mission.target ? '✅ Complete!' : `Reward: ${mission.xp} XP`}
+                        <div style="text-align: right; margin-top: 8px; color: ${isComplete ? '#00ff7f' : '#ffd700'}; font-weight: 700;">
+                            ${isComplete ? 'COMPLETE!' : `Reward: ${m.xp} XP`}
                         </div>
                     </div>
                 `;
@@ -936,21 +1362,12 @@
             document.getElementById('missions-list').innerHTML = html;
         }
         
-        // CREATE HEIST MODE
+        // CREATE HEIST
         let heistLocation = null;
-        
-        function setupCreateMode() {
-            // Reset form
-            document.getElementById('heist-name').value = '';
-            document.getElementById('heist-coords').textContent = 'No location set';
-            document.getElementById('clue1').value = '';
-            document.getElementById('clue2').value = '';
-            heistLocation = null;
-        }
         
         function setHeistLocation(lat, lon) {
             heistLocation = { lat, lon };
-            document.getElementById('heist-coords').textContent = `${formatCoordinate(lat, true)}, ${formatCoordinate(lon, false)}`;
+            document.getElementById('heist-coords').textContent = `${formatCoord(lat, true)}, ${formatCoord(lon, false)}`;
             if (currentMarker) map.removeLayer(currentMarker);
             currentMarker = L.marker([lat, lon]).addTo(map);
         }
@@ -961,7 +1378,7 @@
             const clue2 = document.getElementById('clue2').value;
             
             if (!name || !heistLocation || !clue1) {
-                alert('⚠️ Please fill in heist name, location, and at least one clue!');
+                showNotification('⚠️ Fill in name, location, and clue 1!');
                 return;
             }
             
@@ -974,26 +1391,31 @@
             };
             
             gameState.heists.push(heist);
+            gameState.missions[3].progress++;
+            addXP(50, 'Heist created!');
             saveState();
-            addXP(50);
-            alert('🎉 Heist saved! +50 XP');
-            setupCreateMode();
+            
+            document.getElementById('heist-name').value = '';
+            document.getElementById('clue1').value = '';
+            document.getElementById('clue2').value = '';
+            document.getElementById('heist-coords').textContent = 'Click on map to set location';
+            heistLocation = null;
+            if (currentMarker) map.removeLayer(currentMarker);
         }
         
         function loadHeists() {
             if (gameState.heists.length === 0) {
-                alert('No saved heists yet! Create one first.');
+                showNotification('No saved heists yet!');
                 return;
             }
             
-            const html = gameState.heists.map(heist => `
-                <div class="info-item">
-                    <div class="info-label">${heist.name}</div>
-                    <div class="info-value" style="font-size: 11px;">
-                        Created: ${heist.created}<br>
-                        Clues: ${heist.clues.length}
+            const html = gameState.heists.map(h => `
+                <div class="challenge-item">
+                    <div>
+                        <strong style="color: #ffd700;">${h.name}</strong><br>
+                        <span style="font-size: 12px; color: #aaa;">Created: ${h.created}</span>
                     </div>
-                    <button class="btn" style="margin-top: 8px; padding: 6px;" onclick="viewHeist(${heist.id})">🔍 View</button>
+                    <button class="btn" style="width: auto; padding: 8px 16px; margin: 0;" onclick="viewHeist(${h.id})">VIEW</button>
                 </div>
             `).join('');
             
@@ -1005,39 +1427,102 @@
             const heist = gameState.heists.find(h => h.id === id);
             if (!heist) return;
             
-            map.setView([heist.location.lat, heist.location.lon], 8);
+            map.setView([heist.location.lat, heist.location.lon], 10);
             if (currentMarker) map.removeLayer(currentMarker);
             currentMarker = L.marker([heist.location.lat, heist.location.lon]).addTo(map);
             
-            alert(`🕵️ ${heist.name}\n\nClues:\n${heist.clues.map((c, i) => `${i + 1}. ${c}`).join('\n')}`);
+            showNotification(`📍 ${heist.name}`);
         }
         
-        // EASTER EGG 67
-        function checkEasterEgg(lat, lon) {
-            // Check if coordinates contain 67
-            if (!gameState.easterEggFound && (lat.toFixed(4).includes('67') || lon.toFixed(4).includes('67'))) {
-                gameState.easterEggFound = true;
-                addXP(67);
-                document.getElementById('easter-egg').style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('easter-egg').style.display = 'none';
-                }, 3000);
-            }
+        // TUTORIALS
+        function showTutorial(mode) {
+            const tutorials = {
+                mystery: `
+                    <h2>🎯 MYSTERY CHALLENGE TUTORIAL</h2>
+                    <div class="why-play">
+                        <strong>WHY PLAY THIS?</strong>
+                        <p>Master coordinate reading while racing against time. Build massive streaks for huge XP bonuses. Compete with friends for the highest score!</p>
+                    </div>
+                    <h3>HOW TO PLAY:</h3>
+                    <ul>
+                        <li><strong>Step 1:</strong> Click "START MYSTERY CHALLENGE"</li>
+                        <li><strong>Step 2:</strong> You'll see coordinates like <code>40.7128°N, 74.0060°W</code></li>
+                        <li><strong>Step 3:</strong> Find that location on the map and click it</li>
+                        <li><strong>Step 4:</strong> You have 60 seconds - hints unlock at 30s and 15s</li>
+                        <li><strong>Step 5:</strong> Get it right to earn XP and build your streak!</li>
+                    </ul>
+                    <h3>TIPS:</h3>
+                    <ul>
+                        <li>🧭 Use the coordinates to narrow down the region first</li>
+                        <li>🗺️ Switch map layers to see terrain/satellite views</li>
+                        <li>🔥 Build streaks for bonus XP (each streak adds +10 XP)</li>
+                        <li>⏱️ Don't wait for hints - faster = more practice!</li>
+                    </ul>
+                    <button class="btn" onclick="closeTutorial()">GOT IT! LET'S PLAY</button>
+                `,
+                scavenger: `
+                    <h2>🌍 SCAVENGER HUNT TUTORIAL</h2>
+                    <div class="why-play">
+                        <strong>WHY PLAY THIS?</strong>
+                        <p>Explore the entire world! Learn where major geographic features are located. Unlock achievement badges and become a geography expert!</p>
+                    </div>
+                    <h3>HOW TO PLAY:</h3>
+                    <ul>
+                        <li><strong>Step 1:</strong> Click "START SCAVENGER HUNT"</li>
+                        <li><strong>Step 2:</strong> You'll get 10 challenges (find deserts, mountains, cities, etc.)</li>
+                        <li><strong>Step 3:</strong> Use different map layers to help you find each one</li>
+                        <li><strong>Step 4:</strong> Click on the map when you think you found it</li>
+                        <li><strong>Step 5:</strong> Each correct answer = 20 XP!</li>
+                    </ul>
+                    <h3>TIPS:</h3>
+                    <ul>
+                        <li>🛰️ Use Satellite view to see terrain features</li>
+                        <li>⛰️ Use Topographic view to find mountains</li>
+                        <li>🏙️ Use Street view to find cities</li>
+                        <li>🌍 Zoom out to see continents, zoom in for precision</li>
+                    </ul>
+                    <button class="btn" onclick="closeTutorial()">GOT IT! LET'S HUNT</button>
+                `,
+                guess: `
+                    <h2>📸 GUESS THE LOCATION TUTORIAL</h2>
+                    <div class="why-play">
+                        <strong>WHY PLAY THIS?</strong>
+                        <p>Test your world knowledge! Identify famous landmarks from satellite view. Perfect your visual geography skills and impress everyone!</p>
+                    </div>
+                    <h3>HOW TO PLAY:</h3>
+                    <ul>
+                        <li><strong>Step 1:</strong> Click "START GUESS GAME"</li>
+                        <li><strong>Step 2:</strong> The map zooms to a famous location</li>
+                        <li><strong>Step 3:</strong> Look at the satellite/terrain view carefully</li>
+                        <li><strong>Step 4:</strong> Choose the correct country from 4 options</li>
+                        <li><strong>Step 5:</strong> Earn 30 XP for each correct answer!</li>
+                    </ul>
+                    <h3>TIPS:</h3>
+                    <ul>
+                        <li>👀 Look for distinctive features (rivers, coastlines, deserts)</li>
+                        <li>🗺️ Try switching to Terrain view for elevation clues</li>
+                        <li>🏛️ Famous landmarks have unique shapes from above</li>
+                        <li>🌍 Use continent knowledge to eliminate wrong answers</li>
+                    </ul>
+                    <button class="btn" onclick="closeTutorial()">GOT IT! LET'S GUESS</button>
+                `
+            };
+            
+            document.getElementById('tutorial-content').innerHTML = tutorials[mode];
+            document.getElementById('tutorial-overlay').classList.add('active');
         }
         
-        // Add easter egg check to map clicks
-        map.on('click', function(e) {
-            checkEasterEgg(e.latlng.lat, e.latlng.lng);
-        });
+        function closeTutorial() {
+            document.getElementById('tutorial-overlay').classList.remove('active');
+        }
         
         // Initialize
-        updateScoreDisplay();
+        updateAllDisplays();
         renderMissions();
         
         console.log('🕵️ Geographic Detective Academy initialized!');
-        console.log('🎮 5 game modes ready');
-        console.log('🏆 Mission system active');
-        console.log('🔍 Easter egg 67 hidden somewhere...');
+        console.log('🎮 All game modes ready!');
+        console.log('🏆 Mission system active!');
     </script>
 </body>
 </html>
