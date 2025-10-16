@@ -3676,6 +3676,17 @@
             
             console.log('Checking Alaska achievements:', totalFound, 'locations found out of', grandTotal);
             
+            // Initialize achievement tracking if not exists
+            if (!gameState.alaska.achievements) {
+                gameState.alaska.achievements = {
+                    mountainMaster: false,
+                    riverRunner: false,
+                    parkExplorer: false,
+                    cityFinder: false,
+                    alaskaExpert: false
+                };
+            }
+            
             // Count types across ALL found locations
             let mountains = 0, rivers = 0, parks = 0, cities = 0, glaciers = 0;
             
@@ -3695,35 +3706,157 @@
             console.log('Mountains:', mountains, 'Rivers:', rivers, 'Parks:', parks, 'Cities:', cities, 'Glaciers:', glaciers);
             
             // Mountain Master - find 5+ mountains
-            if (mountains >= 5) {
+            if (mountains >= 5 && !gameState.alaska.achievements.mountainMaster) {
+                gameState.alaska.achievements.mountainMaster = true;
+                unlockAchievement(badges[0], '⛰️ MOUNTAIN MASTER', 'Found 5 mountains!', 100);
+            } else if (mountains >= 5) {
                 badges[0].classList.remove('locked');
                 badges[0].classList.add('unlocked');
             }
             
             // River Runner - find 3+ rivers
-            if (rivers >= 3) {
+            if (rivers >= 3 && !gameState.alaska.achievements.riverRunner) {
+                gameState.alaska.achievements.riverRunner = true;
+                unlockAchievement(badges[1], '🌊 RIVER RUNNER', 'Found 3 rivers!', 75);
+            } else if (rivers >= 3) {
                 badges[1].classList.remove('locked');
                 badges[1].classList.add('unlocked');
             }
             
             // Park Explorer - find 5+ parks
-            if (parks >= 5) {
+            if (parks >= 5 && !gameState.alaska.achievements.parkExplorer) {
+                gameState.alaska.achievements.parkExplorer = true;
+                unlockAchievement(badges[2], '🏞️ PARK EXPLORER', 'Found 5 parks!', 125);
+            } else if (parks >= 5) {
                 badges[2].classList.remove('locked');
                 badges[2].classList.add('unlocked');
             }
             
             // City Finder - find 8+ cities
-            if (cities >= 8) {
+            if (cities >= 8 && !gameState.alaska.achievements.cityFinder) {
+                gameState.alaska.achievements.cityFinder = true;
+                unlockAchievement(badges[3], '🏙️ CITY FINDER', 'Found 8 cities!', 150);
+            } else if (cities >= 8) {
                 badges[3].classList.remove('locked');
                 badges[3].classList.add('unlocked');
             }
             
-            // Alaska Expert - find all 50 locations
-            if (totalFound === grandTotal) {
+            // Alaska Expert - find all locations
+            if (totalFound === grandTotal && !gameState.alaska.achievements.alaskaExpert) {
+                gameState.alaska.achievements.alaskaExpert = true;
+                unlockAchievement(badges[4], '🏆 ALASKA EXPERT', 'Discovered all Alaska locations!', 500);
+            } else if (totalFound === grandTotal) {
                 badges[4].classList.remove('locked');
                 badges[4].classList.add('unlocked');
-                showNotification('🏆 ALASKA EXPERT UNLOCKED! +500 XP BONUS!');
-                addXP(500);
+            }
+            
+            saveState();
+        }
+        
+        // Animated achievement unlock with visual celebration
+        function unlockAchievement(badgeElement, title, description, xpReward) {
+            // Unlock the badge visually
+            badgeElement.classList.remove('locked');
+            badgeElement.classList.add('unlocked');
+            
+            // Award XP
+            addXP(xpReward, title);
+            
+            // Show celebration overlay
+            setTimeout(() => {
+                showAchievementUnlock(title, description, xpReward);
+            }, 500);
+        }
+        
+        // Show full-screen achievement unlock celebration
+        window.showAchievementUnlock = function(title, description, xpReward) {
+            const overlay = document.createElement('div');
+            overlay.id = 'achievement-unlock-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 3000;
+                animation: fadeIn 0.5s ease-in;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="text-align: center; padding: 60px 40px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 237, 78, 0.15) 100%); border-radius: 20px; border: 3px solid #ffd700; max-width: 500px; animation: achievementPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);">
+                    <div style="font-size: 80px; margin-bottom: 20px; animation: achievementSpin 0.8s ease-out;">
+                        🏆
+                    </div>
+                    <h2 style="color: #ffd700; font-size: 32px; margin: 0 0 10px 0; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">
+                        ACHIEVEMENT UNLOCKED!
+                    </h2>
+                    <h3 style="color: #fff; font-size: 24px; margin: 0 0 15px 0;">
+                        ${title}
+                    </h3>
+                    <p style="color: #aaa; font-size: 16px; margin: 0 0 25px 0;">
+                        ${description}
+                    </p>
+                    <div style="background: rgba(255, 215, 0, 0.2); border-radius: 12px; padding: 20px; margin: 20px 0;">
+                        <p style="color: #ffd700; font-size: 28px; margin: 0; font-weight: bold;">
+                            +${xpReward} XP
+                        </p>
+                    </div>
+                    <button onclick="closeAchievementOverlay()" class="btn" style="font-size: 18px; padding: 12px 30px; margin-top: 15px; background: #ffd700; color: #000;">
+                        🎉 AWESOME!
+                    </button>
+                    <p style="font-size: 12px; color: #666; margin: 15px 0 0 0;">Click or wait 5 seconds...</p>
+                </div>
+            `;
+            
+            // Add animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes achievementPop {
+                    0% {
+                        transform: scale(0.5) rotateY(-180deg);
+                        opacity: 0;
+                    }
+                    70% {
+                        transform: scale(1.1) rotateY(10deg);
+                    }
+                    100% {
+                        transform: scale(1) rotateY(0deg);
+                        opacity: 1;
+                    }
+                }
+                @keyframes achievementSpin {
+                    0% {
+                        transform: rotate(0deg) scale(0.5);
+                        opacity: 0;
+                    }
+                    50% {
+                        transform: rotate(180deg) scale(1.2);
+                    }
+                    100% {
+                        transform: rotate(360deg) scale(1);
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(overlay);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                closeAchievementOverlay();
+            }, 5000);
+        }
+        
+        window.closeAchievementOverlay = function() {
+            const overlay = document.getElementById('achievement-unlock-overlay');
+            if (overlay) {
+                overlay.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => overlay.remove(), 300);
             }
         }
         
