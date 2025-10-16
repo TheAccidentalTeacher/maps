@@ -162,37 +162,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.2s;
-        }
-        
-        .section h2:hover {
-            color: #fff;
-            transform: translateX(4px);
-        }
-        
-        .section h2::after {
-            content: '▼';
-            margin-left: auto;
-            font-size: 12px;
-            transition: transform 0.2s;
-        }
-        
-        .section.collapsed h2::after {
-            transform: rotate(-90deg);
-        }
-        
-        .section-content {
-            max-height: 2000px;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, opacity 0.2s;
-            opacity: 1;
-        }
-        
-        .section.collapsed .section-content {
-            max-height: 0;
-            opacity: 0;
         }
         
         .btn {
@@ -682,15 +651,13 @@
             position: fixed;
             top: 100px;
             right: 30px;
-            width: 450px;
-            max-width: calc(100vw - 60px);
+            width: 400px;
             background: rgba(10, 14, 39, 0.98);
             border: 3px solid #667eea;
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             z-index: 2000;
             display: none;
-            box-sizing: border-box;
         }
         
         #coordinate-finder-panel.active {
@@ -713,9 +680,6 @@
             font-size: 18px;
             font-weight: 700;
             color: white;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
         
         .cf-close-btn {
@@ -733,7 +697,6 @@
             transition: all 0.2s;
             line-height: 1;
             padding: 0;
-            flex-shrink: 0;
         }
         
         .cf-close-btn:hover {
@@ -744,14 +707,6 @@
         .cf-content {
             padding: 20px;
             color: white;
-            overflow-x: hidden;
-            overflow-y: auto;
-            max-height: calc(100vh - 200px);
-            box-sizing: border-box;
-        }
-        
-        .cf-content * {
-            box-sizing: border-box;
         }
         
         @media (max-width: 768px) {
@@ -760,264 +715,6 @@
                 left: 20px;
                 right: 20px;
                 top: 80px;
-            }
-        }
-        
-        /* ========================================
-           FUN MODE STYLES - Phase 4
-           ======================================== */
-        
-        /* Fun Mode Toggle Switch */
-        .fun-mode-toggle {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            border: 2px solid rgba(102, 126, 234, 0.3);
-        }
-        
-        .toggle-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #aaa;
-            flex-grow: 1;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            width: 60px;
-            height: 30px;
-            background: #2a2f4a;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid #667eea;
-        }
-        
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        
-        .toggle-switch.active {
-            background: linear-gradient(135deg, #00ff88, #00ccff);
-            border-color: #00ff88;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
-        }
-        
-        .toggle-switch.active::after {
-            left: 33px;
-            background: #0a0e27;
-        }
-        
-        /* Fun Mode - Body Changes */
-        body.fun-mode {
-            background: #0a0e27;
-        }
-        
-        body.fun-mode #coordinate-finder-panel {
-            background: linear-gradient(135deg, rgba(10, 14, 39, 0.98), rgba(20, 14, 39, 0.98));
-            border: 3px solid #00ff88;
-            box-shadow: 0 8px 32px rgba(0, 255, 136, 0.4), 0 0 60px rgba(0, 204, 255, 0.2);
-        }
-        
-        body.fun-mode .cf-header {
-            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
-        }
-        
-        body.fun-mode .cf-header h3 {
-            color: #0a0e27;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-        
-        body.fun-mode .cf-close-btn {
-            background: rgba(10, 14, 39, 0.6);
-            color: #00ff88;
-        }
-        
-        body.fun-mode .cf-close-btn:hover {
-            background: rgba(10, 14, 39, 0.8);
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
-        }
-        
-        body.fun-mode .btn {
-            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
-            color: #0a0e27;
-            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
-            font-weight: 800;
-        }
-        
-        body.fun-mode .btn:hover:not(:disabled) {
-            box-shadow: 0 6px 25px rgba(0, 255, 136, 0.5);
-            transform: translateY(-3px) scale(1.02);
-        }
-        
-        body.fun-mode .btn:disabled {
-            background: linear-gradient(135deg, #2a2f4a, #3a3f5a);
-            color: #666;
-        }
-        
-        body.fun-mode #cf-timer-overlay {
-            background: linear-gradient(135deg, rgba(10, 14, 39, 0.98), rgba(20, 14, 39, 0.98)) !important;
-            border: 3px solid #00ff88 !important;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 255, 136, 0.6) !important;
-        }
-        
-        body.fun-mode #cf-timer-label {
-            color: #00ff88;
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
-        }
-        
-        body.fun-mode #cf-timer-countdown {
-            color: #00ccff;
-            text-shadow: 0 0 20px rgba(0, 204, 255, 0.8);
-        }
-        
-        body.fun-mode #cf-timer-countdown.warning {
-            color: #ff00ff;
-            text-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
-        }
-        
-        body.fun-mode #cf-timer-countdown.danger {
-            color: #ff0088;
-            text-shadow: 0 0 20px rgba(255, 0, 136, 0.8);
-        }
-        
-        body.fun-mode #cf-skip-hint {
-            color: #00ff88;
-        }
-        
-        /* Fun Mode Input Styling */
-        body.fun-mode input[type="number"],
-        body.fun-mode select {
-            background: rgba(10, 14, 39, 0.8);
-            border-color: #00ccff;
-            color: #00ff88;
-        }
-        
-        body.fun-mode input[type="number"]:focus,
-        body.fun-mode select:focus {
-            border-color: #00ff88;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
-        }
-        
-        body.fun-mode input.valid {
-            border-color: #00ff88;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-        }
-        
-        body.fun-mode input.invalid {
-            border-color: #ff0088;
-            box-shadow: 0 0 10px rgba(255, 0, 136, 0.3);
-        }
-        
-        /* ========================================
-           CELEBRATION MESSAGE STYLES - Phase 5
-           ======================================== */
-        
-        /* Success Message Popup */
-        .success-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, rgba(0, 255, 127, 0.95), rgba(0, 204, 255, 0.95));
-            color: #0a0e27;
-            padding: 40px 60px;
-            border-radius: 20px;
-            font-size: 36px;
-            font-weight: 900;
-            z-index: 10000;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 255, 127, 0.6);
-            text-align: center;
-            animation: popIn 0.3s ease-out;
-        }
-        
-        .success-message.academic {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
-            color: white;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
-        }
-        
-        @keyframes popIn {
-            0% {
-                transform: translate(-50%, -50%) scale(0.5);
-                opacity: 0;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.1);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-        }
-        
-        /* Six Seven Glitch Effect */
-        .glitch-text {
-            position: relative;
-            font-size: 48px;
-            font-weight: 900;
-            color: #ff00ff;
-            text-shadow: 
-                2px 2px #00ffff,
-                -2px -2px #ff00ff;
-            animation: glitch 0.3s infinite;
-        }
-        
-        @keyframes glitch {
-            0% {
-                text-shadow: 
-                    2px 2px #00ffff,
-                    -2px -2px #ff00ff;
-            }
-            25% {
-                text-shadow: 
-                    -2px 2px #ff00ff,
-                    2px -2px #00ffff;
-            }
-            50% {
-                text-shadow: 
-                    2px -2px #00ffff,
-                    -2px 2px #ff00ff;
-            }
-            75% {
-                text-shadow: 
-                    -2px -2px #00ffff,
-                    2px 2px #ff00ff;
-            }
-            100% {
-                text-shadow: 
-                    2px 2px #00ffff,
-                    -2px -2px #ff00ff;
-            }
-        }
-        
-        /* Fade out animation */
-        .fade-out {
-            animation: fadeOut 0.5s ease-out forwards;
-        }
-        
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
             }
         }
     </style>
@@ -1074,62 +771,54 @@
             <!-- EXPLORE MODE -->
             <div id="explore-panel" class="game-panel active">
                 <div class="section">
-                    <h2>� COORDINATE FINDER</h2>
-                    <div class="section-content">
-                        <p style="color: #aaa; line-height: 1.6; margin-bottom: 12px;">
-                            Have coordinates? Use our Coordinate Finder tool to navigate to any location on Earth!
-                        </p>
-                        <button class="btn" onclick="toggleCoordinateFinderPanel()" style="width: 100%; font-size: 16px;">
-                            📍 OPEN COORDINATE FINDER
-                        </button>
+                    <h2>🗺️ FREE EXPLORE</h2>
+                    <p style="color: #aaa; line-height: 1.6; margin-bottom: 12px;">
+                        Click anywhere on the map to see coordinates and location info. Use the layer control (top right) to switch between satellite, terrain, and street views.
+                    </p>
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Latitude</div>
+                            <div class="stat-value" id="hover-lat">--</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Longitude</div>
+                            <div class="stat-value" id="hover-lon">--</div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="section">
-                    <h2>�🗺️ FREE EXPLORE</h2>
-                    <div class="section-content">
-                        <p style="color: #aaa; line-height: 1.6; margin-bottom: 12px;">
-                            Click anywhere on the map to see coordinates and location info. Use the layer control (top right) to switch between satellite, terrain, and street views.
-                        </p>
-                        <div class="stat-grid">
-                            <div class="stat-box">
-                                <div class="stat-label">Latitude</div>
-                                <div class="stat-value" id="hover-lat">--</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Longitude</div>
-                                <div class="stat-value" id="hover-lon">--</div>
-                            </div>
-                        </div>
-                        <div id="location-info" style="color: #aaa; font-size: 14px; margin-top: 12px;">
-                            Click on the map to investigate a location
-                        </div>
+                    <div id="location-info" style="color: #aaa; font-size: 14px; margin-top: 12px;">
+                        Click on the map to investigate a location
                     </div>
                 </div>
                 
                 <div class="section">
                     <h2>📍 DISTANCE FROM GLENNALLEN</h2>
-                    <div class="section-content">
-                        <div id="distance-display" style="color: #aaa; font-size: 14px; line-height: 1.6;">
-                            Click anywhere on the map to see how far it is from your hometown!
-                        </div>
+                    <div id="distance-display" style="color: #aaa; font-size: 14px; line-height: 1.6;">
+                        Click anywhere on the map to see how far it is from your hometown!
                     </div>
                 </div>
                 
                 <div class="section">
                     <h2>🎮 GAME MODES</h2>
-                    <div class="section-content">
-                        <p style="color: #aaa; line-height: 1.6; margin-bottom: 12px;">
-                            Choose a game mode above to start earning XP and completing challenges!
-                        </p>
-                        <div style="background: rgba(102, 126, 234, 0.1); padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.6; color: #ddd;">
-                            <strong style="color: #ffd700;">🎯 MYSTERY:</strong> Find locations from coordinates<br>
-                            <strong style="color: #ffd700;">🌍 SCAVENGER:</strong> Complete geographic challenges<br>
-                            <strong style="color: #ffd700;">📸 GUESS:</strong> Identify famous landmarks<br>
-                            <strong style="color: #ffd700;">🏆 MISSIONS:</strong> Track your progress<br>
-                            <strong style="color: #ffd700;">🗺️ CREATE:</strong> Make your own mysteries
-                        </div>
+                    <p style="color: #aaa; line-height: 1.6; margin-bottom: 12px;">
+                        Choose a game mode above to start earning XP and completing challenges!
+                    </p>
+                    <div style="background: rgba(102, 126, 234, 0.1); padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.6; color: #ddd;">
+                        <strong style="color: #ffd700;">🎯 MYSTERY:</strong> Find locations from coordinates<br>
+                        <strong style="color: #ffd700;">🌍 SCAVENGER:</strong> Complete geographic challenges<br>
+                        <strong style="color: #ffd700;">📸 GUESS:</strong> Identify famous landmarks<br>
+                        <strong style="color: #ffd700;">🏆 MISSIONS:</strong> Track your progress<br>
+                        <strong style="color: #ffd700;">🗺️ CREATE:</strong> Make your own mysteries
                     </div>
+                </div>
+                
+                <div class="section">
+                    <h2>📍 COORDINATE FINDER</h2>
+                    <p style="color: #aaa; line-height: 1.6; margin-bottom: 12px;">
+                        Have coordinates? Use our Coordinate Finder tool to navigate to any location on Earth!
+                    </p>
+                    <button class="btn" onclick="toggleCoordinateFinderPanel()" style="width: 100%; font-size: 16px;">
+                        📍 OPEN COORDINATE FINDER
+                    </button>
                 </div>
             </div>
             
@@ -1529,144 +1218,10 @@
             <button class="cf-close-btn" onclick="closeCoordinateFinderPanel()">×</button>
         </div>
         <div class="cf-content">
-            <p style="color: #aaa; margin-bottom: 12px; line-height: 1.6;">
+            <p style="color: #aaa; margin-bottom: 16px;">
                 Enter coordinates to find any location on Earth!
             </p>
-            
-            <!-- Fun Mode Toggle - Phase 4 -->
-            <div class="fun-mode-toggle">
-                <span class="toggle-label">
-                    <span id="fun-mode-label">📚 Academic Mode</span>
-                </span>
-                <div class="toggle-switch" id="fun-mode-switch" onclick="toggleFunMode()"></div>
-            </div>
-            
-            <!-- Format Toggle -->
-            <div style="display: flex; gap: 8px; margin-bottom: 16px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">
-                <button 
-                    id="format-decimal" 
-                    class="format-toggle-btn active" 
-                    onclick="switchCoordinateFormat('decimal')"
-                    style="flex: 1; padding: 10px 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 6px; color: white; font-weight: 600; cursor: pointer; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    📊 Decimal
-                </button>
-                <button 
-                    id="format-cardinal" 
-                    class="format-toggle-btn" 
-                    onclick="switchCoordinateFormat('cardinal')"
-                    style="flex: 1; padding: 10px 8px; background: rgba(102, 126, 234, 0.2); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #aaa; font-weight: 600; cursor: pointer; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    🧭 N/S/E/W
-                </button>
-            </div>
-            
-            <!-- Decimal Format Inputs (default) -->
-            <div id="decimal-inputs" style="display: block;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                    <div>
-                        <label style="display: block; color: #888; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">Latitude</label>
-                        <input 
-                            type="number" 
-                            id="cf-latitude-decimal" 
-                            placeholder="40.71" 
-                            step="0.01" 
-                            min="-90" 
-                            max="90"
-                            style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; color: white; font-size: 16px; font-weight: bold;"
-                            oninput="validateCoordinateInputs()"
-                        >
-                        <div style="font-size: 11px; color: #666; margin-top: 4px;">(-90 to 90)</div>
-                    </div>
-                    <div>
-                        <label style="display: block; color: #888; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">Longitude</label>
-                        <input 
-                            type="number" 
-                            id="cf-longitude-decimal" 
-                            placeholder="-74.01" 
-                            step="0.01" 
-                            min="-180" 
-                            max="180"
-                            style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; color: white; font-size: 16px; font-weight: bold;"
-                            oninput="validateCoordinateInputs()"
-                        >
-                        <div style="font-size: 11px; color: #666; margin-top: 4px;">(-180 to 180)</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Cardinal Format Inputs (N/S/E/W) -->
-            <div id="cardinal-inputs" style="display: none;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                    <div>
-                        <label style="display: block; color: #888; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">Latitude</label>
-                        <div style="display: flex; gap: 8px;">
-                            <input 
-                                type="number" 
-                                id="cf-latitude-cardinal" 
-                                placeholder="40.71" 
-                                step="0.01" 
-                                min="0" 
-                                max="90"
-                                style="flex: 1; padding: 12px; background: rgba(0,0,0,0.3); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; color: white; font-size: 16px; font-weight: bold;"
-                                oninput="validateCoordinateInputs()"
-                            >
-                            <select 
-                                id="cf-lat-direction" 
-                                style="padding: 12px; background: rgba(0,0,0,0.3); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; color: white; font-size: 16px; font-weight: bold; cursor: pointer;"
-                                onchange="validateCoordinateInputs()">
-                                <option value="N">N</option>
-                                <option value="S">S</option>
-                            </select>
-                        </div>
-                        <div style="font-size: 11px; color: #666; margin-top: 4px;">(0 to 90)</div>
-                    </div>
-                    <div>
-                        <label style="display: block; color: #888; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">Longitude</label>
-                        <div style="display: flex; gap: 8px;">
-                            <input 
-                                type="number" 
-                                id="cf-longitude-cardinal" 
-                                placeholder="74.01" 
-                                step="0.01" 
-                                min="0" 
-                                max="180"
-                                style="flex: 1; padding: 12px; background: rgba(0,0,0,0.3); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; color: white; font-size: 16px; font-weight: bold;"
-                                oninput="validateCoordinateInputs()"
-                            >
-                            <select 
-                                id="cf-lon-direction" 
-                                style="padding: 12px; background: rgba(0,0,0,0.3); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; color: white; font-size: 16px; font-weight: bold; cursor: pointer;"
-                                onchange="validateCoordinateInputs()">
-                                <option value="E">E</option>
-                                <option value="W" selected>W</option>
-                            </select>
-                        </div>
-                        <div style="font-size: 11px; color: #666; margin-top: 4px;">(0 to 180)</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Error Message -->
-            <div id="cf-error" style="display: none; background: rgba(255, 107, 107, 0.2); border: 2px solid rgba(255, 107, 107, 0.5); padding: 12px; border-radius: 8px; margin-bottom: 16px; color: #ff6b6b; font-size: 14px;"></div>
-            
-            <!-- Helper Guide -->
-            <div style="background: rgba(102, 179, 255, 0.1); border-left: 4px solid #66b3ff; padding: 12px; margin-bottom: 16px; border-radius: 6px; word-wrap: break-word; overflow-wrap: break-word;">
-                <strong style="color: #66b3ff; font-size: 13px;">💡 Quick Guide:</strong><br>
-                <span style="font-size: 12px; color: #aaa; line-height: 1.8;">
-                    • <strong>Latitude:</strong> North (+) or South (-)<br>
-                    • <strong>Longitude:</strong> East (+) or West (-)<br>
-                    • <strong>Examples:</strong> NYC (40.71, -74.01),<br>&nbsp;&nbsp;Sydney (-33.87, 151.21)
-                </span>
-            </div>
-            
-            <!-- Find Location Button -->
-            <button 
-                id="cf-find-btn" 
-                class="btn" 
-                onclick="findCoordinateLocation()" 
-                disabled
-                style="width: 100%; font-size: 16px; padding: 14px; opacity: 0.5; cursor: not-allowed;">
-                🗺️ FIND LOCATION!
-            </button>
+            <!-- Content will be added in future phases -->
         </div>
     </div>
     
@@ -1675,13 +1230,6 @@
         <div class="tutorial-content" id="tutorial-content">
             <!-- Tutorial content will be inserted here -->
         </div>
-    </div>
-    
-    <!-- Coordinate Finder Timer Overlay (Fun & Draggable!) -->
-    <div id="cf-timer-overlay" style="display: none; position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95)); border: 3px solid #ffd700; border-radius: 16px; padding: 20px 24px; z-index: 3000; text-align: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.3); cursor: move; user-select: none; min-width: 200px;">
-        <div style="font-size: 13px; color: #ffd700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; font-weight: bold;" id="cf-stage-label">🌍 Stage 1: Hemisphere</div>
-        <div style="font-size: 48px; font-weight: 900; color: #fff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 8px; font-family: 'Arial Black', sans-serif;" id="cf-timer-display">20</div>
-        <div style="font-size: 11px; color: #ffeb3b; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">👆 Click map to skip fr fr</div>
     </div>
     
     <!-- Notification -->
@@ -2168,560 +1716,6 @@
         }
         
         // ========================================
-        // COLLAPSIBLE SECTIONS FUNCTIONALITY
-        // ========================================
-        
-        // Make all sidebar sections collapsible by clicking h2
-        document.querySelectorAll('.section h2').forEach(header => {
-            header.addEventListener('click', function() {
-                const section = this.parentElement;
-                section.classList.toggle('collapsed');
-            });
-        });
-        
-        // ========================================
-        // FUN MODE TOGGLE - Phase 4
-        // ========================================
-        
-        // Check localStorage for Fun Mode preference on page load
-        function initFunMode() {
-            const funModeEnabled = localStorage.getItem('funModeEnabled') === 'true';
-            if (funModeEnabled) {
-                document.body.classList.add('fun-mode');
-                document.getElementById('fun-mode-switch').classList.add('active');
-                document.getElementById('fun-mode-label').textContent = '🎮 Fun Mode';
-            }
-        }
-        
-        // Toggle Fun Mode
-        window.toggleFunMode = function() {
-            const body = document.body;
-            const toggleSwitch = document.getElementById('fun-mode-switch');
-            const label = document.getElementById('fun-mode-label');
-            
-            // Toggle the fun-mode class on body
-            body.classList.toggle('fun-mode');
-            toggleSwitch.classList.toggle('active');
-            
-            // Update label
-            if (body.classList.contains('fun-mode')) {
-                label.textContent = '🎮 Fun Mode';
-                localStorage.setItem('funModeEnabled', 'true');
-            } else {
-                label.textContent = '📚 Academic Mode';
-                localStorage.setItem('funModeEnabled', 'false');
-            }
-        }
-        
-        // Initialize Fun Mode on page load
-        initFunMode();
-        
-        // ========================================
-        // CELEBRATION MESSAGES - Phase 5
-        // ========================================
-        
-        // Academic Mode messages - simple and professional
-        const ACADEMIC_MESSAGES = [
-            '📍 Location Found!',
-            '✅ Target Reached!',
-            '🎯 Success!',
-            '✓ Coordinates Verified!'
-        ];
-        
-        // Fun Mode messages - Gen Alpha approved
-        const FUN_MESSAGES = [
-            '🔥 W!',
-            '✨ SLAY!',
-            '💯 NO CAP!',
-            '🎮 LOCKED IN!',
-            '⚡ BUSSIN!',
-            '🚀 SHEESH!',
-            '👑 GET GOOD!',
-            '💪 COOKED!',
-            '🎯 LET HIM COOK!',
-            '🌟 FIRE!'
-        ];
-        
-        // Six Seven easter egg messages (4.5% chance)
-        const SIX_SEVEN_MESSAGES = [
-            'SIIIIX SEEEEVVEN! 🎉',
-            '6-7 GANG! 💪',
-            'DOOT DOOT 6-7! 🎮',
-            '67 NO CAP! ✨'
-        ];
-        
-        // Get celebration message based on Fun Mode state
-        function getCelebrationMessage() {
-            const funModeEnabled = document.body.classList.contains('fun-mode');
-            
-            if (!funModeEnabled) {
-                // Academic mode - simple messages
-                return ACADEMIC_MESSAGES[Math.floor(Math.random() * ACADEMIC_MESSAGES.length)];
-            }
-            
-            // Fun mode - check for six seven easter egg (4.5% chance)
-            const random = Math.random() * 100;
-            if (random < 4.5) {
-                // SIX SEVEN EASTER EGG!
-                return SIX_SEVEN_MESSAGES[Math.floor(Math.random() * SIX_SEVEN_MESSAGES.length)];
-            }
-            
-            // Regular fun message
-            return FUN_MESSAGES[Math.floor(Math.random() * FUN_MESSAGES.length)];
-        }
-        
-        // Show celebration message popup
-        function showCelebrationMessage(message) {
-            const isSixSeven = message.includes('6') || message.includes('SIX');
-            const messageDiv = document.createElement('div');
-            
-            // Check if Fun Mode for styling
-            const funModeEnabled = document.body.classList.contains('fun-mode');
-            messageDiv.className = funModeEnabled ? 'success-message' : 'success-message academic';
-            
-            // Add glitch effect for six seven
-            if (isSixSeven && funModeEnabled) {
-                messageDiv.innerHTML = `<div class="glitch-text">${message}</div>`;
-            } else {
-                messageDiv.textContent = message;
-            }
-            
-            document.body.appendChild(messageDiv);
-            
-            // Remove after 3 seconds with fade
-            setTimeout(() => {
-                messageDiv.classList.add('fade-out');
-                setTimeout(() => messageDiv.remove(), 500);
-            }, 3000);
-        }
-        
-        // ========================================
-        // COORDINATE FINDER FUNCTIONS - Phase 2
-        // ========================================
-        
-        // Track current format
-        let coordinateFormat = 'decimal';
-        
-        // Switch between decimal and cardinal format
-        window.switchCoordinateFormat = function(format) {
-            coordinateFormat = format;
-            
-            // Update button styles
-            document.getElementById('format-decimal').style.background = 
-                format === 'decimal' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'rgba(102, 126, 234, 0.2)';
-            document.getElementById('format-decimal').style.border = 
-                format === 'decimal' ? 'none' : '2px solid rgba(102, 126, 234, 0.3)';
-            document.getElementById('format-decimal').style.color = 
-                format === 'decimal' ? 'white' : '#aaa';
-                
-            document.getElementById('format-cardinal').style.background = 
-                format === 'cardinal' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'rgba(102, 126, 234, 0.2)';
-            document.getElementById('format-cardinal').style.border = 
-                format === 'cardinal' ? 'none' : '2px solid rgba(102, 126, 234, 0.3)';
-            document.getElementById('format-cardinal').style.color = 
-                format === 'cardinal' ? 'white' : '#aaa';
-            
-            // Show/hide input sections
-            document.getElementById('decimal-inputs').style.display = format === 'decimal' ? 'block' : 'none';
-            document.getElementById('cardinal-inputs').style.display = format === 'cardinal' ? 'block' : 'none';
-            
-            // Reset validation
-            validateCoordinateInputs();
-        }
-        
-        // Validate coordinate inputs in real-time (FIXED VERSION)
-        window.validateCoordinateInputs = function() {
-            const errorDiv = document.getElementById('cf-error');
-            const findBtn = document.getElementById('cf-find-btn');
-            
-            let lat, lon, latInput, lonInput;
-            let latValid = false;
-            let lonValid = false;
-            let errorMessage = '';
-            
-            if (coordinateFormat === 'decimal') {
-                latInput = document.getElementById('cf-latitude-decimal');
-                lonInput = document.getElementById('cf-longitude-decimal');
-                lat = parseFloat(latInput.value);
-                lon = parseFloat(lonInput.value);
-            } else {
-                latInput = document.getElementById('cf-latitude-cardinal');
-                lonInput = document.getElementById('cf-longitude-cardinal');
-                const latDir = document.getElementById('cf-lat-direction').value;
-                const lonDir = document.getElementById('cf-lon-direction').value;
-                
-                let latNum = parseFloat(latInput.value);
-                let lonNum = parseFloat(lonInput.value);
-                
-                // Convert cardinal to decimal
-                lat = latDir === 'S' ? -Math.abs(latNum) : Math.abs(latNum);
-                lon = lonDir === 'W' ? -Math.abs(lonNum) : Math.abs(lonNum);
-            }
-            
-            // Reset all styles first
-            if (latInput) latInput.style.borderColor = 'rgba(102, 126, 234, 0.3)';
-            if (lonInput) lonInput.style.borderColor = 'rgba(102, 126, 234, 0.3)';
-            errorDiv.style.display = 'none';
-            
-            // Check if both fields have values
-            if (!latInput.value || !lonInput.value) {
-                findBtn.disabled = true;
-                findBtn.style.opacity = '0.5';
-                findBtn.style.cursor = 'not-allowed';
-                return;
-            }
-            
-            // Validate latitude independently
-            if (coordinateFormat === 'decimal') {
-                if (isNaN(lat) || lat < -90 || lat > 90) {
-                    latInput.style.borderColor = '#ff6b6b';
-                    errorMessage = '❌ Latitude must be between -90 and 90';
-                } else {
-                    latInput.style.borderColor = '#00ff7f';
-                    latValid = true;
-                }
-            } else {
-                if (isNaN(lat) || Math.abs(lat) < 0 || Math.abs(lat) > 90) {
-                    latInput.style.borderColor = '#ff6b6b';
-                    errorMessage = '❌ Latitude must be between 0 and 90';
-                } else {
-                    latInput.style.borderColor = '#00ff7f';
-                    latValid = true;
-                }
-            }
-            
-            // Validate longitude independently
-            if (coordinateFormat === 'decimal') {
-                if (isNaN(lon) || lon < -180 || lon > 180) {
-                    lonInput.style.borderColor = '#ff6b6b';
-                    if (!errorMessage) errorMessage = '❌ Longitude must be between -180 and 180';
-                } else {
-                    lonInput.style.borderColor = '#00ff7f';
-                    lonValid = true;
-                }
-            } else {
-                if (isNaN(lon) || Math.abs(lon) < 0 || Math.abs(lon) > 180) {
-                    lonInput.style.borderColor = '#ff6b6b';
-                    if (!errorMessage) errorMessage = '❌ Longitude must be between 0 and 180';
-                } else {
-                    lonInput.style.borderColor = '#00ff7f';
-                    lonValid = true;
-                }
-            }
-            
-            // Show error if any validation failed
-            if (errorMessage) {
-                errorDiv.textContent = errorMessage;
-                errorDiv.style.display = 'block';
-            }
-            
-            // Enable button only if BOTH are valid
-            if (latValid && lonValid) {
-                findBtn.disabled = false;
-                findBtn.style.opacity = '1';
-                findBtn.style.cursor = 'pointer';
-            } else {
-                findBtn.disabled = true;
-                findBtn.style.opacity = '0.5';
-                findBtn.style.cursor = 'not-allowed';
-            }
-        }
-        
-        // ========================================
-        // COORDINATE FINDER FUNCTIONS - Phase 3
-        // ========================================
-        
-        // Track progressive reveal state
-        let progressiveRevealActive = false;
-        let progressiveRevealTimer = null;
-        let currentStage = 0;
-        let targetLat, targetLon;
-        let revealMarker = null;
-        
-        // Find location from coordinates - START PROGRESSIVE REVEAL
-        window.findCoordinateLocation = function() {
-            if (coordinateFormat === 'decimal') {
-                targetLat = parseFloat(document.getElementById('cf-latitude-decimal').value);
-                targetLon = parseFloat(document.getElementById('cf-longitude-decimal').value);
-            } else {
-                const latNum = parseFloat(document.getElementById('cf-latitude-cardinal').value);
-                const lonNum = parseFloat(document.getElementById('cf-longitude-cardinal').value);
-                const latDir = document.getElementById('cf-lat-direction').value;
-                const lonDir = document.getElementById('cf-lon-direction').value;
-                
-                targetLat = latDir === 'S' ? -Math.abs(latNum) : Math.abs(latNum);
-                targetLon = lonDir === 'W' ? -Math.abs(lonNum) : Math.abs(lonNum);
-            }
-            
-            // Close the panel
-            closeCoordinateFinderPanel();
-            
-            // Start progressive reveal
-            startProgressiveReveal(targetLat, targetLon);
-        }
-        
-        // Start the progressive reveal sequence
-        function startProgressiveReveal(lat, lon) {
-            progressiveRevealActive = true;
-            currentStage = 1;
-            
-            // Remove any existing marker
-            if (revealMarker) {
-                geoMap.removeLayer(revealMarker);
-                revealMarker = null;
-            }
-            
-            // Make timer overlay draggable (if not already done)
-            makeTimerDraggable();
-            
-            // Start Stage 1: Hemisphere (20 seconds)
-            startStage1Hemisphere(lat, lon);
-        }
-        
-        // Make timer overlay draggable
-        function makeTimerDraggable() {
-            const timerOverlay = document.getElementById('cf-timer-overlay');
-            if (timerOverlay.dataset.draggableInit) return; // Already initialized
-            
-            let isDragging = false;
-            let currentX = 0;
-            let currentY = 0;
-            let initialX = 0;
-            let initialY = 0;
-            
-            timerOverlay.addEventListener('mousedown', dragStart);
-            document.addEventListener('mousemove', drag);
-            document.addEventListener('mouseup', dragEnd);
-            
-            function dragStart(e) {
-                initialX = e.clientX - currentX;
-                initialY = e.clientY - currentY;
-                isDragging = true;
-            }
-            
-            function drag(e) {
-                if (isDragging) {
-                    e.preventDefault();
-                    currentX = e.clientX - initialX;
-                    currentY = e.clientY - initialY;
-                    timerOverlay.style.transform = `translate(${currentX}px, ${currentY}px)`;
-                }
-            }
-            
-            function dragEnd() {
-                initialX = currentX;
-                initialY = currentY;
-                isDragging = false;
-            }
-            
-            timerOverlay.dataset.draggableInit = 'true';
-        }
-        
-        // Stage 1: Show Quadrant (zoom to show the correct quarter of Earth)
-        function startStage1Hemisphere(lat, lon) {
-            currentStage = 1;
-            
-            // Determine quadrant
-            const latHemisphere = lat >= 0 ? 'N' : 'S';
-            const lonHemisphere = lon >= 0 ? 'E' : 'W';
-            const quadrant = `${latHemisphere}${lonHemisphere}`;
-            
-            // Quadrant names for display
-            const quadrantNames = {
-                'NE': '🌏 NE Quadrant (Asia/Pacific)',
-                'NW': '🌎 NW Quadrant (Americas)',
-                'SE': '🌏 SE Quadrant (Australia/Africa)',
-                'SW': '🌍 SW Quadrant (S. America/Antarctica)'
-            };
-            
-            document.getElementById('cf-stage-label').textContent = quadrantNames[quadrant] || '🌍 Stage 1: Quadrant';
-            document.getElementById('cf-timer-overlay').style.display = 'block';
-            
-            // Zoom to center of the quadrant
-            // Each quadrant is centered at ±45° lat, ±90° lon
-            const quadrantCenters = {
-                'NE': [30, 90],    // Asia/Pacific region
-                'NW': [30, -90],   // North America
-                'SE': [-30, 90],   // Australia/Southeast Asia
-                'SW': [-30, -90]   // South America/South Atlantic
-            };
-            
-            const [centerLat, centerLon] = quadrantCenters[quadrant] || [lat / 2, lon / 2];
-            const quadrantZoom = 3; // Zoom level to show a quarter of Earth
-            
-            geoMap.setView([centerLat, centerLon], quadrantZoom, { animate: true, duration: 1 });
-            
-            // Start 20-second timer
-            startStageTimer(20, () => startStage2Continent(lat, lon));
-        }
-        
-        // Stage 2: Show Continent (zoom level 4-5)
-        function startStage2Continent(lat, lon) {
-            if (!progressiveRevealActive) return;
-            
-            currentStage = 2;
-            document.getElementById('cf-stage-label').textContent = '🗺️ Stage 2: Continent';
-            
-            // Zoom to continent level
-            const continentZoom = 4;
-            geoMap.setView([lat, lon], continentZoom, { animate: true, duration: 1 });
-            
-            // Start 20-second timer
-            startStageTimer(20, () => startStage3Region(lat, lon));
-        }
-        
-        // Stage 3: Show Region (zoom level 7-8)
-        function startStage3Region(lat, lon) {
-            if (!progressiveRevealActive) return;
-            
-            currentStage = 3;
-            document.getElementById('cf-stage-label').textContent = '📍 Stage 3: Region';
-            document.getElementById('cf-stage-label').textContent = 'Stage 3: Region';
-            
-            // Zoom to region level
-            const regionZoom = 7;
-            geoMap.setView([lat, lon], regionZoom, { animate: true, duration: 1 });
-            
-            // Start 20-second timer
-            startStageTimer(20, () => dropPinAtTarget(lat, lon));
-        }
-        
-        // Final: Drop pin at exact location
-        function dropPinAtTarget(lat, lon) {
-            if (!progressiveRevealActive) return;
-            
-            currentStage = 4;
-            document.getElementById('cf-stage-label').textContent = '🎯 FOUND IT! NO CAP';
-            document.getElementById('cf-timer-display').textContent = '✓';
-            document.getElementById('cf-timer-display').style.color = '#00ff7f';
-            document.getElementById('cf-timer-display').style.textShadow = '0 0 20px rgba(0, 255, 127, 0.8)';
-            
-            // Zoom to exact location
-            geoMap.setView([lat, lon], 13, { animate: true, duration: 1 });
-            
-            // Drop a pin marker
-            setTimeout(() => {
-                revealMarker = L.marker([lat, lon], {
-                    icon: L.divIcon({
-                        className: 'custom-marker',
-                        html: '<div style="font-size: 32px;">📍</div>',
-                        iconSize: [32, 32],
-                        iconAnchor: [16, 32]
-                    })
-                }).addTo(geoMap);
-                
-                revealMarker.bindPopup(`
-                    <strong>📍 Target Location</strong><br>
-                    ${formatCoord(lat, true)}, ${formatCoord(lon, false)}
-                `).openPopup();
-                
-                // Show celebration message!
-                const celebrationMessage = getCelebrationMessage();
-                showCelebrationMessage(celebrationMessage);
-                
-                // Hide timer overlay after 2 seconds
-                setTimeout(() => {
-                    document.getElementById('cf-timer-overlay').style.display = 'none';
-                    progressiveRevealActive = false;
-                }, 2000);
-            }, 500);
-        }
-        
-        // Timer function for each stage
-        function startStageTimer(seconds, callback) {
-            let timeLeft = seconds;
-            const timerDisplay = document.getElementById('cf-timer-display');
-            timerDisplay.textContent = timeLeft;
-            timerDisplay.style.color = '#fff';
-            timerDisplay.style.textShadow = '0 0 15px rgba(255, 255, 255, 0.5)';
-            
-            if (progressiveRevealTimer) {
-                clearInterval(progressiveRevealTimer);
-            }
-            
-            progressiveRevealTimer = setInterval(() => {
-                timeLeft--;
-                timerDisplay.textContent = timeLeft;
-                
-                // Color changes as time runs out (more dramatic!)
-                if (timeLeft <= 5) {
-                    timerDisplay.style.color = '#ff6b6b';
-                    timerDisplay.style.textShadow = '0 0 20px rgba(255, 107, 107, 0.8)';
-                } else if (timeLeft <= 10) {
-                    timerDisplay.style.color = '#ffd700';
-                    timerDisplay.style.textShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
-                }
-                
-                if (timeLeft <= 0) {
-                    clearInterval(progressiveRevealTimer);
-                    progressiveRevealTimer = null;
-                    callback();
-                }
-            }, 1000);
-        }
-        
-        // Skip to final location when map is clicked during progressive reveal
-        // Only works if click is within acceptable distance of target
-        function skipToLocation(clickLat, clickLon) {
-            if (!progressiveRevealActive) return;
-            
-            // Calculate distance from click to target (in degrees)
-            const latDiff = Math.abs(clickLat - targetLat);
-            const lonDiff = Math.abs(clickLon - targetLon);
-            
-            // Define "close enough" thresholds based on current stage
-            // Stage 1 (Quadrant): Within 30 degrees
-            // Stage 2 (Continent): Within 10 degrees
-            // Stage 3 (Region): Within 3 degrees
-            let threshold;
-            if (currentStage === 1) {
-                threshold = 30; // Pretty generous for quadrant stage
-            } else if (currentStage === 2) {
-                threshold = 10; // Continental accuracy
-            } else if (currentStage === 3) {
-                threshold = 3; // Regional accuracy
-            } else {
-                return; // Already at final stage
-            }
-            
-            // Check if click is within threshold
-            if (latDiff <= threshold && lonDiff <= threshold) {
-                // Clear timer
-                if (progressiveRevealTimer) {
-                    clearInterval(progressiveRevealTimer);
-                    progressiveRevealTimer = null;
-                }
-                
-                // Jump straight to pin drop
-                dropPinAtTarget(targetLat, targetLon);
-            } else {
-                // Not close enough - give feedback
-                const feedback = document.createElement('div');
-                feedback.textContent = '❌ Not quite! Keep searching...';
-                feedback.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: rgba(255, 0, 0, 0.9);
-                    color: white;
-                    padding: 20px 40px;
-                    border-radius: 12px;
-                    font-size: 20px;
-                    font-weight: bold;
-                    z-index: 10000;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
-                `;
-                document.body.appendChild(feedback);
-                
-                // Remove feedback after 1.5 seconds
-                setTimeout(() => {
-                    feedback.remove();
-                }, 1500);
-            }
-        }
-        
-        // ========================================
         // END COORDINATE FINDER FUNCTIONS
         // ========================================
         
@@ -2751,12 +1745,6 @@
         geoMap.on('click', function(e) {
             const lat = e.latlng.lat;
             const lon = e.latlng.lng;
-            
-            // COORDINATE FINDER: Skip to location if progressive reveal is active
-            if (progressiveRevealActive && currentStage < 4) {
-                skipToLocation(lat, lon); // Pass clicked coordinates
-                return; // Don't process other click handlers
-            }
             
             // Always show distance from Glennallen (useful in all modes)
             const distFromHome = calculateDistance(GLENNALLEN.lat, GLENNALLEN.lon, lat, lon);

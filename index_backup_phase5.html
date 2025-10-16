@@ -922,104 +922,6 @@
             border-color: #ff0088;
             box-shadow: 0 0 10px rgba(255, 0, 136, 0.3);
         }
-        
-        /* ========================================
-           CELEBRATION MESSAGE STYLES - Phase 5
-           ======================================== */
-        
-        /* Success Message Popup */
-        .success-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, rgba(0, 255, 127, 0.95), rgba(0, 204, 255, 0.95));
-            color: #0a0e27;
-            padding: 40px 60px;
-            border-radius: 20px;
-            font-size: 36px;
-            font-weight: 900;
-            z-index: 10000;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 255, 127, 0.6);
-            text-align: center;
-            animation: popIn 0.3s ease-out;
-        }
-        
-        .success-message.academic {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
-            color: white;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
-        }
-        
-        @keyframes popIn {
-            0% {
-                transform: translate(-50%, -50%) scale(0.5);
-                opacity: 0;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.1);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-        }
-        
-        /* Six Seven Glitch Effect */
-        .glitch-text {
-            position: relative;
-            font-size: 48px;
-            font-weight: 900;
-            color: #ff00ff;
-            text-shadow: 
-                2px 2px #00ffff,
-                -2px -2px #ff00ff;
-            animation: glitch 0.3s infinite;
-        }
-        
-        @keyframes glitch {
-            0% {
-                text-shadow: 
-                    2px 2px #00ffff,
-                    -2px -2px #ff00ff;
-            }
-            25% {
-                text-shadow: 
-                    -2px 2px #ff00ff,
-                    2px -2px #00ffff;
-            }
-            50% {
-                text-shadow: 
-                    2px -2px #00ffff,
-                    -2px 2px #ff00ff;
-            }
-            75% {
-                text-shadow: 
-                    -2px -2px #00ffff,
-                    2px 2px #ff00ff;
-            }
-            100% {
-                text-shadow: 
-                    2px 2px #00ffff,
-                    -2px -2px #ff00ff;
-            }
-        }
-        
-        /* Fade out animation */
-        .fade-out {
-            animation: fadeOut 0.5s ease-out forwards;
-        }
-        
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-        }
     </style>
 </head>
 <body>
@@ -2217,85 +2119,6 @@
         initFunMode();
         
         // ========================================
-        // CELEBRATION MESSAGES - Phase 5
-        // ========================================
-        
-        // Academic Mode messages - simple and professional
-        const ACADEMIC_MESSAGES = [
-            '📍 Location Found!',
-            '✅ Target Reached!',
-            '🎯 Success!',
-            '✓ Coordinates Verified!'
-        ];
-        
-        // Fun Mode messages - Gen Alpha approved
-        const FUN_MESSAGES = [
-            '🔥 W!',
-            '✨ SLAY!',
-            '💯 NO CAP!',
-            '🎮 LOCKED IN!',
-            '⚡ BUSSIN!',
-            '🚀 SHEESH!',
-            '👑 GET GOOD!',
-            '💪 COOKED!',
-            '🎯 LET HIM COOK!',
-            '🌟 FIRE!'
-        ];
-        
-        // Six Seven easter egg messages (4.5% chance)
-        const SIX_SEVEN_MESSAGES = [
-            'SIIIIX SEEEEVVEN! 🎉',
-            '6-7 GANG! 💪',
-            'DOOT DOOT 6-7! 🎮',
-            '67 NO CAP! ✨'
-        ];
-        
-        // Get celebration message based on Fun Mode state
-        function getCelebrationMessage() {
-            const funModeEnabled = document.body.classList.contains('fun-mode');
-            
-            if (!funModeEnabled) {
-                // Academic mode - simple messages
-                return ACADEMIC_MESSAGES[Math.floor(Math.random() * ACADEMIC_MESSAGES.length)];
-            }
-            
-            // Fun mode - check for six seven easter egg (4.5% chance)
-            const random = Math.random() * 100;
-            if (random < 4.5) {
-                // SIX SEVEN EASTER EGG!
-                return SIX_SEVEN_MESSAGES[Math.floor(Math.random() * SIX_SEVEN_MESSAGES.length)];
-            }
-            
-            // Regular fun message
-            return FUN_MESSAGES[Math.floor(Math.random() * FUN_MESSAGES.length)];
-        }
-        
-        // Show celebration message popup
-        function showCelebrationMessage(message) {
-            const isSixSeven = message.includes('6') || message.includes('SIX');
-            const messageDiv = document.createElement('div');
-            
-            // Check if Fun Mode for styling
-            const funModeEnabled = document.body.classList.contains('fun-mode');
-            messageDiv.className = funModeEnabled ? 'success-message' : 'success-message academic';
-            
-            // Add glitch effect for six seven
-            if (isSixSeven && funModeEnabled) {
-                messageDiv.innerHTML = `<div class="glitch-text">${message}</div>`;
-            } else {
-                messageDiv.textContent = message;
-            }
-            
-            document.body.appendChild(messageDiv);
-            
-            // Remove after 3 seconds with fade
-            setTimeout(() => {
-                messageDiv.classList.add('fade-out');
-                setTimeout(() => messageDiv.remove(), 500);
-            }, 3000);
-        }
-        
-        // ========================================
         // COORDINATE FINDER FUNCTIONS - Phase 2
         // ========================================
         
@@ -2615,14 +2438,11 @@
                     ${formatCoord(lat, true)}, ${formatCoord(lon, false)}
                 `).openPopup();
                 
-                // Show celebration message!
-                const celebrationMessage = getCelebrationMessage();
-                showCelebrationMessage(celebrationMessage);
-                
                 // Hide timer overlay after 2 seconds
                 setTimeout(() => {
                     document.getElementById('cf-timer-overlay').style.display = 'none';
                     progressiveRevealActive = false;
+                    showNotification('📍 Location revealed!');
                 }, 2000);
             }, 500);
         }

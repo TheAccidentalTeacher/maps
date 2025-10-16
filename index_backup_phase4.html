@@ -762,264 +762,6 @@
                 top: 80px;
             }
         }
-        
-        /* ========================================
-           FUN MODE STYLES - Phase 4
-           ======================================== */
-        
-        /* Fun Mode Toggle Switch */
-        .fun-mode-toggle {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            border: 2px solid rgba(102, 126, 234, 0.3);
-        }
-        
-        .toggle-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #aaa;
-            flex-grow: 1;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            width: 60px;
-            height: 30px;
-            background: #2a2f4a;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid #667eea;
-        }
-        
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        
-        .toggle-switch.active {
-            background: linear-gradient(135deg, #00ff88, #00ccff);
-            border-color: #00ff88;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
-        }
-        
-        .toggle-switch.active::after {
-            left: 33px;
-            background: #0a0e27;
-        }
-        
-        /* Fun Mode - Body Changes */
-        body.fun-mode {
-            background: #0a0e27;
-        }
-        
-        body.fun-mode #coordinate-finder-panel {
-            background: linear-gradient(135deg, rgba(10, 14, 39, 0.98), rgba(20, 14, 39, 0.98));
-            border: 3px solid #00ff88;
-            box-shadow: 0 8px 32px rgba(0, 255, 136, 0.4), 0 0 60px rgba(0, 204, 255, 0.2);
-        }
-        
-        body.fun-mode .cf-header {
-            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
-        }
-        
-        body.fun-mode .cf-header h3 {
-            color: #0a0e27;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-        
-        body.fun-mode .cf-close-btn {
-            background: rgba(10, 14, 39, 0.6);
-            color: #00ff88;
-        }
-        
-        body.fun-mode .cf-close-btn:hover {
-            background: rgba(10, 14, 39, 0.8);
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
-        }
-        
-        body.fun-mode .btn {
-            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
-            color: #0a0e27;
-            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
-            font-weight: 800;
-        }
-        
-        body.fun-mode .btn:hover:not(:disabled) {
-            box-shadow: 0 6px 25px rgba(0, 255, 136, 0.5);
-            transform: translateY(-3px) scale(1.02);
-        }
-        
-        body.fun-mode .btn:disabled {
-            background: linear-gradient(135deg, #2a2f4a, #3a3f5a);
-            color: #666;
-        }
-        
-        body.fun-mode #cf-timer-overlay {
-            background: linear-gradient(135deg, rgba(10, 14, 39, 0.98), rgba(20, 14, 39, 0.98)) !important;
-            border: 3px solid #00ff88 !important;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 255, 136, 0.6) !important;
-        }
-        
-        body.fun-mode #cf-timer-label {
-            color: #00ff88;
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
-        }
-        
-        body.fun-mode #cf-timer-countdown {
-            color: #00ccff;
-            text-shadow: 0 0 20px rgba(0, 204, 255, 0.8);
-        }
-        
-        body.fun-mode #cf-timer-countdown.warning {
-            color: #ff00ff;
-            text-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
-        }
-        
-        body.fun-mode #cf-timer-countdown.danger {
-            color: #ff0088;
-            text-shadow: 0 0 20px rgba(255, 0, 136, 0.8);
-        }
-        
-        body.fun-mode #cf-skip-hint {
-            color: #00ff88;
-        }
-        
-        /* Fun Mode Input Styling */
-        body.fun-mode input[type="number"],
-        body.fun-mode select {
-            background: rgba(10, 14, 39, 0.8);
-            border-color: #00ccff;
-            color: #00ff88;
-        }
-        
-        body.fun-mode input[type="number"]:focus,
-        body.fun-mode select:focus {
-            border-color: #00ff88;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
-        }
-        
-        body.fun-mode input.valid {
-            border-color: #00ff88;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-        }
-        
-        body.fun-mode input.invalid {
-            border-color: #ff0088;
-            box-shadow: 0 0 10px rgba(255, 0, 136, 0.3);
-        }
-        
-        /* ========================================
-           CELEBRATION MESSAGE STYLES - Phase 5
-           ======================================== */
-        
-        /* Success Message Popup */
-        .success-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, rgba(0, 255, 127, 0.95), rgba(0, 204, 255, 0.95));
-            color: #0a0e27;
-            padding: 40px 60px;
-            border-radius: 20px;
-            font-size: 36px;
-            font-weight: 900;
-            z-index: 10000;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 255, 127, 0.6);
-            text-align: center;
-            animation: popIn 0.3s ease-out;
-        }
-        
-        .success-message.academic {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
-            color: white;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
-        }
-        
-        @keyframes popIn {
-            0% {
-                transform: translate(-50%, -50%) scale(0.5);
-                opacity: 0;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.1);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-        }
-        
-        /* Six Seven Glitch Effect */
-        .glitch-text {
-            position: relative;
-            font-size: 48px;
-            font-weight: 900;
-            color: #ff00ff;
-            text-shadow: 
-                2px 2px #00ffff,
-                -2px -2px #ff00ff;
-            animation: glitch 0.3s infinite;
-        }
-        
-        @keyframes glitch {
-            0% {
-                text-shadow: 
-                    2px 2px #00ffff,
-                    -2px -2px #ff00ff;
-            }
-            25% {
-                text-shadow: 
-                    -2px 2px #ff00ff,
-                    2px -2px #00ffff;
-            }
-            50% {
-                text-shadow: 
-                    2px -2px #00ffff,
-                    -2px 2px #ff00ff;
-            }
-            75% {
-                text-shadow: 
-                    -2px -2px #00ffff,
-                    2px 2px #ff00ff;
-            }
-            100% {
-                text-shadow: 
-                    2px 2px #00ffff,
-                    -2px -2px #ff00ff;
-            }
-        }
-        
-        /* Fade out animation */
-        .fade-out {
-            animation: fadeOut 0.5s ease-out forwards;
-        }
-        
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-        }
     </style>
 </head>
 <body>
@@ -1532,14 +1274,6 @@
             <p style="color: #aaa; margin-bottom: 12px; line-height: 1.6;">
                 Enter coordinates to find any location on Earth!
             </p>
-            
-            <!-- Fun Mode Toggle - Phase 4 -->
-            <div class="fun-mode-toggle">
-                <span class="toggle-label">
-                    <span id="fun-mode-label">📚 Academic Mode</span>
-                </span>
-                <div class="toggle-switch" id="fun-mode-switch" onclick="toggleFunMode()"></div>
-            </div>
             
             <!-- Format Toggle -->
             <div style="display: flex; gap: 8px; margin-bottom: 16px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">
@@ -2180,122 +1914,6 @@
         });
         
         // ========================================
-        // FUN MODE TOGGLE - Phase 4
-        // ========================================
-        
-        // Check localStorage for Fun Mode preference on page load
-        function initFunMode() {
-            const funModeEnabled = localStorage.getItem('funModeEnabled') === 'true';
-            if (funModeEnabled) {
-                document.body.classList.add('fun-mode');
-                document.getElementById('fun-mode-switch').classList.add('active');
-                document.getElementById('fun-mode-label').textContent = '🎮 Fun Mode';
-            }
-        }
-        
-        // Toggle Fun Mode
-        window.toggleFunMode = function() {
-            const body = document.body;
-            const toggleSwitch = document.getElementById('fun-mode-switch');
-            const label = document.getElementById('fun-mode-label');
-            
-            // Toggle the fun-mode class on body
-            body.classList.toggle('fun-mode');
-            toggleSwitch.classList.toggle('active');
-            
-            // Update label
-            if (body.classList.contains('fun-mode')) {
-                label.textContent = '🎮 Fun Mode';
-                localStorage.setItem('funModeEnabled', 'true');
-            } else {
-                label.textContent = '📚 Academic Mode';
-                localStorage.setItem('funModeEnabled', 'false');
-            }
-        }
-        
-        // Initialize Fun Mode on page load
-        initFunMode();
-        
-        // ========================================
-        // CELEBRATION MESSAGES - Phase 5
-        // ========================================
-        
-        // Academic Mode messages - simple and professional
-        const ACADEMIC_MESSAGES = [
-            '📍 Location Found!',
-            '✅ Target Reached!',
-            '🎯 Success!',
-            '✓ Coordinates Verified!'
-        ];
-        
-        // Fun Mode messages - Gen Alpha approved
-        const FUN_MESSAGES = [
-            '🔥 W!',
-            '✨ SLAY!',
-            '💯 NO CAP!',
-            '🎮 LOCKED IN!',
-            '⚡ BUSSIN!',
-            '🚀 SHEESH!',
-            '👑 GET GOOD!',
-            '💪 COOKED!',
-            '🎯 LET HIM COOK!',
-            '🌟 FIRE!'
-        ];
-        
-        // Six Seven easter egg messages (4.5% chance)
-        const SIX_SEVEN_MESSAGES = [
-            'SIIIIX SEEEEVVEN! 🎉',
-            '6-7 GANG! 💪',
-            'DOOT DOOT 6-7! 🎮',
-            '67 NO CAP! ✨'
-        ];
-        
-        // Get celebration message based on Fun Mode state
-        function getCelebrationMessage() {
-            const funModeEnabled = document.body.classList.contains('fun-mode');
-            
-            if (!funModeEnabled) {
-                // Academic mode - simple messages
-                return ACADEMIC_MESSAGES[Math.floor(Math.random() * ACADEMIC_MESSAGES.length)];
-            }
-            
-            // Fun mode - check for six seven easter egg (4.5% chance)
-            const random = Math.random() * 100;
-            if (random < 4.5) {
-                // SIX SEVEN EASTER EGG!
-                return SIX_SEVEN_MESSAGES[Math.floor(Math.random() * SIX_SEVEN_MESSAGES.length)];
-            }
-            
-            // Regular fun message
-            return FUN_MESSAGES[Math.floor(Math.random() * FUN_MESSAGES.length)];
-        }
-        
-        // Show celebration message popup
-        function showCelebrationMessage(message) {
-            const isSixSeven = message.includes('6') || message.includes('SIX');
-            const messageDiv = document.createElement('div');
-            
-            // Check if Fun Mode for styling
-            const funModeEnabled = document.body.classList.contains('fun-mode');
-            messageDiv.className = funModeEnabled ? 'success-message' : 'success-message academic';
-            
-            // Add glitch effect for six seven
-            if (isSixSeven && funModeEnabled) {
-                messageDiv.innerHTML = `<div class="glitch-text">${message}</div>`;
-            } else {
-                messageDiv.textContent = message;
-            }
-            
-            document.body.appendChild(messageDiv);
-            
-            // Remove after 3 seconds with fade
-            setTimeout(() => {
-                messageDiv.classList.add('fade-out');
-                setTimeout(() => messageDiv.remove(), 500);
-            }, 3000);
-        }
-        
-        // ========================================
         // COORDINATE FINDER FUNCTIONS - Phase 2
         // ========================================
         
@@ -2615,14 +2233,11 @@
                     ${formatCoord(lat, true)}, ${formatCoord(lon, false)}
                 `).openPopup();
                 
-                // Show celebration message!
-                const celebrationMessage = getCelebrationMessage();
-                showCelebrationMessage(celebrationMessage);
-                
                 // Hide timer overlay after 2 seconds
                 setTimeout(() => {
                     document.getElementById('cf-timer-overlay').style.display = 'none';
                     progressiveRevealActive = false;
+                    showNotification('📍 Location revealed!');
                 }, 2000);
             }, 500);
         }
@@ -2661,64 +2276,17 @@
         }
         
         // Skip to final location when map is clicked during progressive reveal
-        // Only works if click is within acceptable distance of target
-        function skipToLocation(clickLat, clickLon) {
+        function skipToLocation() {
             if (!progressiveRevealActive) return;
             
-            // Calculate distance from click to target (in degrees)
-            const latDiff = Math.abs(clickLat - targetLat);
-            const lonDiff = Math.abs(clickLon - targetLon);
-            
-            // Define "close enough" thresholds based on current stage
-            // Stage 1 (Quadrant): Within 30 degrees
-            // Stage 2 (Continent): Within 10 degrees
-            // Stage 3 (Region): Within 3 degrees
-            let threshold;
-            if (currentStage === 1) {
-                threshold = 30; // Pretty generous for quadrant stage
-            } else if (currentStage === 2) {
-                threshold = 10; // Continental accuracy
-            } else if (currentStage === 3) {
-                threshold = 3; // Regional accuracy
-            } else {
-                return; // Already at final stage
+            // Clear timer
+            if (progressiveRevealTimer) {
+                clearInterval(progressiveRevealTimer);
+                progressiveRevealTimer = null;
             }
             
-            // Check if click is within threshold
-            if (latDiff <= threshold && lonDiff <= threshold) {
-                // Clear timer
-                if (progressiveRevealTimer) {
-                    clearInterval(progressiveRevealTimer);
-                    progressiveRevealTimer = null;
-                }
-                
-                // Jump straight to pin drop
-                dropPinAtTarget(targetLat, targetLon);
-            } else {
-                // Not close enough - give feedback
-                const feedback = document.createElement('div');
-                feedback.textContent = '❌ Not quite! Keep searching...';
-                feedback.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: rgba(255, 0, 0, 0.9);
-                    color: white;
-                    padding: 20px 40px;
-                    border-radius: 12px;
-                    font-size: 20px;
-                    font-weight: bold;
-                    z-index: 10000;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
-                `;
-                document.body.appendChild(feedback);
-                
-                // Remove feedback after 1.5 seconds
-                setTimeout(() => {
-                    feedback.remove();
-                }, 1500);
-            }
+            // Jump straight to pin drop
+            dropPinAtTarget(targetLat, targetLon);
         }
         
         // ========================================
@@ -2754,7 +2322,7 @@
             
             // COORDINATE FINDER: Skip to location if progressive reveal is active
             if (progressiveRevealActive && currentStage < 4) {
-                skipToLocation(lat, lon); // Pass clicked coordinates
+                skipToLocation();
                 return; // Don't process other click handlers
             }
             
