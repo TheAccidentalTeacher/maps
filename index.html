@@ -2679,12 +2679,66 @@
                 const celebrationMessage = getCelebrationMessage();
                 showCelebrationMessage(celebrationMessage);
                 
+                // Show Play Again button
+                showCoordinateFinderComplete();
+                
                 // Hide timer overlay after 2 seconds
                 setTimeout(() => {
                     document.getElementById('cf-timer-overlay').style.display = 'none';
                     progressiveRevealActive = false;
                 }, 2000);
             }, 500);
+        }
+        
+        // Show Coordinate Finder completion with Play Again button
+        function showCoordinateFinderComplete() {
+            setTimeout(() => {
+                const overlay = document.createElement('div');
+                overlay.id = 'cf-complete-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(20, 30, 40, 0.95);
+                    border-radius: 15px;
+                    border: 2px solid #00ff7f;
+                    padding: 40px;
+                    z-index: 2000;
+                    text-align: center;
+                    max-width: 400px;
+                    animation: fadeIn 0.5s ease-in;
+                `;
+                
+                overlay.innerHTML = `
+                    <h2 style="color: #00ff7f; font-size: 32px; margin: 0 0 15px 0;">🎯 LOCATION FOUND!</h2>
+                    <p style="font-size: 16px; color: #aaa; margin: 0 0 20px 0;">You successfully navigated to the target coordinates!</p>
+                    <button onclick="playAgainCoordinateFinder()" class="btn" style="font-size: 18px; padding: 12px 30px; background: #00ff7f; color: #000;">
+                        🔄 FIND ANOTHER
+                    </button>
+                `;
+                
+                document.body.appendChild(overlay);
+                
+                // Remove after 10 seconds if not clicked
+                setTimeout(() => {
+                    if (document.getElementById('cf-complete-overlay')) {
+                        overlay.remove();
+                    }
+                }, 10000);
+            }, 2500);
+        }
+        
+        window.playAgainCoordinateFinder = function() {
+            const overlay = document.getElementById('cf-complete-overlay');
+            if (overlay) overlay.remove();
+            
+            // Reset and start new game
+            if (revealMarker) {
+                geoMap.removeLayer(revealMarker);
+                revealMarker = null;
+            }
+            startProgressiveReveal();
         }
         
         // Timer function for each stage
@@ -3094,7 +3148,7 @@
                 gameState.mystery.solved++;
                 
                 if (gameState.mystery.streak > gameState.mystery.bestStreak) {
-                    gameState.mystery.bestStreak = gameState.mystery.streak;
+                    gameState.mystery.bestStreak = gameState.mystery.bestStreak;
                 }
                 
                 // Update mission progress
@@ -3103,10 +3157,61 @@
                 updateAllDisplays();
                 saveState();
                 
-                setTimeout(() => startMystery(), 1500);
+                // Show Play Again message with button
+                showMysterySuccess();
             } else {
                 showNotification('❌ Not quite! Keep trying!');
             }
+        }
+        
+        window.showMysterySuccess = function() {
+            // Show success message overlay with Play Again button
+            const mysteryGame = document.getElementById('mystery-game');
+            const overlay = document.createElement('div');
+            overlay.id = 'mystery-success-overlay';
+            overlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.85);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                animation: fadeIn 0.3s ease-in;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="text-align: center; padding: 40px; background: rgba(20, 30, 40, 0.95); border-radius: 15px; border: 2px solid #00ff7f; max-width: 400px;">
+                    <h2 style="color: #00ff7f; font-size: 36px; margin: 0 0 15px 0;">✅ CORRECT!</h2>
+                    <p style="font-size: 24px; color: #ffd700; margin: 0 0 10px 0;">${gameState.mystery.current.name}</p>
+                    <p style="font-size: 16px; color: #aaa; margin: 0 0 20px 0;">${gameState.mystery.current.hint}</p>
+                    <div style="background: rgba(0, 255, 127, 0.1); border-radius: 8px; padding: 15px; margin: 20px 0;">
+                        <p style="color: #00ff7f; font-size: 18px; margin: 0;">🔥 Streak: ${gameState.mystery.streak}</p>
+                        <p style="color: #66b3ff; font-size: 14px; margin: 5px 0 0 0;">Best: ${gameState.mystery.bestStreak}</p>
+                    </div>
+                    <button onclick="playAgainMystery()" class="btn" style="font-size: 20px; padding: 15px 40px; margin-top: 10px; background: #00ff7f; color: #000;">
+                        🎯 PLAY AGAIN
+                    </button>
+                    <p style="font-size: 12px; color: #666; margin: 15px 0 0 0;">Auto-start in 3 seconds...</p>
+                </div>
+            `;
+            
+            mysteryGame.style.position = 'relative';
+            mysteryGame.appendChild(overlay);
+            
+            // Auto-start after 3 seconds
+            setTimeout(() => {
+                playAgainMystery();
+            }, 3000);
+        }
+        
+        window.playAgainMystery = function() {
+            const overlay = document.getElementById('mystery-success-overlay');
+            if (overlay) overlay.remove();
+            startMystery();
         }
         
         window.skipMystery = function() {
@@ -3176,12 +3281,39 @@
                         addXP(100, 'Scavenger Hunt Complete!');
                         gameState.missions[1].progress = 1;
                         saveState();
+                        showScavengerComplete();
                     }
                     return;
                 }
             }
             
             showNotification('❌ Not quite! Try another location.');
+        }
+        
+        window.showScavengerComplete = function() {
+            setTimeout(() => {
+                const scavengerList = document.getElementById('scavenger-list');
+                const celebrationHTML = `
+                    <div style="text-align: center; padding: 40px; background: rgba(0, 255, 127, 0.1); border-radius: 15px; border: 2px solid #00ff7f; margin: 20px 0;">
+                        <h2 style="color: #00ff7f; font-size: 36px; margin: 0 0 15px 0;">🏆 ALL CHALLENGES COMPLETE!</h2>
+                        <p style="font-size: 18px; color: #aaa; margin: 0 0 25px 0;">
+                            You discovered all ${gameState.scavenger.challenges.length} locations!
+                        </p>
+                        <div style="background: rgba(255, 215, 0, 0.1); border-radius: 8px; padding: 15px; margin: 20px 0;">
+                            <p style="color: #ffd700; font-size: 20px; margin: 0;">+100 XP Completion Bonus!</p>
+                        </div>
+                        <button onclick="playAgainScavenger()" class="btn" style="font-size: 20px; padding: 15px 40px; margin-top: 15px; background: #00ff7f; color: #000;">
+                            🔄 PLAY AGAIN
+                        </button>
+                    </div>
+                `;
+                scavengerList.innerHTML = celebrationHTML;
+            }, 1500);
+        }
+        
+        window.playAgainScavenger = function() {
+            resetScavenger();
+            showNotification('🌍 New Scavenger Hunt started! Find all locations!');
         }
         
         window.resetScavenger = function() {
@@ -3218,8 +3350,7 @@
             if (gameState.guess.round >= 5) {
                 gameState.guess.active = false;
                 addXP(50, 'Guess Game Complete!');
-                document.getElementById('guess-intro').style.display = 'block';
-                document.getElementById('guess-game').style.display = 'none';
+                showGuessComplete();
                 return;
             }
             
@@ -3235,6 +3366,43 @@
                 `<button class="answer-btn" onclick="checkGuess('${option}')">${option}</button>`
             ).join('');
             document.getElementById('guess-options').innerHTML = optionsHtml;
+        }
+        
+        window.showGuessComplete = function() {
+            const accuracy = gameState.guess.correct > 0 ? Math.round((gameState.guess.correct / 5) * 100) : 0;
+            const guessGame = document.getElementById('guess-game');
+            const guessOptions = document.getElementById('guess-options');
+            
+            const completionHTML = `
+                <div style="text-align: center; padding: 40px; background: rgba(102, 179, 255, 0.1); border-radius: 15px; border: 2px solid #66b3ff; margin: 20px 0;">
+                    <h2 style="color: #66b3ff; font-size: 36px; margin: 0 0 15px 0;">🎯 GAME COMPLETE!</h2>
+                    <p style="font-size: 20px; color: #aaa; margin: 0 0 10px 0;">
+                        You got <span style="color: #00ff7f; font-weight: bold;">${gameState.guess.correct}/5</span> correct!
+                    </p>
+                    <p style="font-size: 16px; color: #aaa; margin: 0 0 25px 0;">
+                        Accuracy: ${accuracy}%
+                    </p>
+                    <div style="background: rgba(255, 215, 0, 0.1); border-radius: 8px; padding: 15px; margin: 20px 0;">
+                        <p style="color: #ffd700; font-size: 20px; margin: 0;">+50 XP Completion Bonus!</p>
+                        <p style="color: #aaa; font-size: 14px; margin: 5px 0 0 0;">Total Score: ${gameState.guess.score} XP</p>
+                    </div>
+                    <button onclick="playAgainGuess()" class="btn" style="font-size: 20px; padding: 15px 40px; margin-top: 15px; background: #66b3ff; color: #000;">
+                        🔄 PLAY AGAIN
+                    </button>
+                </div>
+            `;
+            
+            guessOptions.innerHTML = completionHTML;
+            document.getElementById('next-guess-btn').style.display = 'none';
+        }
+        
+        window.playAgainGuess = function() {
+            gameState.guess.round = 0;
+            gameState.guess.score = 0;
+            gameState.guess.correct = 0;
+            document.getElementById('guess-score').textContent = '0';
+            nextGuessRound();
+            showNotification('🎯 New Guess Game started! Good luck!');
         }
         
         window.checkGuess = function(answer) {
@@ -3321,6 +3489,62 @@
             addXP(50, 'Heist created!');
             saveState();
             
+            // Show success message with Play Again option
+            showHeistSaved(heist.name);
+        }
+        
+        window.showHeistSaved = function(heistName) {
+            const overlay = document.createElement('div');
+            overlay.id = 'heist-saved-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(20, 30, 40, 0.95);
+                border-radius: 15px;
+                border: 2px solid #ffd700;
+                padding: 40px;
+                z-index: 2000;
+                text-align: center;
+                max-width: 400px;
+                animation: fadeIn 0.5s ease-in;
+            `;
+            
+            overlay.innerHTML = `
+                <h2 style="color: #ffd700; font-size: 32px; margin: 0 0 15px 0;">💾 HEIST SAVED!</h2>
+                <p style="font-size: 18px; color: #00ff7f; margin: 0 0 10px 0;">"${heistName}"</p>
+                <p style="font-size: 14px; color: #aaa; margin: 0 0 20px 0;">Your classmates can now try to find this location!</p>
+                <div style="background: rgba(255, 215, 0, 0.1); border-radius: 8px; padding: 15px; margin: 20px 0;">
+                    <p style="color: #ffd700; font-size: 18px; margin: 0;">+50 XP Earned!</p>
+                </div>
+                <button onclick="createAnotherHeist()" class="btn" style="font-size: 18px; padding: 12px 30px; background: #ffd700; color: #000; margin-right: 10px;">
+                    🗺️ CREATE ANOTHER
+                </button>
+                <button onclick="closeHeistOverlay()" class="btn" style="font-size: 18px; padding: 12px 30px; background: #444; color: #fff;">
+                    ✓ DONE
+                </button>
+            `;
+            
+            document.body.appendChild(overlay);
+        }
+        
+        window.createAnotherHeist = function() {
+            closeHeistOverlay();
+            // Reset form
+            document.getElementById('heist-name').value = '';
+            document.getElementById('clue1').value = '';
+            document.getElementById('clue2').value = '';
+            document.getElementById('heist-coords').textContent = 'Click on map to set location';
+            heistLocation = null;
+            if (currentMarker) geoMap.removeLayer(currentMarker);
+            showNotification('🗺️ Create another heist! Click the map to set a new location.');
+        }
+        
+        window.closeHeistOverlay = function() {
+            const overlay = document.getElementById('heist-saved-overlay');
+            if (overlay) overlay.remove();
+            // Also reset form
             document.getElementById('heist-name').value = '';
             document.getElementById('clue1').value = '';
             document.getElementById('clue2').value = '';
