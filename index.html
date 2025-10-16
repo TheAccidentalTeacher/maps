@@ -2942,16 +2942,87 @@
         
         // MYSTERY CHALLENGE
         const mysteryLocations = [
-            { lat: 40.7128, lon: -74.0060, name: "New York City", hint: "Major US city, financial capital", continent: "North America", zoom: 10 },
-            { lat: 51.5074, lon: -0.1278, name: "London", hint: "UK capital, River Thames", continent: "Europe", zoom: 10 },
-            { lat: 35.6762, lon: 139.6503, name: "Tokyo", hint: "Japan's capital, largest metro area", continent: "Asia", zoom: 10 },
-            { lat: -33.8688, lon: 151.2093, name: "Sydney", hint: "Famous harbor, Opera House", continent: "Australia", zoom: 10 },
-            { lat: 48.8566, lon: 2.3522, name: "Paris", hint: "City of Light, Eiffel Tower", continent: "Europe", zoom: 10 },
-            { lat: 55.7558, lon: 37.6173, name: "Moscow", hint: "Russia's capital, Red Square", continent: "Europe", zoom: 10 },
-            { lat: -23.5505, lon: -46.6333, name: "São Paulo", hint: "Largest city in South America", continent: "South America", zoom: 10 },
-            { lat: 30.0444, lon: 31.2357, name: "Cairo", hint: "Ancient capital, pyramids nearby", continent: "Africa", zoom: 10 },
-            { lat: 19.4326, lon: -99.1332, name: "Mexico City", hint: "Aztec heritage, high altitude", continent: "North America", zoom: 10 },
-            { lat: 1.3521, lon: 103.8198, name: "Singapore", hint: "Island city-state, Southeast Asia", continent: "Asia", zoom: 11 }
+            // NORTH AMERICA (15 locations)
+            { lat: 40.7128, lon: -74.0060, name: "New York City, USA", hint: "Major US city, financial capital, Statue of Liberty", continent: "North America", zoom: 10 },
+            { lat: 19.4326, lon: -99.1332, name: "Mexico City, Mexico", hint: "Aztec heritage, high altitude capital", continent: "North America", zoom: 10 },
+            { lat: 34.0522, lon: -118.2437, name: "Los Angeles, USA", hint: "Hollywood, Pacific coast, entertainment capital", continent: "North America", zoom: 10 },
+            { lat: 41.8781, lon: -87.6298, name: "Chicago, USA", hint: "Windy City, Great Lakes, deep-dish pizza", continent: "North America", zoom: 10 },
+            { lat: 43.6532, lon: -79.3832, name: "Toronto, Canada", hint: "CN Tower, largest Canadian city, multicultural", continent: "North America", zoom: 10 },
+            { lat: 49.2827, lon: -123.1207, name: "Vancouver, Canada", hint: "Pacific coast, mountains meet ocean", continent: "North America", zoom: 10 },
+            { lat: 21.3099, lon: -157.8581, name: "Honolulu, Hawaii", hint: "Pacific island paradise, Pearl Harbor", continent: "North America", zoom: 10 },
+            { lat: 29.7604, lon: -95.3698, name: "Houston, USA", hint: "Space City, NASA Mission Control", continent: "North America", zoom: 10 },
+            { lat: 37.7749, lon: -122.4194, name: "San Francisco, USA", hint: "Golden Gate Bridge, Silicon Valley neighbor", continent: "North America", zoom: 10 },
+            { lat: 25.7617, lon: -80.1918, name: "Miami, USA", hint: "Tropical beaches, cruise capital, Cuban culture", continent: "North America", zoom: 10 },
+            { lat: 38.9072, lon: -77.0369, name: "Washington DC, USA", hint: "US capital, White House, monuments", continent: "North America", zoom: 10 },
+            { lat: 45.4215, lon: -75.6972, name: "Ottawa, Canada", hint: "Canadian capital, Parliament Hill", continent: "North America", zoom: 10 },
+            { lat: 51.0447, lon: -114.0719, name: "Calgary, Canada", hint: "Canadian Rockies gateway, Stampede city", continent: "North America", zoom: 10 },
+            { lat: 20.9674, lon: -89.5926, name: "Mérida, Mexico", hint: "Mayan heritage, Yucatán Peninsula", continent: "North America", zoom: 10 },
+            { lat: 32.7157, lon: -117.1611, name: "San Diego, USA", hint: "Perfect weather, Mexico border, naval base", continent: "North America", zoom: 10 },
+            
+            // SOUTH AMERICA (10 locations)
+            { lat: -23.5505, lon: -46.6333, name: "São Paulo, Brazil", hint: "Largest city in South America, financial hub", continent: "South America", zoom: 10 },
+            { lat: -22.9068, lon: -43.1729, name: "Rio de Janeiro, Brazil", hint: "Christ the Redeemer, Copacabana Beach, Carnival", continent: "South America", zoom: 10 },
+            { lat: -34.6037, lon: -58.3816, name: "Buenos Aires, Argentina", hint: "Tango, Paris of South America, steakhouses", continent: "South America", zoom: 10 },
+            { lat: -12.0464, lon: -77.0428, name: "Lima, Peru", hint: "Pacific coast, ancient Incan connections", continent: "South America", zoom: 10 },
+            { lat: -33.4489, lon: -70.6693, name: "Santiago, Chile", hint: "Andes Mountains backdrop, wine country", continent: "South America", zoom: 10 },
+            { lat: 4.7110, lon: -74.0721, name: "Bogotá, Colombia", hint: "High altitude capital, Andean culture", continent: "South America", zoom: 10 },
+            { lat: -0.1807, lon: -78.4678, name: "Quito, Ecuador", hint: "Equator line city, colonial architecture", continent: "South America", zoom: 10 },
+            { lat: -3.7172, lon: -38.5433, name: "Fortaleza, Brazil", hint: "Northeastern beaches, tropical coast", continent: "South America", zoom: 10 },
+            { lat: -16.5000, lon: -68.1500, name: "La Paz, Bolivia", hint: "Highest capital city, Andean culture", continent: "South America", zoom: 10 },
+            { lat: -25.2637, lon: -57.5759, name: "Asunción, Paraguay", hint: "River port, Guaraní culture", continent: "South America", zoom: 10 },
+            
+            // EUROPE (15 locations)
+            { lat: 51.5074, lon: -0.1278, name: "London, United Kingdom", hint: "UK capital, River Thames, Big Ben", continent: "Europe", zoom: 10 },
+            { lat: 48.8566, lon: 2.3522, name: "Paris, France", hint: "City of Light, Eiffel Tower, Louvre Museum", continent: "Europe", zoom: 10 },
+            { lat: 55.7558, lon: 37.6173, name: "Moscow, Russia", hint: "Russia's capital, Red Square, Kremlin", continent: "Europe", zoom: 10 },
+            { lat: 41.9028, lon: 12.4964, name: "Rome, Italy", hint: "Eternal City, Colosseum, Vatican nearby", continent: "Europe", zoom: 10 },
+            { lat: 52.5200, lon: 13.4050, name: "Berlin, Germany", hint: "Brandenburg Gate, historic wall location", continent: "Europe", zoom: 10 },
+            { lat: 40.4168, lon: -3.7038, name: "Madrid, Spain", hint: "Spanish capital, Royal Palace, museums", continent: "Europe", zoom: 10 },
+            { lat: 59.3293, lon: 18.0686, name: "Stockholm, Sweden", hint: "Built on 14 islands, Nobel Prize home", continent: "Europe", zoom: 10 },
+            { lat: 60.1699, lon: 24.9384, name: "Helsinki, Finland", hint: "Baltic Sea port, midnight sun in summer", continent: "Europe", zoom: 10 },
+            { lat: 50.0755, lon: 14.4378, name: "Prague, Czech Republic", hint: "City of a Hundred Spires, medieval charm", continent: "Europe", zoom: 10 },
+            { lat: 47.4979, lon: 19.0402, name: "Budapest, Hungary", hint: "Danube River divides Buda and Pest", continent: "Europe", zoom: 10 },
+            { lat: 38.7223, lon: -9.1393, name: "Lisbon, Portugal", hint: "Westernmost European capital, Age of Discovery", continent: "Europe", zoom: 10 },
+            { lat: 59.9139, lon: 10.7522, name: "Oslo, Norway", hint: "Fjord city, Viking heritage, Nobel Peace Prize", continent: "Europe", zoom: 10 },
+            { lat: 55.6761, lon: 12.5683, name: "Copenhagen, Denmark", hint: "Little Mermaid statue, bicycle culture", continent: "Europe", zoom: 10 },
+            { lat: 53.3498, lon: -6.2603, name: "Dublin, Ireland", hint: "Emerald Isle capital, literary heritage", continent: "Europe", zoom: 10 },
+            { lat: 64.1466, lon: -21.9426, name: "Reykjavik, Iceland", hint: "Northernmost capital, geothermal energy, midnight sun", continent: "Europe", zoom: 10 },
+            
+            // AFRICA (10 locations)
+            { lat: 30.0444, lon: 31.2357, name: "Cairo, Egypt", hint: "Ancient capital, pyramids nearby, Nile River", continent: "Africa", zoom: 10 },
+            { lat: -26.2041, lon: 28.0473, name: "Johannesburg, South Africa", hint: "Gold mining history, largest SA city", continent: "Africa", zoom: 10 },
+            { lat: -33.9249, lon: 18.4241, name: "Cape Town, South Africa", hint: "Table Mountain, southern tip of Africa", continent: "Africa", zoom: 10 },
+            { lat: -1.2921, lon: 36.8219, name: "Nairobi, Kenya", hint: "Safari capital, East African hub", continent: "Africa", zoom: 10 },
+            { lat: 6.5244, lon: 3.3792, name: "Lagos, Nigeria", hint: "West African megacity, Atlantic coast", continent: "Africa", zoom: 10 },
+            { lat: 33.5731, lon: -7.5898, name: "Casablanca, Morocco", hint: "Atlantic port, famous movie namesake", continent: "Africa", zoom: 10 },
+            { lat: -4.0435, lon: 39.6682, name: "Mombasa, Kenya", hint: "Indian Ocean port, historic Swahili coast", continent: "Africa", zoom: 10 },
+            { lat: 9.0320, lon: 38.7469, name: "Addis Ababa, Ethiopia", hint: "High altitude capital, African Union headquarters", continent: "Africa", zoom: 10 },
+            { lat: 15.5007, lon: 32.5599, name: "Khartoum, Sudan", hint: "Where Blue and White Nile meet", continent: "Africa", zoom: 10 },
+            { lat: -18.8792, lon: 47.5079, name: "Antananarivo, Madagascar", hint: "Island nation capital, unique wildlife nearby", continent: "Africa", zoom: 10 },
+            
+            // ASIA (15 locations)
+            { lat: 35.6762, lon: 139.6503, name: "Tokyo, Japan", hint: "Japan's capital, largest metro area, tech hub", continent: "Asia", zoom: 10 },
+            { lat: 39.9042, lon: 116.4074, name: "Beijing, China", hint: "Chinese capital, Forbidden City, Great Wall nearby", continent: "Asia", zoom: 10 },
+            { lat: 31.2304, lon: 121.4737, name: "Shanghai, China", hint: "Largest Chinese city, futuristic skyline", continent: "Asia", zoom: 10 },
+            { lat: 28.6139, lon: 77.2090, name: "New Delhi, India", hint: "Indian capital, Red Fort, historic monuments", continent: "Asia", zoom: 10 },
+            { lat: 19.0760, lon: 72.8777, name: "Mumbai, India", hint: "Bollywood, India's financial capital, Arabian Sea", continent: "Asia", zoom: 10 },
+            { lat: 1.3521, lon: 103.8198, name: "Singapore", hint: "Island city-state, garden city, global finance hub", continent: "Asia", zoom: 11 },
+            { lat: 13.7563, lon: 100.5018, name: "Bangkok, Thailand", hint: "Golden temples, floating markets, Chao Phraya River", continent: "Asia", zoom: 10 },
+            { lat: 25.0330, lon: 121.5654, name: "Taipei, Taiwan", hint: "Island tech hub, Taipei 101 skyscraper", continent: "Asia", zoom: 10 },
+            { lat: 37.5665, lon: 126.9780, name: "Seoul, South Korea", hint: "K-pop capital, palaces meet technology", continent: "Asia", zoom: 10 },
+            { lat: 21.0285, lon: 105.8542, name: "Hanoi, Vietnam", hint: "Vietnamese capital, thousand-year history", continent: "Asia", zoom: 10 },
+            { lat: -6.2088, lon: 106.8456, name: "Jakarta, Indonesia", hint: "Island nation capital, massive megacity", continent: "Asia", zoom: 10 },
+            { lat: 14.5995, lon: 120.9842, name: "Manila, Philippines", hint: "Island capital, Spanish colonial history", continent: "Asia", zoom: 10 },
+            { lat: 3.1390, lon: 101.6869, name: "Kuala Lumpur, Malaysia", hint: "Petronas Towers, multicultural Southeast Asian hub", continent: "Asia", zoom: 10 },
+            { lat: 23.8103, lon: 90.4125, name: "Dhaka, Bangladesh", hint: "River delta megacity, historic textile trade", continent: "Asia", zoom: 10 },
+            { lat: 33.3152, lon: 44.3661, name: "Baghdad, Iraq", hint: "Ancient Mesopotamian heritage, Tigris River", continent: "Asia", zoom: 10 },
+            
+            // OCEANIA (5 locations)
+            { lat: -33.8688, lon: 151.2093, name: "Sydney, Australia", hint: "Famous harbor, Opera House, Harbour Bridge", continent: "Oceania", zoom: 10 },
+            { lat: -37.8136, lon: 144.9631, name: "Melbourne, Australia", hint: "Cultural capital, Australian Rules Football, coffee culture", continent: "Oceania", zoom: 10 },
+            { lat: -41.2865, lon: 174.7762, name: "Wellington, New Zealand", hint: "Windy city, southernmost capital, Lord of the Rings", continent: "Oceania", zoom: 10 },
+            { lat: -36.8485, lon: 174.7633, name: "Auckland, New Zealand", hint: "City of Sails, volcanic field, largest NZ city", continent: "Oceania", zoom: 10 },
+            { lat: -17.7134, lon: 178.0650, name: "Suva, Fiji", hint: "Pacific island capital, coral reefs, tropical paradise", continent: "Oceania", zoom: 10 }
         ];
         
         window.startMysteryGame = function() {
