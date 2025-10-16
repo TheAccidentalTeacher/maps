@@ -2067,6 +2067,10 @@
         
         // Switch mode
         window.switchMode = function(mode) {
+            // CRITICAL FIX: Stop all timers and cleanup before switching
+            stopAllGameTimers();
+            cleanupGameMarkers();
+            
             gameState.currentMode = mode;
             
             // Deactivate all active games when switching modes
@@ -2075,23 +2079,79 @@
             gameState.guess.active = false;
             gameState.alaska.active = false;
             
-            // Clear any mystery timer
-            if (gameState.mystery.timer) {
-                clearInterval(gameState.mystery.timer);
-                gameState.mystery.timer = null;
-            }
+            // Update mode buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+                // Find the button for the new mode and activate it
+                if (btn.textContent.toLowerCase().includes(mode.toLowerCase()) || 
+                    (mode === 'explore' && btn.textContent.includes('EXPLORE'))) {
+                    btn.classList.add('active');
+                }
+            });
             
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
+            // Switch panels
             document.querySelectorAll('.game-panel').forEach(panel => panel.classList.remove('active'));
-            document.getElementById(mode + '-panel').classList.add('active');
+            const targetPanel = document.getElementById(mode + '-panel');
+            if (targetPanel) {
+                targetPanel.classList.add('active');
+            }
             
             if (mode === 'missions') {
                 renderMissions();
             }
             
             saveState();
+        }
+        
+        // CRITICAL FIX: Centralized timer cleanup function
+        function stopAllGameTimers() {
+            // Clear Mystery Challenge timer
+            if (gameState.mystery.timer) {
+                clearInterval(gameState.mystery.timer);
+                gameState.mystery.timer = null;
+            }
+            
+            // Clear any other game timers here as they're added
+            // Example: if (gameState.guess.timer) clearInterval(gameState.guess.timer);
+        }
+        
+        // CRITICAL FIX #3: Centralized marker cleanup function
+        function cleanupGameMarkers() {
+            // Remove current marker if it exists
+            if (currentMarker) {
+                try {
+                    geoMap.removeLayer(currentMarker);
+                    console.log('🧹 Removed current marker');
+                } catch (e) {
+                    console.warn('⚠️ Could not remove current marker:', e);
+                }
+                currentMarker = null;
+            }
+            
+            // Remove Coordinate Finder reveal marker
+            if (typeof revealMarker !== 'undefined' && revealMarker) {
+                try {
+                    geoMap.removeLayer(revealMarker);
+                    console.log('🧹 Removed reveal marker');
+                } catch (e) {
+                    console.warn('⚠️ Could not remove reveal marker:', e);
+                }
+                revealMarker = null;
+            }
+            
+            // Clear any orphaned markers (markers without proper tracking)
+            // This catches any markers that weren't properly tracked
+            geoMap.eachLayer(function(layer) {
+                // Keep the base tile layer, but remove any markers
+                if (layer instanceof L.Marker) {
+                    try {
+                        geoMap.removeLayer(layer);
+                        console.log('🧹 Removed orphaned marker');
+                    } catch (e) {
+                        console.warn('⚠️ Could not remove marker:', e);
+                    }
+                }
+            });
         }
         
         // ========================================
@@ -2784,27 +2844,99 @@
             }
         });
         
+        // CRITICAL FIX #2: Race condition prevention
+        let currentFetchController = null;
+        let lastFetchTime = 0;
+        const FETCH_DELAY = 1000; // 1 second minimum between API calls (Nominatim rate limit)
+        
         async function showLocationInfo(lat, lon) {
+            // Cancel previous fetch if still running
+            if (currentFetchController) {
+                currentFetchController.abort();
+                console.log('🚫 Cancelled previous location fetch');
+            }
+            
+            // Rate limiting: Ensure minimum delay between requests
+            const now = Date.now();
+            const timeSinceLastFetch = now - lastFetchTime;
+            if (timeSinceLastFetch < FETCH_DELAY) {
+                const waitTime = FETCH_DELAY - timeSinceLastFetch;
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+            }
+            
+            // Create new abort controller for this request
+            currentFetchController = new AbortController();
+            const signal = currentFetchController.signal;
+            
+            // Update marker
             if (currentMarker) geoMap.removeLayer(currentMarker);
             currentMarker = L.marker([lat, lon]).addTo(geoMap);
             
-            document.getElementById('location-info').innerHTML = 'Loading...';
+            const locationInfoEl = document.getElementById('location-info');
+            locationInfoEl.innerHTML = '<span style="color: #888;">📍 Loading location...</span>';
             
             try {
+                lastFetchTime = Date.now();
+                
                 const response = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1&accept-language=en`,
-                    { headers: { 'User-Agent': 'Geographic Detective Academy' } }
+                    { 
+                        headers: { 'User-Agent': 'Geographic Detective Academy' },
+                        signal: signal  // Allow aborting this request
+                    }
                 );
+                
+                // Check if request was aborted
+                if (signal.aborted) {
+                    console.log('⚠️ Request was aborted');
+                    return;
+                }
+                
+                // Check response status
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
                 const addr = data.address || {};
                 
+                // Build location info
                 let info = `<strong>${formatCoord(lat, true)}, ${formatCoord(lon, false)}</strong><br>`;
-                if (addr.city || addr.town) info += `${addr.city || addr.town}, `;
-                if (addr.country) info += addr.country;
+                if (addr.city || addr.town) {
+                    info += `📍 ${addr.city || addr.town}`;
+                }
+                if (addr.state || addr.province) {
+                    info += `, ${addr.state || addr.province}`;
+                }
+                if (addr.country) {
+                    info += `<br>🌍 ${addr.country}`;
+                }
                 
-                document.getElementById('location-info').innerHTML = info;
+                // Only update if this request wasn't aborted
+                if (!signal.aborted) {
+                    locationInfoEl.innerHTML = info;
+                }
+                
             } catch (error) {
-                document.getElementById('location-info').innerHTML = 'Error loading location';
+                // Don't show error if request was deliberately aborted
+                if (error.name === 'AbortError') {
+                    console.log('✅ Location fetch cancelled (user clicked elsewhere)');
+                    return;
+                }
+                
+                // Show user-friendly error message
+                console.error('❌ Location fetch error:', error);
+                if (!signal.aborted) {
+                    locationInfoEl.innerHTML = `
+                        <span style="color: #ff6b6b;">⚠️ Location service temporarily unavailable</span><br>
+                        <span style="color: #888; font-size: 11px;">Try again in a moment</span>
+                    `;
+                }
+            } finally {
+                // Clear the controller reference
+                if (currentFetchController && currentFetchController.signal === signal) {
+                    currentFetchController = null;
+                }
             }
         }
         
@@ -3579,7 +3711,14 @@
         console.log('🕵️ Geographic Detective Academy initialized!');
         console.log('🎮 All game modes ready!');
         console.log('🏆 Mission system active!');
-        }); // end window.onload
+        }); // end DOMContentLoaded
+        
+        // CRITICAL FIX: Cleanup on page unload to prevent memory leaks
+        window.addEventListener('beforeunload', function() {
+            stopAllGameTimers();
+            cleanupGameMarkers();
+            console.log('🧹 Cleaned up all timers and markers');
+        });
     </script>
 </body>
 </html>
