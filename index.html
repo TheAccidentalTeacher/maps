@@ -2141,6 +2141,13 @@
             position: 'topright'
         }).addTo(geoMap);
         
+        // Track layer changes for Explore achievements
+        geoMap.on('baselayerchange', function(e) {
+            playerAchievements.stats.explore.layersUsed.add(e.name);
+            saveAchievements();
+            checkExploreAchievements();
+        });
+        
         L.control.scale({
             imperial: true,
             metric: true
@@ -5010,6 +5017,15 @@
             gameState.missions[3].progress++;
             addXP(50, 'Heist created!');
             saveState();
+            
+            // Track heist creation for achievements
+            playerAchievements.stats.heist.created++;
+            playerAchievements.stats.universal.modesPlayed.add('heist');
+            playerAchievements.stats.universal.modesCompleted.add('heist');
+            saveAchievements();
+            checkHeistAchievements();
+            checkUniversalAchievements();
+            trackPlayDate();
             
             // Show success message with Play Again option
             showHeistSaved(heist.name);
