@@ -87,10 +87,48 @@
   * Console confirmation logging
 
 **Next Steps:**
-- Hook achievement checkers into game events
-- Test with console commands
-- Verify localStorage persistence
-- Add tracking increments to existing functions
+- [x] Hook achievement checkers into game events ✅
+- [x] Alaska: Track location finds, check achievements
+- [x] Mystery: Track solves, unique locations, streaks
+- [x] Explore: Track markers placed, zoom levels
+- [x] Universal: Track modes played, daily play dates
+- [ ] Test with console commands
+- [ ] Verify localStorage persistence
+- [ ] Add tracking increments to remaining games
+
+### Session 2: Achievement Integration Hooks (30 minutes)
+**What was completed:**
+1. ✅ Hooked Alaska Adventure achievements
+   - Track modesPlayed when game starts
+   - Call checkAlaskaAchievements() on location found
+   - Mark modesCompleted when all 5 rounds complete
+   - Track daily play dates
+
+2. ✅ Hooked Mystery Challenge achievements
+   - Track modesPlayed when game starts
+   - Increment solved count on correct answer
+   - Track uniqueLocationsSolved with Set
+   - Track current streak
+   - Call checkMysteryAchievements() after solve
+
+3. ✅ Hooked Explore Mode achievements
+   - Track markersPlaced on every map click
+   - Track zoomLevelsUsed on zoom events
+   - Mark explore mode as played
+   - Call checkExploreAchievements() after marker/zoom
+
+4. ✅ Universal tracking
+   - trackPlayDate() called on game start
+   - modesPlayed tracked for Alaska, Mystery, Explore
+   - modesCompleted tracked for Alaska
+   - checkUniversalAchievements() called after major events
+
+**Still needed:**
+- Coordinate Finder tracking (format usage, accuracy, speed)
+- Scavenger Hunt tracking (completions, continents, accuracy)
+- Guess Mode tracking (accuracy, photos seen, close guesses)
+- Create Heist tracking (created count, continents, shares)
+- Layer usage tracking for Explore mode
 
 ---
 

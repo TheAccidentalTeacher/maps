@@ -4315,6 +4315,14 @@
             }
         });
         
+        // Track zoom levels for Explore achievements
+        geoMap.on('zoomend', function() {
+            const zoomLevel = geoMap.getZoom();
+            playerAchievements.stats.explore.zoomLevelsUsed.add(zoomLevel);
+            saveAchievements();
+            checkExploreAchievements();
+        });
+        
         // Click handler
         let currentMarker = null;
         geoMap.on('click', function(e) {
@@ -4380,6 +4388,12 @@
             // Update marker
             if (currentMarker) geoMap.removeLayer(currentMarker);
             currentMarker = L.marker([lat, lon]).addTo(geoMap);
+            
+            // Track marker placement for Explore achievements
+            playerAchievements.stats.explore.markersPlaced++;
+            playerAchievements.stats.universal.modesPlayed.add('explore');
+            saveAchievements();
+            checkExploreAchievements();
             
             const locationInfoEl = document.getElementById('location-info');
             locationInfoEl.innerHTML = '<span style="color: #888;">📍 Loading location...</span>';
@@ -4538,6 +4552,12 @@
             document.getElementById('mystery-intro').style.display = 'none';
             document.getElementById('mystery-game').style.display = 'block';
             gameState.mystery.active = true;
+            
+            // Track that Mystery mode was played
+            playerAchievements.stats.universal.modesPlayed.add('mystery');
+            saveAchievements();
+            trackPlayDate();
+            
             startMystery();
             
             // Welcome toast
@@ -4614,6 +4634,14 @@
                 
                 updateAllDisplays();
                 saveState();
+                
+                // Track achievement stats
+                playerAchievements.stats.mystery.solved++;
+                playerAchievements.stats.mystery.uniqueLocationsSolved.add(gameState.mystery.current.name);
+                playerAchievements.stats.mystery.streak = gameState.mystery.streak;
+                saveAchievements();
+                checkMysteryAchievements();
+                checkUniversalAchievements();
                 
                 // Show Play Again message with button
                 showMysterySuccess();
@@ -5075,6 +5103,11 @@
             gameState.alaska.totalFound = 0;
             gameState.alaska.foundLocations = [];
             
+            // Track that Alaska mode was played (for universal achievements)
+            playerAchievements.stats.universal.modesPlayed.add('alaska');
+            saveAchievements();
+            trackPlayDate();
+            
             document.getElementById('alaska-intro').style.display = 'none';
             document.getElementById('alaska-game').style.display = 'block';
             
@@ -5380,6 +5413,11 @@
                     updateAlaskaDisplay();
                     saveState();
                     
+                    // Check for achievements!
+                    checkAlaskaAchievements();
+                    checkUniversalAchievements();
+                    trackPlayDate();
+                    
                     // Check if round is complete
                     if (gameState.alaska.roundProgress[currentRound] === roundInfo.locations.length) {
                         setTimeout(() => {
@@ -5446,6 +5484,12 @@
         
         window.showGameComplete = function() {
             const totalFound = gameState.alaska.totalFound;
+            
+            // Mark Alaska as completed for universal achievements!
+            playerAchievements.stats.universal.modesCompleted.add('alaska');
+            saveAchievements();
+            checkAlaskaAchievements(); // Final check for completion achievements
+            checkUniversalAchievements();
             
             const html = `
                 <div style="text-align: center; padding: 30px;">
