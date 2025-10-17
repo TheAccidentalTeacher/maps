@@ -1956,6 +1956,11 @@
         
         document.addEventListener('DOMContentLoaded', function() {
         console.log('DOMContentLoaded event fired');
+        
+        // Load saved achievements from localStorage
+        loadAchievements();
+        console.log('🏆 Achievement system initialized');
+        
         // v2.0 - Alaska Adventure Edition
         // Initialize map
         const geoMap = L.map('map', {
@@ -2182,6 +2187,1194 @@
                 foundLocations: [] // Track which locations have been found
             }
         };
+        
+        // ========================================
+        // UNIVERSAL ACHIEVEMENT SYSTEM
+        // ========================================
+        
+        // Complete achievement database (45 total achievements)
+        const ACHIEVEMENTS = {
+            // EXPLORE MODE (5 achievements)
+            explore: {
+                globeTrotter: {
+                    id: 'globeTrotter',
+                    name: '🌍 Globe Trotter',
+                    description: 'Visit all 7 continents',
+                    xp: 100,
+                    tier: 'uncommon',
+                    requirement: { type: 'continents', count: 7 }
+                },
+                zoomMaster: {
+                    id: 'zoomMaster',
+                    name: '🔭 Zoom Master',
+                    description: 'Use all zoom levels',
+                    xp: 75,
+                    tier: 'common',
+                    requirement: { type: 'zoomLevels', count: 10 }
+                },
+                layerExpert: {
+                    id: 'layerExpert',
+                    name: '🗺️ Layer Expert',
+                    description: 'Try all 10 map layers',
+                    xp: 125,
+                    tier: 'uncommon',
+                    requirement: { type: 'layers', count: 10 }
+                },
+                markerManiac: {
+                    id: 'markerManiac',
+                    name: '📍 Marker Maniac',
+                    description: 'Place 50+ markers',
+                    xp: 150,
+                    tier: 'rare',
+                    requirement: { type: 'markers', count: 50 }
+                },
+                styleSwitcher: {
+                    id: 'styleSwitcher',
+                    name: '🎨 Style Switcher',
+                    description: 'Toggle Fun Mode 10 times',
+                    xp: 50,
+                    tier: 'common',
+                    requirement: { type: 'modeToggles', count: 10 }
+                }
+            },
+            
+            // COORDINATE FINDER (5 achievements)
+            coordinate: {
+                pinpointPro: {
+                    id: 'pinpointPro',
+                    name: '🎯 Pinpoint Pro',
+                    description: '10 perfect finds (within 1km)',
+                    xp: 150,
+                    tier: 'rare',
+                    requirement: { type: 'perfectFinds', count: 10 }
+                },
+                formatFluent: {
+                    id: 'formatFluent',
+                    name: '🌎 Format Fluent',
+                    description: 'Use both Decimal and Cardinal 5 times each',
+                    xp: 100,
+                    tier: 'uncommon',
+                    requirement: { type: 'formats', decimalCount: 5, cardinalCount: 5 }
+                },
+                speedDemon: {
+                    id: 'speedDemon',
+                    name: '⚡ Speed Demon',
+                    description: 'Find 5 locations in under 30 seconds each',
+                    xp: 200,
+                    tier: 'rare',
+                    requirement: { type: 'speedFinds', count: 5, maxTime: 30 }
+                },
+                navigator: {
+                    id: 'navigator',
+                    name: '🧭 Navigator',
+                    description: 'Complete 25 coordinate challenges',
+                    xp: 125,
+                    tier: 'uncommon',
+                    requirement: { type: 'completions', count: 25 }
+                },
+                perfectionist: {
+                    id: 'perfectionist',
+                    name: '💯 Perfectionist',
+                    description: '100% accuracy on 10 finds',
+                    xp: 250,
+                    tier: 'epic',
+                    requirement: { type: 'perfectAccuracy', count: 10 }
+                }
+            },
+            
+            // MYSTERY CHALLENGE (7 achievements)
+            mystery: {
+                mysterySolver: {
+                    id: 'mysterySolver',
+                    name: '🔍 Mystery Solver',
+                    description: 'Solve 10 mysteries',
+                    xp: 100,
+                    tier: 'uncommon',
+                    requirement: { type: 'solved', count: 10 }
+                },
+                speedDetective: {
+                    id: 'speedDetective',
+                    name: '⏱️ Speed Detective',
+                    description: 'Solve in under 20 seconds',
+                    xp: 200,
+                    tier: 'rare',
+                    requirement: { type: 'speedSolve', maxTime: 20 }
+                },
+                noHints: {
+                    id: 'noHints',
+                    name: '🧠 No Hints',
+                    description: 'Solve without using hints 5 times',
+                    xp: 250,
+                    tier: 'epic',
+                    requirement: { type: 'noHintSolves', count: 5 }
+                },
+                continentalExpert: {
+                    id: 'continentalExpert',
+                    name: '🌍 Continental Expert',
+                    description: 'Solve 1 from each continent',
+                    xp: 150,
+                    tier: 'uncommon',
+                    requirement: { type: 'continents', count: 6 }
+                },
+                streakMaster: {
+                    id: 'streakMaster',
+                    name: '🔥 Streak Master',
+                    description: '5-mystery win streak',
+                    xp: 300,
+                    tier: 'epic',
+                    requirement: { type: 'streak', count: 5 }
+                },
+                mysteryMaster: {
+                    id: 'mysteryMaster',
+                    name: '🏆 Mystery Master',
+                    description: 'Solve all 70 locations',
+                    xp: 500,
+                    tier: 'legendary',
+                    requirement: { type: 'uniqueSolves', count: 70 }
+                },
+                lightningRound: {
+                    id: 'lightningRound',
+                    name: '⚡ Lightning Round',
+                    description: 'Solve 3 in under 2 minutes total',
+                    xp: 400,
+                    tier: 'epic',
+                    requirement: { type: 'lightningRound', count: 3, maxTime: 120 }
+                }
+            },
+            
+            // SCAVENGER HUNT (6 achievements)
+            scavenger: {
+                photoFinish: {
+                    id: 'photoFinish',
+                    name: '📸 Photo Finish',
+                    description: 'Complete 10 scavenger hunts',
+                    xp: 125,
+                    tier: 'uncommon',
+                    requirement: { type: 'completed', count: 10 }
+                },
+                speedScavenger: {
+                    id: 'speedScavenger',
+                    name: '🏃 Speed Scavenger',
+                    description: 'Complete hunt in under 5 minutes',
+                    xp: 200,
+                    tier: 'rare',
+                    requirement: { type: 'speedHunt', maxTime: 300 }
+                },
+                eagleEye: {
+                    id: 'eagleEye',
+                    name: '🎯 Eagle Eye',
+                    description: 'Find all items with 95%+ accuracy',
+                    xp: 250,
+                    tier: 'epic',
+                    requirement: { type: 'accuracy', threshold: 95 }
+                },
+                worldExplorer: {
+                    id: 'worldExplorer',
+                    name: '🌏 World Explorer',
+                    description: 'Complete hunts on all continents',
+                    xp: 150,
+                    tier: 'uncommon',
+                    requirement: { type: 'continents', count: 6 }
+                },
+                detailDetective: {
+                    id: 'detailDetective',
+                    name: '🔎 Detail Detective',
+                    description: 'Find 5 hidden bonus items',
+                    xp: 300,
+                    tier: 'epic',
+                    requirement: { type: 'bonusItems', count: 5 }
+                },
+                scavengerLegend: {
+                    id: 'scavengerLegend',
+                    name: '🏆 Scavenger Legend',
+                    description: 'Complete 25 hunts',
+                    xp: 400,
+                    tier: 'epic',
+                    requirement: { type: 'completed', count: 25 }
+                }
+            },
+            
+            // GUESS MODE (6 achievements)
+            guess: {
+                sharpShooter: {
+                    id: 'sharpShooter',
+                    name: '🎯 Sharp Shooter',
+                    description: '10 guesses within 100km',
+                    xp: 150,
+                    tier: 'rare',
+                    requirement: { type: 'closeGuesses', count: 10, maxDistance: 100 }
+                },
+                geographyGenius: {
+                    id: 'geographyGenius',
+                    name: '🌍 Geography Genius',
+                    description: '90%+ accuracy over 20 photos',
+                    xp: 250,
+                    tier: 'epic',
+                    requirement: { type: 'accuracy', threshold: 90, count: 20 }
+                },
+                instantIdentifier: {
+                    id: 'instantIdentifier',
+                    name: '⚡ Instant Identifier',
+                    description: 'Guess correctly in under 5 seconds, 5 times',
+                    xp: 200,
+                    tier: 'rare',
+                    requirement: { type: 'speedGuesses', count: 5, maxTime: 5 }
+                },
+                photoMaster: {
+                    id: 'photoMaster',
+                    name: '🏆 Photo Master',
+                    description: 'View all 100 photos',
+                    xp: 300,
+                    tier: 'epic',
+                    requirement: { type: 'photosSeen', count: 100 }
+                },
+                perfectRound: {
+                    id: 'perfectRound',
+                    name: '🔥 Perfect Round',
+                    description: '5/5 perfect guesses in one session',
+                    xp: 400,
+                    tier: 'epic',
+                    requirement: { type: 'perfectRound', count: 5 }
+                },
+                detailExpert: {
+                    id: 'detailExpert',
+                    name: '👁️ Detail Expert',
+                    description: 'Identify from cropped/zoomed photos 10 times',
+                    xp: 350,
+                    tier: 'epic',
+                    requirement: { type: 'croppedPhotos', count: 10 }
+                }
+            },
+            
+            // CREATE HEIST (6 achievements)
+            heist: {
+                architect: {
+                    id: 'architect',
+                    name: '🎨 Architect',
+                    description: 'Create 5 heists',
+                    xp: 100,
+                    tier: 'uncommon',
+                    requirement: { type: 'created', count: 5 }
+                },
+                globalPlanner: {
+                    id: 'globalPlanner',
+                    name: '🌍 Global Planner',
+                    description: 'Heists on all continents',
+                    xp: 150,
+                    tier: 'uncommon',
+                    requirement: { type: 'continents', count: 6 }
+                },
+                masterThief: {
+                    id: 'masterThief',
+                    name: '🏆 Master Thief',
+                    description: 'Create 25 heists',
+                    xp: 300,
+                    tier: 'epic',
+                    requirement: { type: 'created', count: 25 }
+                },
+                speedDesigner: {
+                    id: 'speedDesigner',
+                    name: '⚡ Speed Designer',
+                    description: 'Create heist in under 2 minutes',
+                    xp: 200,
+                    tier: 'rare',
+                    requirement: { type: 'speedCreate', maxTime: 120 }
+                },
+                heistPerfectionist: {
+                    id: 'heistPerfectionist',
+                    name: '🎯 Perfectionist',
+                    description: 'All custom waypoints, no templates',
+                    xp: 250,
+                    tier: 'epic',
+                    requirement: { type: 'customWaypoints', count: 5 }
+                },
+                influencer: {
+                    id: 'influencer',
+                    name: '📱 Influencer',
+                    description: 'Share 10 heists',
+                    xp: 150,
+                    tier: 'uncommon',
+                    requirement: { type: 'shared', count: 10 }
+                }
+            },
+            
+            // ALASKA ADVENTURE (10 achievements - 5 already implemented!)
+            alaska: {
+                mountainMaster: {
+                    id: 'mountainMaster',
+                    name: '⛰️ Mountain Master',
+                    description: 'Find 5+ mountains',
+                    xp: 100,
+                    tier: 'uncommon',
+                    requirement: { type: 'locationsByType', locationType: 'mountain', count: 5 }
+                },
+                riverRunner: {
+                    id: 'riverRunner',
+                    name: '🌊 River Runner',
+                    description: 'Find 3+ rivers',
+                    xp: 75,
+                    tier: 'common',
+                    requirement: { type: 'locationsByType', locationType: 'river', count: 3 }
+                },
+                parkExplorer: {
+                    id: 'parkExplorer',
+                    name: '🏞️ Park Explorer',
+                    description: 'Find 5+ parks',
+                    xp: 125,
+                    tier: 'uncommon',
+                    requirement: { type: 'locationsByType', locationType: 'park', count: 5 }
+                },
+                cityFinder: {
+                    id: 'cityFinder',
+                    name: '🏙️ City Finder',
+                    description: 'Find 8+ cities',
+                    xp: 150,
+                    tier: 'rare',
+                    requirement: { type: 'locationsByType', locationType: 'city', count: 8 }
+                },
+                alaskaExpert: {
+                    id: 'alaskaExpert',
+                    name: '🏆 Alaska Expert',
+                    description: 'Discover all 50 Alaska locations',
+                    xp: 500,
+                    tier: 'legendary',
+                    requirement: { type: 'total', count: 50 }
+                },
+                fishTales: {
+                    id: 'fishTales',
+                    name: '🎣 Fish Tales',
+                    description: 'Find all fishing locations',
+                    xp: 100,
+                    tier: 'uncommon',
+                    requirement: { type: 'fishingSpots', count: 5 }
+                },
+                bearCountry: {
+                    id: 'bearCountry',
+                    name: '🐻 Bear Country',
+                    description: 'Find all wildlife spots',
+                    xp: 125,
+                    tier: 'uncommon',
+                    requirement: { type: 'wildlifeSpots', count: 5 }
+                },
+                summitSeeker: {
+                    id: 'summitSeeker',
+                    name: '⛰️ Summit Seeker',
+                    description: 'Find all peaks in one session',
+                    xp: 200,
+                    tier: 'rare',
+                    requirement: { type: 'peaksInSession', count: 8 }
+                },
+                alaskaSpeedRunner: {
+                    id: 'alaskaSpeedRunner',
+                    name: '⚡ Speed Runner',
+                    description: 'Complete all 5 rounds in under 30 min',
+                    xp: 500,
+                    tier: 'legendary',
+                    requirement: { type: 'speedComplete', maxTime: 1800 }
+                },
+                alaskaLegend: {
+                    id: 'alaskaLegend',
+                    name: '🏆 Alaska Legend',
+                    description: '100% completion + all achievements',
+                    xp: 1000,
+                    tier: 'legendary',
+                    requirement: { type: 'masterComplete', allAchievements: true }
+                }
+            },
+            
+            // UNIVERSAL CROSS-GAME ACHIEVEMENTS (10 achievements)
+            universal: {
+                gameHopper: {
+                    id: 'gameHopper',
+                    name: '🎮 Game Hopper',
+                    description: 'Try all 7 game modes',
+                    xp: 100,
+                    tier: 'uncommon',
+                    requirement: { type: 'modesPlayed', count: 7 }
+                },
+                jackOfAllTrades: {
+                    id: 'jackOfAllTrades',
+                    name: '🏆 Jack of All Trades',
+                    description: 'Complete 1 of each mode',
+                    xp: 200,
+                    tier: 'rare',
+                    requirement: { type: 'modesCompleted', count: 7 }
+                },
+                masterOfAll: {
+                    id: 'masterOfAll',
+                    name: '👑 Master of All',
+                    description: 'Expert in all 7 modes',
+                    xp: 1000,
+                    tier: 'legendary',
+                    requirement: { type: 'modesMastered', count: 7 }
+                },
+                universalSpeedDemon: {
+                    id: 'universalSpeedDemon',
+                    name: '⚡ Speed Demon',
+                    description: 'Complete 10 games in under 1 hour',
+                    xp: 300,
+                    tier: 'epic',
+                    requirement: { type: 'speedGames', count: 10, maxTime: 3600 }
+                },
+                streakLegend: {
+                    id: 'streakLegend',
+                    name: '🔥 Streak Legend',
+                    description: '7-day play streak',
+                    xp: 500,
+                    tier: 'legendary',
+                    requirement: { type: 'dailyStreak', count: 7 }
+                },
+                statistician: {
+                    id: 'statistician',
+                    name: '📊 Statistician',
+                    description: 'View stats dashboard 10 times',
+                    xp: 50,
+                    tier: 'common',
+                    requirement: { type: 'statsViews', count: 10 }
+                },
+                styleIcon: {
+                    id: 'styleIcon',
+                    name: '🎨 Style Icon',
+                    description: 'Use Fun Mode in all 7 games',
+                    xp: 150,
+                    tier: 'uncommon',
+                    requirement: { type: 'funModeAllGames', count: 7 }
+                },
+                cartographer: {
+                    id: 'cartographer',
+                    name: '🗺️ Cartographer',
+                    description: 'Use all 10 map layers',
+                    xp: 100,
+                    tier: 'uncommon',
+                    requirement: { type: 'layersUsed', count: 10 }
+                },
+                universalPerfectionist: {
+                    id: 'universalPerfectionist',
+                    name: '💯 Perfectionist',
+                    description: '100% accuracy in 3 different modes',
+                    xp: 400,
+                    tier: 'epic',
+                    requirement: { type: 'perfectModes', count: 3 }
+                },
+                achievementHunter: {
+                    id: 'achievementHunter',
+                    name: '🏅 Achievement Hunter',
+                    description: 'Unlock 30 achievements',
+                    xp: 750,
+                    tier: 'legendary',
+                    requirement: { type: 'achievementsUnlocked', count: 30 }
+                }
+            }
+        };
+        
+        // Player achievement tracking (saved to localStorage)
+        let playerAchievements = {
+            unlocked: [], // Array of achievement IDs
+            stats: {
+                // Explore mode stats
+                explore: {
+                    continentsVisited: new Set(),
+                    zoomLevelsUsed: new Set(),
+                    layersUsed: new Set(),
+                    markersPlaced: 0,
+                    modeToggles: 0
+                },
+                // Coordinate Finder stats
+                coordinate: {
+                    perfectFinds: 0,
+                    decimalUses: 0,
+                    cardinalUses: 0,
+                    speedFinds: 0,
+                    completions: 0,
+                    perfectAccuracyRuns: 0
+                },
+                // Mystery Challenge stats
+                mystery: {
+                    solved: 0,
+                    speedSolves: 0,
+                    noHintSolves: 0,
+                    continentsSolved: new Set(),
+                    streak: 0,
+                    uniqueLocationsSolved: new Set(),
+                    lightningRounds: 0
+                },
+                // Scavenger Hunt stats
+                scavenger: {
+                    completed: 0,
+                    speedHunts: 0,
+                    highAccuracyHunts: 0,
+                    continentsCompleted: new Set(),
+                    bonusItemsFound: 0
+                },
+                // Guess Mode stats
+                guess: {
+                    closeGuesses: 0,
+                    accuracyRuns: [],
+                    speedGuesses: 0,
+                    photosSeen: new Set(),
+                    perfectRounds: 0,
+                    croppedPhotoGuesses: 0
+                },
+                // Create Heist stats
+                heist: {
+                    created: 0,
+                    continents: new Set(),
+                    speedCreates: 0,
+                    customHeists: 0,
+                    shared: 0
+                },
+                // Alaska Adventure stats (already tracking some)
+                alaska: {
+                    achievements: {
+                        mountainMaster: false,
+                        riverRunner: false,
+                        parkExplorer: false,
+                        cityFinder: false,
+                        alaskaExpert: false,
+                        fishTales: false,
+                        bearCountry: false,
+                        summitSeeker: false,
+                        alaskaSpeedRunner: false,
+                        alaskaLegend: false
+                    }
+                },
+                // Universal stats
+                universal: {
+                    modesPlayed: new Set(),
+                    modesCompleted: new Set(),
+                    modesMastered: new Set(),
+                    gamesThisHour: [],
+                    playDates: new Set(),
+                    statsViews: 0,
+                    funModeGames: new Set(),
+                    perfectModes: new Set()
+                }
+            },
+            lastUpdated: new Date().toISOString()
+        };
+        
+        // ========================================
+        // UNIVERSAL ACHIEVEMENT FUNCTIONS
+        // ========================================
+        
+        // Load achievement data from localStorage
+        function loadAchievements() {
+            try {
+                const saved = localStorage.getItem('playerAchievements');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    // Restore sets from arrays
+                    playerAchievements.unlocked = data.unlocked || [];
+                    playerAchievements.lastUpdated = data.lastUpdated;
+                    
+                    // Restore stats with Sets
+                    if (data.stats) {
+                        if (data.stats.explore) {
+                            playerAchievements.stats.explore.continentsVisited = new Set(data.stats.explore.continentsVisited || []);
+                            playerAchievements.stats.explore.zoomLevelsUsed = new Set(data.stats.explore.zoomLevelsUsed || []);
+                            playerAchievements.stats.explore.layersUsed = new Set(data.stats.explore.layersUsed || []);
+                            playerAchievements.stats.explore.markersPlaced = data.stats.explore.markersPlaced || 0;
+                            playerAchievements.stats.explore.modeToggles = data.stats.explore.modeToggles || 0;
+                        }
+                        if (data.stats.mystery) {
+                            playerAchievements.stats.mystery.continentsSolved = new Set(data.stats.mystery.continentsSolved || []);
+                            playerAchievements.stats.mystery.uniqueLocationsSolved = new Set(data.stats.mystery.uniqueLocationsSolved || []);
+                            Object.assign(playerAchievements.stats.mystery, data.stats.mystery);
+                        }
+                        if (data.stats.guess) {
+                            playerAchievements.stats.guess.photosSeen = new Set(data.stats.guess.photosSeen || []);
+                            playerAchievements.stats.guess.accuracyRuns = data.stats.guess.accuracyRuns || [];
+                            Object.assign(playerAchievements.stats.guess, data.stats.guess);
+                        }
+                        if (data.stats.universal) {
+                            playerAchievements.stats.universal.modesPlayed = new Set(data.stats.universal.modesPlayed || []);
+                            playerAchievements.stats.universal.modesCompleted = new Set(data.stats.universal.modesCompleted || []);
+                            playerAchievements.stats.universal.modesMastered = new Set(data.stats.universal.modesMastered || []);
+                            playerAchievements.stats.universal.playDates = new Set(data.stats.universal.playDates || []);
+                            playerAchievements.stats.universal.funModeGames = new Set(data.stats.universal.funModeGames || []);
+                            playerAchievements.stats.universal.perfectModes = new Set(data.stats.universal.perfectModes || []);
+                            Object.assign(playerAchievements.stats.universal, data.stats.universal);
+                        }
+                        // Restore other stats
+                        if (data.stats.coordinate) Object.assign(playerAchievements.stats.coordinate, data.stats.coordinate);
+                        if (data.stats.scavenger) {
+                            playerAchievements.stats.scavenger.continentsCompleted = new Set(data.stats.scavenger.continentsCompleted || []);
+                            Object.assign(playerAchievements.stats.scavenger, data.stats.scavenger);
+                        }
+                        if (data.stats.heist) {
+                            playerAchievements.stats.heist.continents = new Set(data.stats.heist.continents || []);
+                            Object.assign(playerAchievements.stats.heist, data.stats.heist);
+                        }
+                        if (data.stats.alaska) Object.assign(playerAchievements.stats.alaska, data.stats.alaska);
+                    }
+                    console.log('✅ Achievements loaded:', playerAchievements.unlocked.length, 'unlocked');
+                }
+            } catch (e) {
+                console.warn('Could not load achievements:', e);
+            }
+        }
+        
+        // Save achievement data to localStorage
+        function saveAchievements() {
+            try {
+                // Convert Sets to arrays for JSON serialization
+                const toSave = {
+                    unlocked: playerAchievements.unlocked,
+                    lastUpdated: new Date().toISOString(),
+                    stats: {
+                        explore: {
+                            ...playerAchievements.stats.explore,
+                            continentsVisited: Array.from(playerAchievements.stats.explore.continentsVisited),
+                            zoomLevelsUsed: Array.from(playerAchievements.stats.explore.zoomLevelsUsed),
+                            layersUsed: Array.from(playerAchievements.stats.explore.layersUsed)
+                        },
+                        coordinate: playerAchievements.stats.coordinate,
+                        mystery: {
+                            ...playerAchievements.stats.mystery,
+                            continentsSolved: Array.from(playerAchievements.stats.mystery.continentsSolved),
+                            uniqueLocationsSolved: Array.from(playerAchievements.stats.mystery.uniqueLocationsSolved)
+                        },
+                        scavenger: {
+                            ...playerAchievements.stats.scavenger,
+                            continentsCompleted: Array.from(playerAchievements.stats.scavenger.continentsCompleted)
+                        },
+                        guess: {
+                            ...playerAchievements.stats.guess,
+                            photosSeen: Array.from(playerAchievements.stats.guess.photosSeen)
+                        },
+                        heist: {
+                            ...playerAchievements.stats.heist,
+                            continents: Array.from(playerAchievements.stats.heist.continents)
+                        },
+                        alaska: playerAchievements.stats.alaska,
+                        universal: {
+                            ...playerAchievements.stats.universal,
+                            modesPlayed: Array.from(playerAchievements.stats.universal.modesPlayed),
+                            modesCompleted: Array.from(playerAchievements.stats.universal.modesCompleted),
+                            modesMastered: Array.from(playerAchievements.stats.universal.modesMastered),
+                            playDates: Array.from(playerAchievements.stats.universal.playDates),
+                            funModeGames: Array.from(playerAchievements.stats.universal.funModeGames),
+                            perfectModes: Array.from(playerAchievements.stats.universal.perfectModes)
+                        }
+                    }
+                };
+                localStorage.setItem('playerAchievements', JSON.stringify(toSave));
+                console.log('💾 Achievements saved');
+            } catch (e) {
+                console.warn('Could not save achievements:', e);
+            }
+        }
+        
+        // Check if achievement is already unlocked
+        function isAchievementUnlocked(achievementId) {
+            return playerAchievements.unlocked.includes(achievementId);
+        }
+        
+        // Unlock a new achievement
+        function unlockAchievement(category, achievementId, silent = false) {
+            // Check if already unlocked
+            if (isAchievementUnlocked(achievementId)) {
+                return false;
+            }
+            
+            // Get achievement data
+            const achievement = ACHIEVEMENTS[category]?.[achievementId];
+            if (!achievement) {
+                console.warn('Unknown achievement:', category, achievementId);
+                return false;
+            }
+            
+            // Mark as unlocked
+            playerAchievements.unlocked.push(achievementId);
+            
+            // Award XP
+            gameState.totalXP += achievement.xp;
+            
+            // Save to localStorage
+            saveAchievements();
+            
+            // Show celebration (unless silent)
+            if (!silent) {
+                showAchievementUnlock(achievement);
+            }
+            
+            console.log(`🏆 Achievement unlocked: ${achievement.name} (+${achievement.xp} XP)`);
+            return true;
+        }
+        
+        // Show full-screen achievement celebration
+        function showAchievementUnlock(achievement) {
+            // Create celebration overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            // Tier colors
+            const tierColors = {
+                common: '#94a3b8',
+                uncommon: '#3b82f6',
+                rare: '#a855f7',
+                epic: '#f59e0b',
+                legendary: '#ef4444'
+            };
+            
+            const tierColor = tierColors[achievement.tier] || tierColors.common;
+            
+            // Achievement card
+            const card = document.createElement('div');
+            card.style.cssText = `
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                border: 3px solid ${tierColor};
+                border-radius: 20px;
+                padding: 3rem;
+                text-align: center;
+                max-width: 500px;
+                box-shadow: 0 0 50px ${tierColor}80;
+                animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            `;
+            
+            card.innerHTML = `
+                <div style="font-size: 4rem; margin-bottom: 1rem; animation: pulse 2s infinite;">🏆</div>
+                <div style="color: ${tierColor}; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                    ${achievement.tier} Achievement
+                </div>
+                <div style="color: white; font-size: 2rem; font-weight: bold; margin-bottom: 1rem;">
+                    ${achievement.name}
+                </div>
+                <div style="color: #94a3b8; font-size: 1.1rem; margin-bottom: 1.5rem;">
+                    ${achievement.description}
+                </div>
+                <div style="background: ${tierColor}20; border: 1px solid ${tierColor}; border-radius: 10px; padding: 1rem; display: inline-block;">
+                    <div style="color: ${tierColor}; font-size: 1.5rem; font-weight: bold;">+${achievement.xp} XP</div>
+                </div>
+                <div style="margin-top: 2rem; color: #64748b; font-size: 0.9rem;">Click anywhere to continue</div>
+            `;
+            
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+            
+            // Add particle effects
+            createConfetti(tierColor);
+            
+            // Click to close
+            overlay.addEventListener('click', () => {
+                overlay.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => overlay.remove(), 300);
+            });
+            
+            // Auto-close after 5 seconds
+            setTimeout(() => {
+                if (overlay.parentElement) {
+                    overlay.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => overlay.remove(), 300);
+                }
+            }, 5000);
+        }
+        
+        // Create confetti particles
+        function createConfetti(color) {
+            const colors = [color, '#fbbf24', '#10b981', '#3b82f6', '#f59e0b'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        width: 10px;
+                        height: 10px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        top: 50%;
+                        left: 50%;
+                        border-radius: 50%;
+                        z-index: 10001;
+                        animation: confettiFall ${1 + Math.random() * 2}s linear forwards;
+                        transform: translate(-50%, -50%) rotate(${Math.random() * 360}deg);
+                    `;
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+        
+        // Add animations to document
+        if (!document.getElementById('achievement-animations')) {
+            const style = document.createElement('style');
+            style.id = 'achievement-animations';
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes fadeOut {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
+                }
+                @keyframes bounceIn {
+                    0% { transform: scale(0); }
+                    50% { transform: scale(1.1); }
+                    100% { transform: scale(1); }
+                }
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.2); }
+                }
+                @keyframes confettiFall {
+                    0% {
+                        transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translate(-50%, -50%) translateY(100vh) rotate(720deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // ========================================
+        // GAME-SPECIFIC ACHIEVEMENT CHECKERS
+        // ========================================
+        
+        // Check Explore Mode achievements
+        function checkExploreAchievements() {
+            const stats = playerAchievements.stats.explore;
+            
+            // Globe Trotter: Visit all 7 continents
+            if (stats.continentsVisited.size >= 7) {
+                unlockAchievement('explore', 'globeTrotter');
+            }
+            
+            // Zoom Master: Use all zoom levels (2-19)
+            if (stats.zoomLevelsUsed.size >= 10) {
+                unlockAchievement('explore', 'zoomMaster');
+            }
+            
+            // Layer Expert: Try all 10 map layers
+            if (stats.layersUsed.size >= 10) {
+                unlockAchievement('explore', 'layerExpert');
+            }
+            
+            // Marker Maniac: Place 50+ markers
+            if (stats.markersPlaced >= 50) {
+                unlockAchievement('explore', 'markerManiac');
+            }
+            
+            // Style Switcher: Toggle Fun Mode 10 times
+            if (stats.modeToggles >= 10) {
+                unlockAchievement('explore', 'styleSwitcher');
+            }
+        }
+        
+        // Check Coordinate Finder achievements
+        function checkCoordinateAchievements() {
+            const stats = playerAchievements.stats.coordinate;
+            
+            // Pinpoint Pro: 10 perfect finds (within 1km)
+            if (stats.perfectFinds >= 10) {
+                unlockAchievement('coordinate', 'pinpointPro');
+            }
+            
+            // Format Fluent: Use both formats 5 times each
+            if (stats.decimalUses >= 5 && stats.cardinalUses >= 5) {
+                unlockAchievement('coordinate', 'formatFluent');
+            }
+            
+            // Speed Demon: 5 finds in under 30 seconds each
+            if (stats.speedFinds >= 5) {
+                unlockAchievement('coordinate', 'speedDemon');
+            }
+            
+            // Navigator: Complete 25 challenges
+            if (stats.completions >= 25) {
+                unlockAchievement('coordinate', 'navigator');
+            }
+            
+            // Perfectionist: 100% accuracy on 10 finds
+            if (stats.perfectAccuracyRuns >= 10) {
+                unlockAchievement('coordinate', 'perfectionist');
+            }
+        }
+        
+        // Check Mystery Challenge achievements
+        function checkMysteryAchievements() {
+            const stats = playerAchievements.stats.mystery;
+            
+            // Mystery Solver: Solve 10 mysteries
+            if (stats.solved >= 10) {
+                unlockAchievement('mystery', 'mysterySolver');
+            }
+            
+            // Speed Detective: Solve in under 20 seconds (tracked per solve)
+            // This is checked in the mystery solve function
+            
+            // No Hints: Solve without hints 5 times
+            if (stats.noHintSolves >= 5) {
+                unlockAchievement('mystery', 'noHints');
+            }
+            
+            // Continental Expert: Solve 1 from each continent (6 continents)
+            if (stats.continentsSolved.size >= 6) {
+                unlockAchievement('mystery', 'continentalExpert');
+            }
+            
+            // Streak Master: 5-mystery win streak
+            if (stats.streak >= 5) {
+                unlockAchievement('mystery', 'streakMaster');
+            }
+            
+            // Mystery Master: Solve all 70 locations
+            if (stats.uniqueLocationsSolved.size >= 70) {
+                unlockAchievement('mystery', 'mysteryMaster');
+            }
+            
+            // Lightning Round: 3 solves in under 2 minutes total
+            if (stats.lightningRounds >= 1) {
+                unlockAchievement('mystery', 'lightningRound');
+            }
+        }
+        
+        // Check Scavenger Hunt achievements
+        function checkScavengerAchievements() {
+            const stats = playerAchievements.stats.scavenger;
+            
+            // Photo Finish: Complete 10 hunts
+            if (stats.completed >= 10) {
+                unlockAchievement('scavenger', 'photoFinish');
+            }
+            
+            // Speed Scavenger: Complete in under 5 minutes (tracked per hunt)
+            // Checked during hunt completion
+            
+            // Eagle Eye: 95%+ accuracy (tracked per hunt)
+            // Checked during hunt completion
+            
+            // World Explorer: Complete hunts on all continents
+            if (stats.continentsCompleted.size >= 6) {
+                unlockAchievement('scavenger', 'worldExplorer');
+            }
+            
+            // Detail Detective: Find 5 hidden bonus items
+            if (stats.bonusItemsFound >= 5) {
+                unlockAchievement('scavenger', 'detailDetective');
+            }
+            
+            // Scavenger Legend: Complete 25 hunts
+            if (stats.completed >= 25) {
+                unlockAchievement('scavenger', 'scavengerLegend');
+            }
+        }
+        
+        // Check Guess Mode achievements
+        function checkGuessAchievements() {
+            const stats = playerAchievements.stats.guess;
+            
+            // Sharp Shooter: 10 guesses within 100km
+            if (stats.closeGuesses >= 10) {
+                unlockAchievement('guess', 'sharpShooter');
+            }
+            
+            // Geography Genius: 90%+ accuracy over 20 photos
+            const recentAccuracy = stats.accuracyRuns.slice(-20);
+            if (recentAccuracy.length >= 20) {
+                const avgAccuracy = recentAccuracy.reduce((a,b) => a+b, 0) / recentAccuracy.length;
+                if (avgAccuracy >= 90) {
+                    unlockAchievement('guess', 'geographyGenius');
+                }
+            }
+            
+            // Instant Identifier: Guess correctly in under 5 seconds, 5 times
+            if (stats.speedGuesses >= 5) {
+                unlockAchievement('guess', 'instantIdentifier');
+            }
+            
+            // Photo Master: View all 100 photos
+            if (stats.photosSeen.size >= 100) {
+                unlockAchievement('guess', 'photoMaster');
+            }
+            
+            // Perfect Round: 5/5 perfect guesses (tracked per round)
+            // Checked during round completion
+            
+            // Detail Expert: Identify from cropped photos 10 times
+            if (stats.croppedPhotoGuesses >= 10) {
+                unlockAchievement('guess', 'detailExpert');
+            }
+        }
+        
+        // Check Create Heist achievements
+        function checkHeistAchievements() {
+            const stats = playerAchievements.stats.heist;
+            
+            // Architect: Create 5 heists
+            if (stats.created >= 5) {
+                unlockAchievement('heist', 'architect');
+            }
+            
+            // Global Planner: Heists on all continents
+            if (stats.continents.size >= 6) {
+                unlockAchievement('heist', 'globalPlanner');
+            }
+            
+            // Master Thief: Create 25 heists
+            if (stats.created >= 25) {
+                unlockAchievement('heist', 'masterThief');
+            }
+            
+            // Speed Designer: Create in under 2 minutes (tracked per heist)
+            // Checked during heist creation
+            
+            // Perfectionist: All custom waypoints
+            if (stats.customHeists >= 5) {
+                unlockAchievement('heist', 'heistPerfectionist');
+            }
+            
+            // Influencer: Share 10 heists
+            if (stats.shared >= 10) {
+                unlockAchievement('heist', 'influencer');
+            }
+        }
+        
+        // Check Alaska Adventure achievements (already exists in gameState)
+        function checkAlaskaAchievements() {
+            const alaska = gameState.alaska;
+            const achievements = playerAchievements.stats.alaska.achievements;
+            
+            // Count locations by type
+            const locationTypes = { mountain: 0, river: 0, park: 0, city: 0 };
+            
+            alaskaRounds.forEach(round => {
+                round.locations.forEach(loc => {
+                    if (alaska.foundLocations.includes(loc.name)) {
+                        if (locationTypes[loc.type] !== undefined) {
+                            locationTypes[loc.type]++;
+                        }
+                    }
+                });
+            });
+            
+            // Mountain Master: Find 5+ mountains
+            if (locationTypes.mountain >= 5 && !achievements.mountainMaster) {
+                achievements.mountainMaster = true;
+                unlockAchievement('alaska', 'mountainMaster');
+            }
+            
+            // River Runner: Find 3+ rivers
+            if (locationTypes.river >= 3 && !achievements.riverRunner) {
+                achievements.riverRunner = true;
+                unlockAchievement('alaska', 'riverRunner');
+            }
+            
+            // Park Explorer: Find 5+ parks
+            if (locationTypes.park >= 5 && !achievements.parkExplorer) {
+                achievements.parkExplorer = true;
+                unlockAchievement('alaska', 'parkExplorer');
+            }
+            
+            // City Finder: Find 8+ cities
+            if (locationTypes.city >= 8 && !achievements.cityFinder) {
+                achievements.cityFinder = true;
+                unlockAchievement('alaska', 'cityFinder');
+            }
+            
+            // Alaska Expert: Find all 50 locations
+            if (alaska.totalFound >= 50 && !achievements.alaskaExpert) {
+                achievements.alaskaExpert = true;
+                unlockAchievement('alaska', 'alaskaExpert');
+            }
+            
+            // Save updated achievements
+            saveAchievements();
+        }
+        
+        // Check Universal achievements (cross-game)
+        function checkUniversalAchievements() {
+            const stats = playerAchievements.stats.universal;
+            
+            // Game Hopper: Try all 7 game modes
+            if (stats.modesPlayed.size >= 7) {
+                unlockAchievement('universal', 'gameHopper');
+            }
+            
+            // Jack of All Trades: Complete 1 of each mode
+            if (stats.modesCompleted.size >= 7) {
+                unlockAchievement('universal', 'jackOfAllTrades');
+            }
+            
+            // Master of All: Expert in all 7 modes
+            if (stats.modesMastered.size >= 7) {
+                unlockAchievement('universal', 'masterOfAll');
+            }
+            
+            // Speed Demon: 10 games in under 1 hour
+            const now = Date.now();
+            const recentGames = stats.gamesThisHour.filter(t => now - t < 3600000);
+            if (recentGames.length >= 10) {
+                unlockAchievement('universal', 'universalSpeedDemon');
+            }
+            
+            // Streak Legend: 7-day play streak
+            if (stats.playDates.size >= 7) {
+                // Check if consecutive days
+                const dates = Array.from(stats.playDates).sort();
+                let consecutive = 1;
+                for (let i = 1; i < dates.length; i++) {
+                    const prev = new Date(dates[i-1]);
+                    const curr = new Date(dates[i]);
+                    const diffDays = Math.floor((curr - prev) / (1000 * 60 * 60 * 24));
+                    if (diffDays === 1) consecutive++;
+                    else consecutive = 1;
+                    if (consecutive >= 7) {
+                        unlockAchievement('universal', 'streakLegend');
+                        break;
+                    }
+                }
+            }
+            
+            // Statistician: View stats 10 times
+            if (stats.statsViews >= 10) {
+                unlockAchievement('universal', 'statistician');
+            }
+            
+            // Style Icon: Use Fun Mode in all 7 games
+            if (stats.funModeGames.size >= 7) {
+                unlockAchievement('universal', 'styleIcon');
+            }
+            
+            // Cartographer: Use all 10 map layers
+            // This overlaps with Explore mode, so check explore stats
+            if (playerAchievements.stats.explore.layersUsed.size >= 10) {
+                unlockAchievement('universal', 'cartographer');
+            }
+            
+            // Perfectionist: 100% accuracy in 3 different modes
+            if (stats.perfectModes.size >= 3) {
+                unlockAchievement('universal', 'universalPerfectionist');
+            }
+            
+            // Achievement Hunter: Unlock 30 achievements
+            if (playerAchievements.unlocked.length >= 30) {
+                unlockAchievement('universal', 'achievementHunter');
+            }
+        }
+        
+        // Track today's play date
+        function trackPlayDate() {
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            playerAchievements.stats.universal.playDates.add(today);
+            saveAchievements();
+            checkUniversalAchievements();
+        }
         
         // Glennallen home coordinates
         const GLENNALLEN = { lat: 62.1089, lon: -145.5467 };
