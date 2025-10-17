@@ -3821,6 +3821,15 @@
         window.switchCoordinateFormat = function(format) {
             coordinateFormat = format;
             
+            // Track format usage for achievements
+            if (format === 'decimal') {
+                playerAchievements.stats.coordinate.decimalUses++;
+            } else if (format === 'cardinal') {
+                playerAchievements.stats.coordinate.cardinalUses++;
+            }
+            saveAchievements();
+            checkCoordinateAchievements();
+            
             // Update button styles
             document.getElementById('format-decimal').style.background = 
                 format === 'decimal' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'rgba(102, 126, 234, 0.2)';
@@ -4133,6 +4142,20 @@
                 // Show celebration message!
                 const celebrationMessage = getCelebrationMessage();
                 showCelebrationMessage(celebrationMessage);
+                
+                // Track Coordinate Finder achievements!
+                playerAchievements.stats.coordinate.completions++;
+                playerAchievements.stats.universal.modesPlayed.add('coordinate');
+                playerAchievements.stats.universal.modesCompleted.add('coordinate');
+                
+                // Check accuracy (perfect find = within 1km = ~0.01 degrees)
+                // Note: This is already perfect since we reached the exact coordinates
+                playerAchievements.stats.coordinate.perfectAccuracyRuns++;
+                
+                saveAchievements();
+                checkCoordinateAchievements();
+                checkUniversalAchievements();
+                trackPlayDate();
                 
                 // Show Play Again button
                 showCoordinateFinderComplete();
