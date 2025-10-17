@@ -1847,6 +1847,34 @@
     <!-- Notification -->
     <div id="notification" class="notification"></div>
     
+    <!-- Achievement Testing Debug Panel (Press Ctrl+Shift+A to toggle) -->
+    <div id="debug-panel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 800px; max-height: 80vh; background: rgba(0, 0, 0, 0.95); border: 3px solid #ffd700; border-radius: 12px; padding: 20px; z-index: 10000; overflow-y: auto; box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #ffd700; margin: 0; font-size: 24px;">🎮 Achievement Testing Console</h2>
+            <button onclick="toggleDebugPanel()" style="background: #ff4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">✖ Close</button>
+        </div>
+        
+        <div style="background: rgba(255, 215, 0, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 20px; border-left: 3px solid #ffd700;">
+            <p style="color: #ffd700; margin: 0; font-size: 14px;">
+                <strong>💡 Quick Test:</strong> Click any button below to instantly set achievement stats and trigger unlocks!
+            </p>
+        </div>
+        
+        <div id="debug-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+        
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid rgba(255, 215, 0, 0.3);">
+            <h3 style="color: #66b3ff; font-size: 18px; margin-bottom: 10px;">🔧 Manual Controls:</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button onclick="clearAllAchievements()" class="btn btn-secondary" style="font-size: 14px;">🗑️ Clear All</button>
+                <button onclick="unlockAllAchievements()" class="btn" style="font-size: 14px;">🏆 Unlock All</button>
+                <button onclick="showAchievementStats()" class="btn btn-secondary" style="font-size: 14px;">📊 View Stats</button>
+                <button onclick="testRandomAchievement()" class="btn" style="font-size: 14px;">🎲 Test Random</button>
+            </div>
+        </div>
+    </div>
+    
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
@@ -1957,9 +1985,8 @@
         document.addEventListener('DOMContentLoaded', function() {
         console.log('DOMContentLoaded event fired');
         
-        // Load saved achievements from localStorage
-        loadAchievements();
-        console.log('🏆 Achievement system initialized');
+        // Achievement system will be initialized later after playerAchievements is defined
+        console.log('🏆 Achievement system will initialize after DOM loads');
         
         // v2.0 - Alaska Adventure Edition
         // Initialize map
@@ -2760,12 +2787,16 @@
             lastUpdated: new Date().toISOString()
         };
         
+        // Initialize achievement system immediately after object creation
+        // This ensures loadAchievements() has access to playerAchievements
+        console.log('🏆 Achievement system initialized with playerAchievements object');
+        
         // ========================================
         // UNIVERSAL ACHIEVEMENT FUNCTIONS
         // ========================================
         
         // Load achievement data from localStorage
-        function loadAchievements() {
+        window.loadAchievements = function() {
             try {
                 const saved = localStorage.getItem('playerAchievements');
                 if (saved) {
@@ -2784,33 +2815,54 @@
                             playerAchievements.stats.explore.modeToggles = data.stats.explore.modeToggles || 0;
                         }
                         if (data.stats.mystery) {
+                            // Restore Sets first
                             playerAchievements.stats.mystery.continentsSolved = new Set(data.stats.mystery.continentsSolved || []);
                             playerAchievements.stats.mystery.uniqueLocationsSolved = new Set(data.stats.mystery.uniqueLocationsSolved || []);
-                            Object.assign(playerAchievements.stats.mystery, data.stats.mystery);
+                            // Copy primitive values (don't overwrite Sets)
+                            if (data.stats.mystery.solved) playerAchievements.stats.mystery.solved = data.stats.mystery.solved;
+                            if (data.stats.mystery.currentStreak) playerAchievements.stats.mystery.currentStreak = data.stats.mystery.currentStreak;
+                            if (data.stats.mystery.bestStreak) playerAchievements.stats.mystery.bestStreak = data.stats.mystery.bestStreak;
+                            if (data.stats.mystery.fastestTime) playerAchievements.stats.mystery.fastestTime = data.stats.mystery.fastestTime;
+                            if (data.stats.mystery.hintsUsed !== undefined) playerAchievements.stats.mystery.hintsUsed = data.stats.mystery.hintsUsed;
                         }
                         if (data.stats.guess) {
+                            // Restore Sets and arrays first
                             playerAchievements.stats.guess.photosSeen = new Set(data.stats.guess.photosSeen || []);
                             playerAchievements.stats.guess.accuracyRuns = data.stats.guess.accuracyRuns || [];
-                            Object.assign(playerAchievements.stats.guess, data.stats.guess);
+                            // Copy primitive values
+                            if (data.stats.guess.roundsPlayed) playerAchievements.stats.guess.roundsPlayed = data.stats.guess.roundsPlayed;
+                            if (data.stats.guess.correctGuesses) playerAchievements.stats.guess.correctGuesses = data.stats.guess.correctGuesses;
+                            if (data.stats.guess.closeGuesses) playerAchievements.stats.guess.closeGuesses = data.stats.guess.closeGuesses;
+                            if (data.stats.guess.fastestIdentification) playerAchievements.stats.guess.fastestIdentification = data.stats.guess.fastestIdentification;
                         }
                         if (data.stats.universal) {
+                            // Restore Sets first
                             playerAchievements.stats.universal.modesPlayed = new Set(data.stats.universal.modesPlayed || []);
                             playerAchievements.stats.universal.modesCompleted = new Set(data.stats.universal.modesCompleted || []);
                             playerAchievements.stats.universal.modesMastered = new Set(data.stats.universal.modesMastered || []);
                             playerAchievements.stats.universal.playDates = new Set(data.stats.universal.playDates || []);
                             playerAchievements.stats.universal.funModeGames = new Set(data.stats.universal.funModeGames || []);
                             playerAchievements.stats.universal.perfectModes = new Set(data.stats.universal.perfectModes || []);
-                            Object.assign(playerAchievements.stats.universal, data.stats.universal);
+                            // Copy primitive values (numbers, strings) but NOT the Set arrays
+                            if (data.stats.universal.totalPlayTime) playerAchievements.stats.universal.totalPlayTime = data.stats.universal.totalPlayTime;
+                            if (data.stats.universal.statsViews) playerAchievements.stats.universal.statsViews = data.stats.universal.statsViews;
                         }
                         // Restore other stats
                         if (data.stats.coordinate) Object.assign(playerAchievements.stats.coordinate, data.stats.coordinate);
                         if (data.stats.scavenger) {
-                            playerAchievements.stats.scavenger.continentsCompleted = new Set(data.stats.scavenger.continentsCompleted || []);
-                            Object.assign(playerAchievements.stats.scavenger, data.stats.scavenger);
+                            // Restore Sets first
+                            playerAchievements.stats.scavenger.continentsVisited = new Set(data.stats.scavenger.continentsVisited || []);
+                            // Copy primitive values
+                            if (data.stats.scavenger.challengesCompleted) playerAchievements.stats.scavenger.challengesCompleted = data.stats.scavenger.challengesCompleted;
+                            if (data.stats.scavenger.huntsCompleted) playerAchievements.stats.scavenger.huntsCompleted = data.stats.scavenger.huntsCompleted;
+                            if (data.stats.scavenger.perfectFinds) playerAchievements.stats.scavenger.perfectFinds = data.stats.scavenger.perfectFinds;
+                            if (data.stats.scavenger.fastCompletions) playerAchievements.stats.scavenger.fastCompletions = data.stats.scavenger.fastCompletions;
                         }
                         if (data.stats.heist) {
+                            // Restore Sets first
                             playerAchievements.stats.heist.continents = new Set(data.stats.heist.continents || []);
-                            Object.assign(playerAchievements.stats.heist, data.stats.heist);
+                            // Copy primitive values
+                            if (data.stats.heist.created) playerAchievements.stats.heist.created = data.stats.heist.created;
                         }
                         if (data.stats.alaska) Object.assign(playerAchievements.stats.alaska, data.stats.alaska);
                     }
@@ -2843,7 +2895,7 @@
                         },
                         scavenger: {
                             ...playerAchievements.stats.scavenger,
-                            continentsCompleted: Array.from(playerAchievements.stats.scavenger.continentsCompleted)
+                            continentsVisited: Array.from(playerAchievements.stats.scavenger.continentsVisited)
                         },
                         guess: {
                             ...playerAchievements.stats.guess,
@@ -2871,6 +2923,10 @@
                 console.warn('Could not save achievements:', e);
             }
         }
+        
+        // Load achievements from localStorage immediately after functions are defined
+        loadAchievements();
+        console.log('✅ Achievements loaded from localStorage');
         
         // Check if achievement is already unlocked
         function isAchievementUnlocked(achievementId) {
@@ -3382,6 +3438,266 @@
             saveAchievements();
             checkUniversalAchievements();
         }
+        
+        // ========================================
+        // MAKE ACHIEVEMENT FUNCTIONS GLOBALLY ACCESSIBLE FOR DEBUG PANEL
+        // ========================================
+        // Core functions
+        window.saveAchievements = saveAchievements;
+        window.unlockAchievement = unlockAchievement;
+        window.isAchievementUnlocked = isAchievementUnlocked;
+        window.showAchievementUnlock = showAchievementUnlock;
+        
+        // Checker functions
+        window.checkExploreAchievements = checkExploreAchievements;
+        window.checkCoordinateAchievements = checkCoordinateAchievements;
+        window.checkMysteryAchievements = checkMysteryAchievements;
+        window.checkScavengerAchievements = checkScavengerAchievements;
+        window.checkGuessAchievements = checkGuessAchievements;
+        window.checkHeistAchievements = checkHeistAchievements;
+        window.checkAlaskaAchievements = checkAlaskaAchievements;
+        window.checkUniversalAchievements = checkUniversalAchievements;
+        
+        // ========================================
+        // ACHIEVEMENT TESTING DEBUG PANEL
+        // ========================================
+        
+        window.toggleDebugPanel = function() {
+            const panel = document.getElementById('debug-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                populateDebugPanel();
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+        
+        // Debug test functions (globally accessible)
+        // These functions will be called after DOMContentLoaded, so all game functions will be available
+        window.testExploreGlobeTrotter = function() { 
+            playerAchievements.stats.explore.continentsVisited = new Set(['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania', 'Antarctica']); 
+            window.saveAchievements(); 
+            window.checkExploreAchievements(); 
+        };
+        window.testExploreZoomMaster = function() { 
+            playerAchievements.stats.explore.zoomLevelsUsed = new Set([1,2,3,4,5,6,7,8,9,10,11]); 
+            window.saveAchievements(); 
+            window.checkExploreAchievements(); 
+        };
+        window.testExploreMarkerManiac = function() { 
+            playerAchievements.stats.explore.markersPlaced = 50; 
+            window.saveAchievements(); 
+            window.checkExploreAchievements(); 
+        };
+        window.testExploreLayerExpert = function() { 
+            playerAchievements.stats.explore.layersUsed = new Set(['Street','Satellite','Topo','Dark','Light','Terrain','OpenStreet','CartoDB','Stamen','Esri']); 
+            window.saveAchievements(); 
+            window.checkExploreAchievements(); 
+        };
+        window.testCoordinateNavigator = function() { 
+            playerAchievements.stats.coordinate.completions = 25; 
+            window.saveAchievements(); 
+            window.checkCoordinateAchievements(); 
+        };
+        window.testCoordinateFormatFluent = function() { 
+            playerAchievements.stats.coordinate.decimalUses = 5; 
+            playerAchievements.stats.coordinate.cardinalUses = 5; 
+            window.saveAchievements(); 
+            window.checkCoordinateAchievements(); 
+        };
+        window.testCoordinatePerfectionist = function() { 
+            playerAchievements.stats.coordinate.perfectAccuracyRuns = 10; 
+            window.saveAchievements(); 
+            window.checkCoordinateAchievements(); 
+        };
+        window.testMysterySolver = function() { 
+            playerAchievements.stats.mystery.solved = 10; 
+            window.saveAchievements(); 
+            window.checkMysteryAchievements(); 
+        };
+        window.testMysteryStreakMaster = function() { 
+            playerAchievements.stats.mystery.streak = 5; 
+            window.saveAchievements(); 
+            window.checkMysteryAchievements(); 
+        };
+        window.testMysteryContinental = function() { 
+            playerAchievements.stats.mystery.continentsSolved = new Set(['Africa','Asia','Europe','North America','South America','Oceania']); 
+            window.saveAchievements(); 
+            window.checkMysteryAchievements(); 
+        };
+        window.testMysteryMaster = function() { 
+            playerAchievements.stats.mystery.uniqueLocationsSolved = new Set(Array(70).fill(0).map((_,i) => i)); 
+            window.saveAchievements(); 
+            window.checkMysteryAchievements(); 
+        };
+        window.testScavengerPhotoFinish = function() { 
+            playerAchievements.stats.scavenger.completed = 10; 
+            window.saveAchievements(); 
+            window.checkScavengerAchievements(); 
+        };
+        window.testScavengerSpeedHunter = function() { 
+            playerAchievements.stats.scavenger.speedHunts = 5; 
+            window.saveAchievements(); 
+            window.checkScavengerAchievements(); 
+        };
+        window.testScavengerEagleEye = function() { 
+            playerAchievements.stats.scavenger.highAccuracyHunts = 20; 
+            window.saveAchievements(); 
+            window.checkScavengerAchievements(); 
+        };
+        window.testScavengerWorldExplorer = function() { 
+            playerAchievements.stats.scavenger.continentsCompleted = new Set(['Africa','Asia','Europe','North America','South America','Oceania']); 
+            window.saveAchievements(); 
+            window.checkScavengerAchievements(); 
+        };
+        window.testGuessSharpShooter = function() { 
+            playerAchievements.stats.guess.closeGuesses = 10; 
+            window.saveAchievements(); 
+            window.checkGuessAchievements(); 
+        };
+        window.testGuessGeographyGenius = function() { 
+            playerAchievements.stats.guess.accuracyRuns = [92, 95, 91, 88, 94]; 
+            window.saveAchievements(); 
+            window.checkGuessAchievements(); 
+        };
+        window.testGuessPhotoMaster = function() { 
+            playerAchievements.stats.guess.photosSeen = new Set(Array(100).fill(0).map((_,i) => 'photo' + i)); 
+            window.saveAchievements(); 
+            window.checkGuessAchievements(); 
+        };
+        window.testHeistArchitect = function() { 
+            playerAchievements.stats.heist.created = 5; 
+            window.saveAchievements(); 
+            window.checkHeistAchievements(); 
+        };
+        window.testHeistMasterThief = function() { 
+            playerAchievements.stats.heist.created = 25; 
+            window.saveAchievements(); 
+            window.checkHeistAchievements(); 
+        };
+        window.testAlaskaMountainMaster = function() { 
+            // Add 5 mountains to foundLocations
+            gameState.alaska.foundLocations = ['Mount Denali', 'Mount Wrangell', 'Mount Foraker', 'Mount Hunter', 'Mount Drum'];
+            gameState.alaska.totalFound = 5;
+            window.saveAchievements(); 
+            window.checkAlaskaAchievements(); 
+        };
+        window.testAlaskaRiverRunner = function() { 
+            // Add 3 rivers to foundLocations
+            gameState.alaska.foundLocations = ['Yukon River', 'Copper River', 'Kuskokwim River'];
+            gameState.alaska.totalFound = 3;
+            window.saveAchievements(); 
+            window.checkAlaskaAchievements(); 
+        };
+        window.testAlaskaParkExplorer = function() { 
+            // Add 5 parks to foundLocations
+            gameState.alaska.foundLocations = ['Denali National Park', 'Wrangell-St. Elias National Park', 'Kenai Fjords National Park', 'Glacier Bay National Park', 'Katmai National Park'];
+            gameState.alaska.totalFound = 5;
+            window.saveAchievements(); 
+            window.checkAlaskaAchievements(); 
+        };
+        window.testAlaskaCityFinder = function() { 
+            // Add 8 cities to foundLocations
+            gameState.alaska.foundLocations = ['Anchorage', 'Fairbanks', 'Juneau', 'Sitka', 'Ketchikan', 'Glennallen', 'Nome', 'Barrow'];
+            gameState.alaska.totalFound = 8;
+            window.saveAchievements(); 
+            window.checkAlaskaAchievements(); 
+        };
+        window.testAlaskaExpert = function() { 
+            // Set total found to 50
+            gameState.alaska.totalFound = 50;
+            window.saveAchievements(); 
+            window.checkAlaskaAchievements(); 
+        };
+        window.testUniversalGameHopper = function() { 
+            playerAchievements.stats.universal.modesPlayed = new Set(['explore','coordinate','mystery','scavenger','guess','heist','alaska']); 
+            window.saveAchievements(); 
+            window.checkUniversalAchievements(); 
+        };
+        window.testUniversalJackOfAllTrades = function() { 
+            playerAchievements.stats.universal.modesCompleted = new Set(['explore','coordinate','mystery','scavenger','guess','heist','alaska']); 
+            window.saveAchievements(); 
+            window.checkUniversalAchievements(); 
+        };
+        
+        function populateDebugPanel() {
+            const content = document.getElementById('debug-content');
+            const testButtons = [
+                { name: '🌍 Explore: Globe Trotter', func: 'testExploreGlobeTrotter' },
+                { name: '🔭 Explore: Zoom Master', func: 'testExploreZoomMaster' },
+                { name: '📍 Explore: Marker Maniac', func: 'testExploreMarkerManiac' },
+                { name: '🗺️ Explore: Layer Expert', func: 'testExploreLayerExpert' },
+                { name: '🎯 Coordinate: Navigator', func: 'testCoordinateNavigator' },
+                { name: '🌐 Coordinate: Format Fluent', func: 'testCoordinateFormatFluent' },
+                { name: '💯 Coordinate: Perfectionist', func: 'testCoordinatePerfectionist' },
+                { name: '🕵️ Mystery: Solver', func: 'testMysterySolver' },
+                { name: '🔥 Mystery: Streak Master', func: 'testMysteryStreakMaster' },
+                { name: '🌎 Mystery: Continental', func: 'testMysteryContinental' },
+                { name: '🎓 Mystery: Master', func: 'testMysteryMaster' },
+                { name: '📸 Scavenger: Photo Finish', func: 'testScavengerPhotoFinish' },
+                { name: '⚡ Scavenger: Speed Hunter', func: 'testScavengerSpeedHunter' },
+                { name: '🦅 Scavenger: Eagle Eye', func: 'testScavengerEagleEye' },
+                { name: '🌏 Scavenger: World Explorer', func: 'testScavengerWorldExplorer' },
+                { name: '🎯 Guess: Sharp Shooter', func: 'testGuessSharpShooter' },
+                { name: '🧠 Guess: Geography Genius', func: 'testGuessGeographyGenius' },
+                { name: '📸 Guess: Photo Master', func: 'testGuessPhotoMaster' },
+                { name: '🏗️ Heist: Architect', func: 'testHeistArchitect' },
+                { name: '🦹 Heist: Master Thief', func: 'testHeistMasterThief' },
+                { name: '⛰️ Alaska: Mountain Master', func: 'testAlaskaMountainMaster' },
+                { name: '🏞️ Alaska: River Runner', func: 'testAlaskaRiverRunner' },
+                { name: '🏕️ Alaska: Park Explorer', func: 'testAlaskaParkExplorer' },
+                { name: '🏙️ Alaska: City Finder', func: 'testAlaskaCityFinder' },
+                { name: '🎖️ Alaska: Expert', func: 'testAlaskaExpert' },
+                { name: '🎮 Universal: Game Hopper', func: 'testUniversalGameHopper' },
+                { name: '🏆 Universal: Jack of All Trades', func: 'testUniversalJackOfAllTrades' },
+            ];
+            
+            content.innerHTML = testButtons.map(btn => `
+                <button onclick="${btn.func}()" class="btn" style="font-size: 13px; padding: 12px; text-align: left; white-space: normal; line-height: 1.4;">
+                    ${btn.name}
+                </button>
+            `).join('');
+        }
+        
+        window.clearAllAchievements = function() {
+            if (confirm('Clear all achievements and stats? This cannot be undone!')) {
+                localStorage.removeItem('playerAchievements');
+                location.reload();
+            }
+        }
+        
+        window.unlockAllAchievements = function() {
+            if (confirm('Unlock all 45 achievements at once?')) {
+                Object.keys(ACHIEVEMENTS).forEach(category => {
+                    Object.keys(ACHIEVEMENTS[category]).forEach(id => {
+                        unlockAchievement(category, id, true);
+                    });
+                });
+                showToast('success', '🏆 All Achievements Unlocked!', '45/45 achievements - You are a legend!', 5000);
+            }
+        }
+        
+        window.showAchievementStats = function() {
+            console.log('📊 Current Achievement Stats:', playerAchievements.stats);
+            console.log('🏆 Unlocked Achievements:', playerAchievements.unlocked);
+            console.log('📈 Total Unlocked:', playerAchievements.unlocked.length + '/45');
+            alert(`Achievement Stats:\n\nUnlocked: ${playerAchievements.unlocked.length}/45\n\nCheck console (F12) for full details!`);
+        }
+        
+        window.testRandomAchievement = function() {
+            const categories = Object.keys(ACHIEVEMENTS);
+            const randomCat = categories[Math.floor(Math.random() * categories.length)];
+            const achievements = Object.keys(ACHIEVEMENTS[randomCat]);
+            const randomAch = achievements[Math.floor(Math.random() * achievements.length)];
+            unlockAchievement(randomCat, randomAch);
+        }
+        
+        // Keyboard shortcut to open debug panel: Ctrl+Shift+A
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                toggleDebugPanel();
+            }
+        });
         
         // Glennallen home coordinates
         const GLENNALLEN = { lat: 62.1089, lon: -145.5467 };
@@ -4754,16 +5070,39 @@
         
         // SCAVENGER HUNT
         const scavengerChallenges = [
-            { desc: "Find the Sahara Desert", lat: 23.4162, lon: 25.6628, tolerance: 1000, type: "desert" },
-            { desc: "Find Mount Everest", lat: 27.9881, lon: 86.9250, tolerance: 200, type: "mountain" },
-            { desc: "Find the Amazon River", lat: -3.4653, lon: -62.2159, tolerance: 500, type: "river" },
-            { desc: "Find Paris, France", lat: 48.8566, lon: 2.3522, tolerance: 100, type: "city" },
-            { desc: "Find the Great Barrier Reef", lat: -18.2871, lon: 147.6992, tolerance: 300, type: "reef" },
-            { desc: "Find Tokyo, Japan", lat: 35.6762, lon: 139.6503, tolerance: 100, type: "city" },
-            { desc: "Find the Grand Canyon", lat: 36.1069, lon: -112.1129, tolerance: 200, type: "canyon" },
-            { desc: "Find the Nile River", lat: 26.8206, lon: 30.8025, tolerance: 500, type: "river" },
-            { desc: "Find Antarctica", lat: -82.8628, lon: 135.0000, tolerance: 2000, type: "continent" },
-            { desc: "Find the Great Wall of China", lat: 40.4319, lon: 116.5704, tolerance: 200, type: "landmark" }
+            // Africa
+            { desc: "Find the Sahara Desert", clue: "💡 The world's largest hot desert in northern Africa", lat: 23.4162, lon: 25.6628, tolerance: 1000, type: "desert", continent: "Africa", difficulty: "easy" },
+            { desc: "Find the Nile River", clue: "💡 The longest river in the world, flows through Egypt", lat: 26.8206, lon: 30.8025, tolerance: 500, type: "river", continent: "Africa", difficulty: "medium" },
+            { desc: "Find Mount Kilimanjaro", clue: "💡 Africa's tallest mountain in Tanzania, near Kenya border", lat: -3.0674, lon: 37.3556, tolerance: 150, type: "mountain", continent: "Africa", difficulty: "hard" },
+            
+            // Asia
+            { desc: "Find Mount Everest", clue: "💡 World's highest mountain on Nepal-China border", lat: 27.9881, lon: 86.9250, tolerance: 200, type: "mountain", continent: "Asia", difficulty: "medium" },
+            { desc: "Find Tokyo, Japan", clue: "💡 Capital city on the eastern coast of Japan's main island", lat: 35.6762, lon: 139.6503, tolerance: 100, type: "city", continent: "Asia", difficulty: "easy" },
+            { desc: "Find the Great Wall of China", clue: "💡 Ancient fortification north of Beijing, China", lat: 40.4319, lon: 116.5704, tolerance: 200, type: "landmark", continent: "Asia", difficulty: "medium" },
+            { desc: "Find the Gobi Desert", clue: "💡 Large desert spanning northern China and southern Mongolia", lat: 42.5883, lon: 103.4608, tolerance: 800, type: "desert", continent: "Asia", difficulty: "hard" },
+            
+            // Europe
+            { desc: "Find Paris, France", clue: "💡 France's capital city on the Seine River, home of the Eiffel Tower", lat: 48.8566, lon: 2.3522, tolerance: 100, type: "city", continent: "Europe", difficulty: "easy" },
+            { desc: "Find the Alps", clue: "💡 Major mountain range through Switzerland, France, Italy, and Austria", lat: 46.5498, lon: 9.7882, tolerance: 300, type: "mountain", continent: "Europe", difficulty: "medium" },
+            { desc: "Find the Volga River", clue: "💡 Europe's longest river, flows through western Russia to the Caspian Sea", lat: 57.6222, lon: 39.8844, tolerance: 400, type: "river", continent: "Europe", difficulty: "hard" },
+            
+            // North America
+            { desc: "Find the Grand Canyon", clue: "💡 Massive canyon carved by the Colorado River in Arizona, USA", lat: 36.1069, lon: -112.1129, tolerance: 200, type: "canyon", continent: "North America", difficulty: "medium" },
+            { desc: "Find the Mississippi River", clue: "💡 Major river flowing from Minnesota to the Gulf of Mexico, passes through St. Louis", lat: 38.6270, lon: -90.2006, tolerance: 400, type: "river", continent: "North America", difficulty: "medium" },
+            { desc: "Find the Rocky Mountains", clue: "💡 Mountain range running from Canada through western USA, passes through Alberta", lat: 50.0262, lon: -114.2098, tolerance: 300, type: "mountain", continent: "North America", difficulty: "hard" },
+            { desc: "Find Yellowstone National Park", clue: "💡 Famous national park in Wyoming with geysers and hot springs", lat: 44.4280, lon: -110.5885, tolerance: 150, type: "park", continent: "North America", difficulty: "hard" },
+            
+            // South America
+            { desc: "Find the Amazon River", clue: "💡 World's largest river by volume, flows through Brazil's rainforest", lat: -3.4653, lon: -62.2159, tolerance: 500, type: "river", continent: "South America", difficulty: "medium" },
+            { desc: "Find the Andes Mountains", clue: "💡 Longest mountain range in the world, runs along South America's west coast through Peru", lat: -13.1631, lon: -72.5450, tolerance: 400, type: "mountain", continent: "South America", difficulty: "medium" },
+            { desc: "Find the Atacama Desert", clue: "💡 One of the driest places on Earth, in northern Chile near Bolivia", lat: -23.6980, lon: -70.4019, tolerance: 600, type: "desert", continent: "South America", difficulty: "hard" },
+            
+            // Oceania
+            { desc: "Find the Great Barrier Reef", clue: "💡 World's largest coral reef system off northeastern Australia's coast", lat: -18.2871, lon: 147.6992, tolerance: 300, type: "reef", continent: "Oceania", difficulty: "medium" },
+            { desc: "Find Uluru (Ayers Rock)", clue: "💡 Massive red sandstone formation in central Australia's desert", lat: -25.3444, lon: 131.0369, tolerance: 100, type: "landmark", continent: "Oceania", difficulty: "hard" },
+            
+            // Antarctica
+            { desc: "Find Antarctica", clue: "💡 The frozen continent at the bottom of the world, south of all other continents", lat: -82.8628, lon: 135.0000, tolerance: 2000, type: "continent", continent: "Antarctica", difficulty: "easy" }
         ];
         
         window.startScavengerGame = function() {
@@ -4772,17 +5111,56 @@
             gameState.scavenger.active = true;
             gameState.scavenger.challenges = scavengerChallenges.map(c => ({ ...c, completed: false }));
             gameState.scavenger.completed = 0;
+            gameState.scavenger.startTime = Date.now();
+            
+            // Track mode played for achievements
+            if (!playerAchievements.stats.universal.modesPlayed.has('scavenger')) {
+                playerAchievements.stats.universal.modesPlayed.add('scavenger');
+                saveAchievements();
+            }
+            trackPlayDate();
+            
             renderScavengerList();
         }
         
         window.renderScavengerList = function() {
-            const html = gameState.scavenger.challenges.map((c, idx) => `
-                <div class="challenge-item ${c.completed ? 'completed' : ''}">
-                    <span class="challenge-text">${c.completed ? '✅' : '⭕'} ${c.desc}</span>
-                    ${c.completed ? '<span style="color: #00ff7f; font-weight: 700;">+20 XP</span>' : ''}
-                </div>
-            `).join('');
-            document.getElementById('scavenger-list').innerHTML = html;
+            // Show only the CURRENT challenge (not completed yet)
+            const currentChallenge = gameState.scavenger.challenges.find(c => !c.completed);
+            
+            if (currentChallenge) {
+                const html = `
+                    <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; border: 2px solid rgba(102, 126, 234, 0.3); text-align: center; margin: 20px 0;">
+                        <h3 style="color: #ffd700; font-size: 24px; margin: 0 0 10px 0;">CURRENT CHALLENGE:</h3>
+                        <p style="font-size: 20px; color: #66b3ff; font-weight: bold; margin: 15px 0;">
+                            ${currentChallenge.desc}
+                        </p>
+                        ${currentChallenge.clue ? `
+                            <div style="background: rgba(255, 215, 0, 0.1); border-left: 3px solid #ffd700; padding: 12px; margin: 15px 0; border-radius: 6px; text-align: left;">
+                                <p style="font-size: 14px; color: #ffd700; margin: 0; line-height: 1.6;">
+                                    ${currentChallenge.clue}
+                                </p>
+                            </div>
+                        ` : ''}
+                        <p style="font-size: 14px; color: #aaa; margin-top: 15px;">
+                            �️ Click on the map where you think it is!
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <h4 style="color: #888; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Completed Challenges:</h4>
+                        ${gameState.scavenger.challenges
+                            .filter(c => c.completed)
+                            .map(c => `
+                                <div style="padding: 10px; background: rgba(0, 255, 127, 0.1); border-left: 3px solid #00ff7f; margin: 5px 0; border-radius: 6px;">
+                                    <span style="color: #00ff7f;">✅ ${c.desc}</span>
+                                    <span style="color: #00ff7f; font-weight: 700; float: right;">+20 XP</span>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                `;
+                document.getElementById('scavenger-list').innerHTML = html;
+            }
             
             const progress = (gameState.scavenger.completed / gameState.scavenger.challenges.length) * 100;
             document.getElementById('scavenger-progress').style.width = progress + '%';
@@ -4803,13 +5181,41 @@
                 if (distance < c.tolerance) {
                     c.completed = true;
                     gameState.scavenger.completed++;
+                    
+                    // Track achievement stats
+                    playerAchievements.stats.scavenger.challengesCompleted++;
+                    if (c.continent) {
+                        playerAchievements.stats.scavenger.continentsVisited.add(c.continent);
+                    }
+                    if (distance < c.tolerance * 0.1) { // Within 10% of tolerance = high accuracy
+                        playerAchievements.stats.scavenger.perfectFinds++;
+                    }
+                    
                     addXP(20, c.desc + ' found!');
+                    saveAchievements();
+                    checkScavengerAchievements();
                     renderScavengerList();
                     
                     if (gameState.scavenger.completed === gameState.scavenger.challenges.length) {
+                        const completionTime = (Date.now() - gameState.scavenger.startTime) / 1000;
+                        gameState.scavenger.completionTime = completionTime;
+                        
+                        playerAchievements.stats.scavenger.huntsCompleted++;
+                        if (completionTime < 300) { // Under 5 minutes
+                            playerAchievements.stats.scavenger.fastCompletions++;
+                        }
+                        
+                        // Mark mode completed
+                        if (!playerAchievements.stats.universal.modesCompleted.has('scavenger')) {
+                            playerAchievements.stats.universal.modesCompleted.add('scavenger');
+                        }
+                        
                         addXP(100, 'Scavenger Hunt Complete!');
                         gameState.missions[1].progress = 1;
                         saveState();
+                        saveAchievements();
+                        checkScavengerAchievements();
+                        checkUniversalAchievements();
                         showScavengerComplete();
                     }
                     return;
@@ -4842,27 +5248,60 @@
         
         window.playAgainScavenger = function() {
             resetScavenger();
+            gameState.scavenger.startTime = Date.now();
             showNotification('🌍 New Scavenger Hunt started! Find all locations!');
         }
         
         window.resetScavenger = function() {
             gameState.scavenger.challenges = scavengerChallenges.map(c => ({ ...c, completed: false }));
             gameState.scavenger.completed = 0;
+            gameState.scavenger.startTime = Date.now();
             renderScavengerList();
         }
         
-        // GUESS GAME
+        // GUESS GAME - 30 Famous Landmarks Across All Continents
         const guessLocations = [
-            { lat: 27.1751, lon: 78.0421, name: "Taj Mahal", country: "India", zoom: 15, options: ["India", "Pakistan", "Bangladesh", "Nepal"] },
-            { lat: 41.8902, lon: 12.4922, name: "Colosseum", country: "Italy", zoom: 16, options: ["Italy", "Greece", "Spain", "France"] },
-            { lat: -13.1631, lon: -72.5450, name: "Machu Picchu", country: "Peru", zoom: 14, options: ["Peru", "Chile", "Bolivia", "Ecuador"] },
-            { lat: 29.9792, lon: 31.1342, name: "Pyramids of Giza", country: "Egypt", zoom: 15, options: ["Egypt", "Sudan", "Libya", "Tunisia"] },
-            { lat: -22.9519, lon: -43.2105, name: "Christ the Redeemer", country: "Brazil", zoom: 15, options: ["Brazil", "Argentina", "Colombia", "Venezuela"] },
-            { lat: 40.6892, lon: -74.0445, name: "Statue of Liberty", country: "USA", zoom: 16, options: ["USA", "Canada", "France", "UK"] },
-            { lat: 25.1972, lon: 55.2744, name: "Burj Khalifa", country: "UAE", zoom: 16, options: ["UAE", "Saudi Arabia", "Qatar", "Kuwait"] },
-            { lat: -25.3444, lon: 131.0369, name: "Uluru", country: "Australia", zoom: 13, options: ["Australia", "New Zealand", "South Africa", "Namibia"] },
-            { lat: 43.7230, lon: 10.3966, name: "Leaning Tower of Pisa", country: "Italy", zoom: 17, options: ["Italy", "France", "Spain", "Greece"] },
-            { lat: 51.1789, lon: -1.8262, name: "Stonehenge", country: "UK", zoom: 16, options: ["UK", "Ireland", "France", "Germany"] }
+            // Asia (10 locations)
+            { lat: 27.1751, lon: 78.0421, name: "Taj Mahal", country: "India", continent: "Asia", zoom: 15, difficulty: "easy", options: ["India", "Pakistan", "Bangladesh", "Nepal"] },
+            { lat: 40.4319, lon: 116.5704, name: "Great Wall of China", country: "China", continent: "Asia", zoom: 14, difficulty: "medium", options: ["China", "Japan", "South Korea", "Vietnam"] },
+            { lat: 25.1972, lon: 55.2744, name: "Burj Khalifa", country: "UAE", continent: "Asia", zoom: 16, difficulty: "easy", options: ["UAE", "Saudi Arabia", "Qatar", "Kuwait"] },
+            { lat: 35.6762, lon: 139.6503, name: "Tokyo Tower", country: "Japan", continent: "Asia", zoom: 15, difficulty: "medium", options: ["Japan", "China", "South Korea", "Thailand"] },
+            { lat: 13.4125, lon: 103.8670, name: "Angkor Wat", country: "Cambodia", continent: "Asia", zoom: 14, difficulty: "hard", options: ["Cambodia", "Thailand", "Vietnam", "Indonesia"] },
+            { lat: 27.9881, lon: 86.9250, name: "Mount Everest", country: "Nepal", continent: "Asia", zoom: 13, difficulty: "medium", options: ["Nepal", "China", "India", "Pakistan"] },
+            { lat: 1.2825, lon: 103.8582, name: "Marina Bay Sands", country: "Singapore", continent: "Asia", zoom: 16, difficulty: "medium", options: ["Singapore", "Malaysia", "Indonesia", "Thailand"] },
+            { lat: 41.0082, lon: 28.9784, name: "Hagia Sophia", country: "Turkey", continent: "Asia", zoom: 16, difficulty: "hard", options: ["Turkey", "Greece", "Italy", "Egypt"] },
+            { lat: 21.4225, lon: 39.8262, name: "Masjid al-Haram", country: "Saudi Arabia", continent: "Asia", zoom: 15, difficulty: "hard", options: ["Saudi Arabia", "UAE", "Kuwait", "Qatar"] },
+            { lat: -6.1751, lon: 106.8650, name: "Monas (National Monument)", country: "Indonesia", continent: "Asia", zoom: 15, difficulty: "hard", options: ["Indonesia", "Philippines", "Malaysia", "Thailand"] },
+            
+            // Europe (8 locations)
+            { lat: 41.8902, lon: 12.4922, name: "Colosseum", country: "Italy", continent: "Europe", zoom: 16, difficulty: "easy", options: ["Italy", "Greece", "Spain", "France"] },
+            { lat: 43.7230, lon: 10.3966, name: "Leaning Tower of Pisa", country: "Italy", continent: "Europe", zoom: 17, difficulty: "easy", options: ["Italy", "France", "Spain", "Greece"] },
+            { lat: 51.1789, lon: -1.8262, name: "Stonehenge", country: "UK", continent: "Europe", zoom: 16, difficulty: "medium", options: ["UK", "Ireland", "France", "Germany"] },
+            { lat: 48.8584, lon: 2.2945, name: "Eiffel Tower", country: "France", continent: "Europe", zoom: 16, difficulty: "easy", options: ["France", "Italy", "Spain", "UK"] },
+            { lat: 55.7558, lon: 37.6173, name: "Red Square", country: "Russia", continent: "Europe", zoom: 15, difficulty: "medium", options: ["Russia", "Germany", "UK", "France"] },
+            { lat: 41.4036, lon: 2.1744, name: "Sagrada Familia", country: "Spain", continent: "Europe", zoom: 16, difficulty: "medium", options: ["Spain", "Italy", "France", "Greece"] },
+            { lat: 51.5014, lon: -0.1419, name: "Big Ben", country: "UK", continent: "Europe", zoom: 17, difficulty: "easy", options: ["UK", "France", "Germany", "Ireland"] },
+            { lat: 60.1282, lon: 18.6435, name: "Vasa Museum", country: "Sweden", continent: "Europe", zoom: 16, difficulty: "hard", options: ["Sweden", "Norway", "Germany", "Russia"] },
+            
+            // Africa (3 locations)
+            { lat: 29.9792, lon: 31.1342, name: "Pyramids of Giza", country: "Egypt", continent: "Africa", zoom: 15, difficulty: "easy", options: ["Egypt", "Sudan", "Libya", "Tunisia"] },
+            { lat: -1.2921, lon: 36.8219, name: "Nairobi National Park", country: "Kenya", continent: "Africa", zoom: 14, difficulty: "hard", options: ["Kenya", "Tanzania", "South Africa", "Nigeria"] },
+            { lat: -33.9249, lon: 18.4241, name: "Table Mountain", country: "South Africa", continent: "Africa", zoom: 13, difficulty: "medium", options: ["South Africa", "Namibia", "Kenya", "Morocco"] },
+            
+            // North America (4 locations)
+            { lat: 40.6892, lon: -74.0445, name: "Statue of Liberty", country: "USA", continent: "North America", zoom: 16, difficulty: "easy", options: ["USA", "Canada", "Mexico", "Cuba"] },
+            { lat: 36.1069, lon: -112.1129, name: "Grand Canyon", country: "USA", continent: "North America", zoom: 13, difficulty: "medium", options: ["USA", "Mexico", "Canada", "Peru"] },
+            { lat: 51.1784, lon: -115.5708, name: "Lake Louise", country: "Canada", continent: "North America", zoom: 14, difficulty: "hard", options: ["Canada", "USA", "Norway", "Sweden"] },
+            { lat: 19.4326, lon: -99.1332, name: "Teotihuacan Pyramids", country: "Mexico", continent: "North America", zoom: 14, difficulty: "medium", options: ["Mexico", "Peru", "USA", "Cuba"] },
+            
+            // South America (3 locations)
+            { lat: -13.1631, lon: -72.5450, name: "Machu Picchu", country: "Peru", continent: "South America", zoom: 14, difficulty: "easy", options: ["Peru", "Chile", "Bolivia", "Ecuador"] },
+            { lat: -22.9519, lon: -43.2105, name: "Christ the Redeemer", country: "Brazil", continent: "South America", zoom: 15, difficulty: "easy", options: ["Brazil", "Argentina", "Colombia", "Venezuela"] },
+            { lat: -54.8019, lon: -68.3030, name: "Ushuaia (End of World)", country: "Argentina", continent: "South America", zoom: 13, difficulty: "hard", options: ["Argentina", "Chile", "Brazil", "Peru"] },
+            
+            // Oceania (2 locations)
+            { lat: -25.3444, lon: 131.0369, name: "Uluru", country: "Australia", continent: "Oceania", zoom: 13, difficulty: "medium", options: ["Australia", "New Zealand", "South Africa", "Namibia"] },
+            { lat: -33.8568, lon: 151.2153, name: "Sydney Opera House", country: "Australia", continent: "Oceania", zoom: 16, difficulty: "easy", options: ["Australia", "New Zealand", "Fiji", "Indonesia"] }
         ];
         
         window.startGuessGame = function() {
@@ -4871,19 +5310,52 @@
             gameState.guess.active = true;
             gameState.guess.round = 0;
             gameState.guess.score = 0;
+            gameState.guess.correct = 0;
+            gameState.guess.startTime = Date.now();
             document.getElementById('guess-score').textContent = '0';
+            
+            // Track mode played for achievements
+            if (!playerAchievements.stats.universal.modesPlayed.has('guess')) {
+                playerAchievements.stats.universal.modesPlayed.add('guess');
+                saveAchievements();
+            }
+            trackPlayDate();
+            
             nextGuessRound();
         }
         
         window.nextGuessRound = function() {
             if (gameState.guess.round >= 5) {
                 gameState.guess.active = false;
+                const completionTime = (Date.now() - gameState.guess.startTime) / 1000;
+                gameState.guess.completionTime = completionTime;
+                
+                // Track achievement stats
+                playerAchievements.stats.guess.roundsPlayed += 5;
+                playerAchievements.stats.guess.gamesCompleted++;
+                
+                if (gameState.guess.correct === 5) {
+                    playerAchievements.stats.guess.perfectRounds++;
+                }
+                if (completionTime < 60) { // Under 1 minute for 5 rounds
+                    playerAchievements.stats.guess.fastCompletions++;
+                }
+                
+                // Mark mode completed
+                if (!playerAchievements.stats.universal.modesCompleted.has('guess')) {
+                    playerAchievements.stats.universal.modesCompleted.add('guess');
+                }
+                
                 addXP(50, 'Guess Game Complete!');
+                saveAchievements();
+                checkGuessAchievements();
+                checkUniversalAchievements();
                 showGuessComplete();
                 return;
             }
             
             gameState.guess.round++;
+            gameState.guess.roundStartTime = Date.now();
             gameState.guess.current = guessLocations[Math.floor(Math.random() * guessLocations.length)];
             
             document.getElementById('guess-round').textContent = gameState.guess.round;
@@ -4929,6 +5401,7 @@
             gameState.guess.round = 0;
             gameState.guess.score = 0;
             gameState.guess.correct = 0;
+            gameState.guess.startTime = Date.now();
             document.getElementById('guess-score').textContent = '0';
             nextGuessRound();
             showNotification('🎯 New Guess Game started! Good luck!');
@@ -4937,6 +5410,7 @@
         window.checkGuess = function(answer) {
             if (!gameState.guess.current) return;
             
+            const roundTime = (Date.now() - gameState.guess.roundStartTime) / 1000;
             const buttons = document.querySelectorAll('#guess-options .answer-btn');
             buttons.forEach(btn => {
                 btn.disabled = true;
@@ -4953,13 +5427,51 @@
                 gameState.guess.correct++;
                 gameState.missions[2].progress++;
                 document.getElementById('guess-score').textContent = gameState.guess.score;
+                
+                // Track achievement stats
+                playerAchievements.stats.guess.correctGuesses++;
+                if (gameState.guess.current.name) {
+                    playerAchievements.stats.guess.landmarksIdentified.add(gameState.guess.current.name);
+                }
+                if (roundTime < 5) { // Under 5 seconds
+                    playerAchievements.stats.guess.instantIdentifications++;
+                }
+            } else {
+                // Track close guesses (correct continent but wrong country)
+                if (gameState.guess.current.continent) {
+                    const correctContinent = gameState.guess.current.continent;
+                    const guessContinent = getContinentForCountry(answer);
+                    if (correctContinent === guessContinent) {
+                        playerAchievements.stats.guess.closeGuesses++;
+                    }
+                }
             }
             
             gameState.guess.total++;
+            saveAchievements();
+            checkGuessAchievements();
             updateAllDisplays();
             saveState();
             
             document.getElementById('next-guess-btn').style.display = 'block';
+        }
+        
+        // Helper function to get continent for country (for close guess tracking)
+        function getContinentForCountry(country) {
+            const continentMap = {
+                'India': 'Asia', 'Pakistan': 'Asia', 'Bangladesh': 'Asia', 'Nepal': 'Asia', 'China': 'Asia', 
+                'Japan': 'Asia', 'Thailand': 'Asia', 'Vietnam': 'Asia', 'UAE': 'Asia', 'Saudi Arabia': 'Asia', 
+                'Qatar': 'Asia', 'Kuwait': 'Asia', 'South Korea': 'Asia', 'Indonesia': 'Asia', 'Philippines': 'Asia',
+                'Italy': 'Europe', 'Greece': 'Europe', 'Spain': 'Europe', 'France': 'Europe', 'UK': 'Europe', 
+                'Ireland': 'Europe', 'Germany': 'Europe', 'Russia': 'Europe', 'Norway': 'Europe', 'Sweden': 'Europe',
+                'USA': 'North America', 'Canada': 'North America', 'Mexico': 'North America', 'Cuba': 'North America',
+                'Peru': 'South America', 'Chile': 'South America', 'Bolivia': 'South America', 'Ecuador': 'South America', 
+                'Brazil': 'South America', 'Argentina': 'South America', 'Colombia': 'South America', 'Venezuela': 'South America',
+                'Egypt': 'Africa', 'Sudan': 'Africa', 'Libya': 'Africa', 'Tunisia': 'Africa', 'Kenya': 'Africa', 
+                'Tanzania': 'Africa', 'South Africa': 'Africa', 'Nigeria': 'Africa', 'Morocco': 'Africa',
+                'Australia': 'Oceania', 'New Zealand': 'Oceania', 'Namibia': 'Oceania', 'Fiji': 'Oceania'
+            };
+            return continentMap[country] || 'Unknown';
         }
         
         // MISSIONS
@@ -5254,7 +5766,7 @@
             // Mountain Master - find 5+ mountains
             if (mountains >= 5 && !gameState.alaska.achievements.mountainMaster) {
                 gameState.alaska.achievements.mountainMaster = true;
-                unlockAchievement(badges[0], '⛰️ MOUNTAIN MASTER', 'Found 5 mountains!', 100);
+                unlockAlaskaAchievement(badges[0], '⛰️ MOUNTAIN MASTER', 'Found 5 mountains!', 100);
             } else if (mountains >= 5) {
                 badges[0].classList.remove('locked');
                 badges[0].classList.add('unlocked');
@@ -5263,7 +5775,7 @@
             // River Runner - find 3+ rivers
             if (rivers >= 3 && !gameState.alaska.achievements.riverRunner) {
                 gameState.alaska.achievements.riverRunner = true;
-                unlockAchievement(badges[1], '🌊 RIVER RUNNER', 'Found 3 rivers!', 75);
+                unlockAlaskaAchievement(badges[1], '🌊 RIVER RUNNER', 'Found 3 rivers!', 75);
             } else if (rivers >= 3) {
                 badges[1].classList.remove('locked');
                 badges[1].classList.add('unlocked');
@@ -5272,7 +5784,7 @@
             // Park Explorer - find 5+ parks
             if (parks >= 5 && !gameState.alaska.achievements.parkExplorer) {
                 gameState.alaska.achievements.parkExplorer = true;
-                unlockAchievement(badges[2], '🏞️ PARK EXPLORER', 'Found 5 parks!', 125);
+                unlockAlaskaAchievement(badges[2], '🏞️ PARK EXPLORER', 'Found 5 parks!', 125);
             } else if (parks >= 5) {
                 badges[2].classList.remove('locked');
                 badges[2].classList.add('unlocked');
@@ -5281,7 +5793,7 @@
             // City Finder - find 8+ cities
             if (cities >= 8 && !gameState.alaska.achievements.cityFinder) {
                 gameState.alaska.achievements.cityFinder = true;
-                unlockAchievement(badges[3], '🏙️ CITY FINDER', 'Found 8 cities!', 150);
+                unlockAlaskaAchievement(badges[3], '🏙️ CITY FINDER', 'Found 8 cities!', 150);
             } else if (cities >= 8) {
                 badges[3].classList.remove('locked');
                 badges[3].classList.add('unlocked');
@@ -5290,7 +5802,7 @@
             // Alaska Expert - find all locations
             if (totalFound === grandTotal && !gameState.alaska.achievements.alaskaExpert) {
                 gameState.alaska.achievements.alaskaExpert = true;
-                unlockAchievement(badges[4], '🏆 ALASKA EXPERT', 'Discovered all Alaska locations!', 500);
+                unlockAlaskaAchievement(badges[4], '🏆 ALASKA EXPERT', 'Discovered all Alaska locations!', 500);
             } else if (totalFound === grandTotal) {
                 badges[4].classList.remove('locked');
                 badges[4].classList.add('unlocked');
@@ -5299,8 +5811,8 @@
             saveState();
         }
         
-        // Animated achievement unlock with visual celebration
-        function unlockAchievement(badgeElement, title, description, xpReward) {
+        // Animated achievement unlock with visual celebration (Alaska-specific)
+        function unlockAlaskaAchievement(badgeElement, title, description, xpReward) {
             // Unlock the badge visually
             badgeElement.classList.remove('locked');
             badgeElement.classList.add('unlocked');
@@ -5310,12 +5822,12 @@
             
             // Show celebration overlay
             setTimeout(() => {
-                showAchievementUnlock(title, description, xpReward);
+                showAlaskaAchievementUnlock(title, description, xpReward);
             }, 500);
         }
         
-        // Show full-screen achievement unlock celebration
-        window.showAchievementUnlock = function(title, description, xpReward) {
+        // Show full-screen achievement unlock celebration (Alaska-specific)
+        window.showAlaskaAchievementUnlock = function(title, description, xpReward) {
             const overlay = document.createElement('div');
             overlay.id = 'achievement-unlock-overlay';
             overlay.style.cssText = `
