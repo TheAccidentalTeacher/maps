@@ -600,6 +600,156 @@
             }
         }
         
+        /* Toast Notification System */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            pointer-events: none;
+        }
+        
+        .toast {
+            background: rgba(10, 14, 39, 0.98);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            min-width: 300px;
+            max-width: 400px;
+            border-left: 4px solid;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            animation: toastSlideIn 0.3s ease-out, toastFadeOut 0.3s ease-in 2.7s;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .toast.success {
+            border-left-color: #10b981;
+        }
+        
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+        
+        .toast.warning {
+            border-left-color: #f59e0b;
+        }
+        
+        .toast.info {
+            border-left-color: #3b82f6;
+        }
+        
+        .toast-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+        
+        .toast-content {
+            flex: 1;
+        }
+        
+        .toast-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+        
+        .toast-message {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.4;
+        }
+        
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes toastFadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        
+        /* Loading Spinner System */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 39, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(102, 126, 234, 0.2);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .loading-subtext {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+        
+        /* Button Loading State */
+        .btn.loading {
+            position: relative;
+            color: transparent !important;
+            pointer-events: none;
+        }
+        
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        
         #sidebar::-webkit-scrollbar {
             width: 8px;
         }
@@ -1023,6 +1173,16 @@
     </style>
 </head>
 <body>
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loading-text">Loading...</div>
+        <div class="loading-subtext" id="loading-subtext">Please wait</div>
+    </div>
+    
     <div id="header">
         <h1>🕵️ GEOGRAPHIC DETECTIVE ACADEMY</h1>
         <div class="xp-display">
@@ -1692,6 +1852,108 @@
         crossorigin=""></script>
     
     <script>
+        // ========================================
+        // TOAST NOTIFICATION SYSTEM
+        // ========================================
+        
+        /**
+         * Show a toast notification
+         * @param {string} type - 'success', 'error', 'warning', or 'info'
+         * @param {string} title - Toast title
+         * @param {string} message - Toast message
+         * @param {number} duration - Duration in ms (default 3000)
+         */
+        function showToast(type = 'info', title, message, duration = 3000) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type] || icons.info}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    ${message ? `<div class="toast-message">${message}</div>` : ''}
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Remove after duration
+            setTimeout(() => {
+                toast.style.animation = 'toastFadeOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        container.removeChild(toast);
+                    }
+                }, 300);
+            }, duration);
+        }
+        
+        // ========================================
+        // LOADING STATE SYSTEM
+        // ========================================
+        
+        /**
+         * Show loading overlay
+         * @param {string} text - Main loading text
+         * @param {string} subtext - Subtext (optional)
+         */
+        function showLoading(text = 'Loading...', subtext = 'Please wait') {
+            const overlay = document.getElementById('loading-overlay');
+            const textEl = document.getElementById('loading-text');
+            const subtextEl = document.getElementById('loading-subtext');
+            
+            if (overlay) {
+                if (textEl) textEl.textContent = text;
+                if (subtextEl) subtextEl.textContent = subtext;
+                overlay.classList.add('active');
+            }
+        }
+        
+        /**
+         * Hide loading overlay
+         */
+        function hideLoading() {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+        }
+        
+        /**
+         * Add loading state to a button
+         * @param {HTMLElement} button - Button element
+         */
+        function setButtonLoading(button) {
+            if (button) {
+                button.classList.add('loading');
+                button.disabled = true;
+            }
+        }
+        
+        /**
+         * Remove loading state from a button
+         * @param {HTMLElement} button - Button element
+         */
+        function removeButtonLoading(button) {
+            if (button) {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+        
+        // ========================================
+        // MAIN INITIALIZATION
+        // ========================================
+        
         document.addEventListener('DOMContentLoaded', function() {
         console.log('DOMContentLoaded event fired');
         // v2.0 - Alaska Adventure Edition
@@ -3084,6 +3346,9 @@
             document.getElementById('mystery-game').style.display = 'block';
             gameState.mystery.active = true;
             startMystery();
+            
+            // Welcome toast
+            showToast('info', '🎯 Mystery Challenge Started!', 'Find the location using coordinates. Hints appear at 30s and 15s!', 4000);
         }
         
         window.startMystery = function() {
@@ -3160,7 +3425,20 @@
                 // Show Play Again message with button
                 showMysterySuccess();
             } else {
-                showNotification('❌ Not quite! Keep trying!');
+                // Provide helpful distance feedback
+                const distanceKm = Math.round(distance);
+                let hint = '';
+                if (distanceKm > 5000) {
+                    hint = 'Try a different continent!';
+                } else if (distanceKm > 2000) {
+                    hint = 'Getting closer...';
+                } else if (distanceKm > 1000) {
+                    hint = 'You\'re in the right region!';
+                } else {
+                    hint = 'Very close! Keep trying!';
+                }
+                showNotification(`❌ Not quite! ${distanceKm}km away. ${hint}`);
+                showToast('error', 'Try Again!', `You're ${distanceKm.toLocaleString()}km away. ${hint}`, 3000);
             }
         }
         
@@ -3613,6 +3891,9 @@
             updateAlaskaDisplay();
             const roundInfo = alaskaRounds[0];
             showNotification(`🏔️ ${roundInfo.name} Started! ${roundInfo.description}`);
+            
+            // Welcome toast
+            showToast('info', '🏔️ Alaska Adventure Started!', 'Find all 50 locations to become an Alaska Expert!', 4000);
         }
         
         window.updateAlaskaDisplay = function() {
