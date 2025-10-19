@@ -163,15 +163,167 @@ exports.handler = async (event, context) => {
       }
     }
 
+    // ULTIMATE FALLBACK: AI-Generated Educational Images
     if (photos.length === 0) {
-      // No photos found even with fallbacks - return facts without photos
-      console.log('❌ No photos found after all fallback attempts');
+      console.log('🎨 No real photos found - generating AI educational images for each fact...');
+      
+      const replicateKey = process.env.REPLICATE_API_TOKEN;
+      const claudeKey = process.env.ANTHROPIC_API_KEY;
+      
+      if (!replicateKey || !claudeKey) {
+        console.log('❌ AI generation not available (missing API keys)');
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            matched: facts.map(fact => ({ fact, photo: null })),
+            source: 'none'
+          })
+        };
+      }
+
+      // Generate unique AI images for each fact
+      const aiGeneratedPhotos = [];
+      
+      for (let i = 0; i < facts.length; i++) {
+        const fact = facts[i];
+        console.log(`🎨 Generating AI image ${i + 1}/${facts.length} for: "${fact.substring(0, 50)}..."`);
+        
+        try {
+          // Step 1: Use Claude to create a detailed image generation prompt
+          const promptCreationRequest = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': claudeKey,
+              'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+              model: 'claude-3-5-sonnet-20241022',
+              max_tokens: 300,
+              temperature: 0.7,
+              messages: [{
+                role: 'user',
+                content: `You are an educational visual designer creating engaging images for middle school students.
+
+Given this geography fact about ${location}:
+"${fact}"
+
+Create a detailed image generation prompt (2-3 sentences) that will produce an educational visualization. This could be:
+- An infographic showing key statistics or concepts
+- An illustrated scene depicting the fact
+- A diagram explaining the concept
+- A stylized educational poster
+- A creative visual metaphor
+
+Requirements:
+- Educational and age-appropriate for 11-14 year olds
+- Visually engaging and colorful
+- Clear and easy to understand
+- Style: "educational illustration, infographic style, vibrant colors, clean design, professional"
+
+Respond with ONLY the image generation prompt, nothing else.`
+              }]
+            })
+          });
+
+          if (!promptCreationRequest.ok) {
+            console.warn(`⚠️ Claude prompt creation failed for fact ${i + 1}`);
+            continue;
+          }
+
+          const promptData = await promptCreationRequest.json();
+          const imagePrompt = promptData.content[0].text.trim();
+          console.log(`✅ Created prompt: "${imagePrompt.substring(0, 60)}..."`);
+
+          // Step 2: Generate image using Replicate (Flux Schnell - fast & cheap)
+          const replicateResponse = await fetch('https://api.replicate.com/v1/predictions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Token ${replicateKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              version: 'f2ab8a5569279bc6f34a7e6fd42d72ec1aafff52e5cdd2ba6e93e9b75ba6c77c', // Flux Schnell
+              input: {
+                prompt: imagePrompt,
+                num_outputs: 1,
+                aspect_ratio: '16:9',
+                output_format: 'jpg',
+                output_quality: 90
+              }
+            })
+          });
+
+          if (!replicateResponse.ok) {
+            console.warn(`⚠️ Replicate generation request failed for fact ${i + 1}`);
+            continue;
+          }
+
+          const prediction = await replicateResponse.json();
+          console.log(`⏳ Waiting for image generation (prediction ${prediction.id})...`);
+
+          // Step 3: Poll for completion (max 30 seconds)
+          let imageUrl = null;
+          for (let attempt = 0; attempt < 15; attempt++) {
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+
+            const statusResponse = await fetch(
+              `https://api.replicate.com/v1/predictions/${prediction.id}`,
+              {
+                headers: {
+                  'Authorization': `Token ${replicateKey}`
+                }
+              }
+            );
+
+            if (statusResponse.ok) {
+              const status = await statusResponse.json();
+              
+              if (status.status === 'succeeded' && status.output && status.output[0]) {
+                imageUrl = status.output[0];
+                console.log(`✅ AI image generated successfully for fact ${i + 1}`);
+                break;
+              } else if (status.status === 'failed') {
+                console.warn(`❌ Image generation failed for fact ${i + 1}`);
+                break;
+              }
+            }
+          }
+
+          if (imageUrl) {
+            aiGeneratedPhotos.push({
+              fact,
+              photo: {
+                id: `ai-generated-${i}`,
+                url: imageUrl,
+                thumbnail: imageUrl,
+                photographer: 'AI Generated',
+                photographer_url: null,
+                description: imagePrompt,
+                source: 'ai-generated',
+                aiGenerated: true
+              }
+            });
+          } else {
+            // Generation timed out or failed
+            aiGeneratedPhotos.push({ fact, photo: null });
+          }
+
+        } catch (error) {
+          console.error(`❌ Error generating AI image for fact ${i + 1}:`, error.message);
+          aiGeneratedPhotos.push({ fact, photo: null });
+        }
+      }
+
+      console.log(`🎨 Generated ${aiGeneratedPhotos.filter(p => p.photo).length}/${facts.length} AI images`);
+      
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          matched: facts.map(fact => ({ fact, photo: null })),
-          source: 'none'
+          matched: aiGeneratedPhotos,
+          source: 'ai-generated'
         })
       };
     }
