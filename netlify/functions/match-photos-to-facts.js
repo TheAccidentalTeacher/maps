@@ -344,7 +344,9 @@ Respond with ONLY the image generation prompt, nothing else.`
     }
 
     // AI-powered matching using Claude
+    console.log('🤖 Starting Claude AI matching...');
     const matchingPrompt = createMatchingPrompt(facts, photos, location);
+    console.log(`📝 Prompt length: ${matchingPrompt.length} characters`);
     
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -364,15 +366,26 @@ Respond with ONLY the image generation prompt, nothing else.`
       })
     });
 
+    console.log(`🤖 Claude response status: ${claudeResponse.status}`);
+    
     if (!claudeResponse.ok) {
+      const errorText = await claudeResponse.text();
+      console.error(`❌ Claude API error ${claudeResponse.status}:`, errorText);
       throw new Error(`Claude API error: ${claudeResponse.status}`);
     }
 
     const claudeData = await claudeResponse.json();
     const responseText = claudeData.content[0].text;
+    console.log('🤖 Claude response received:', responseText.substring(0, 200) + '...');
     
     // Parse Claude's matching recommendations
+    console.log('🔍 Parsing Claude matching...');
     const matched = parseClaudeMatching(responseText, facts, photos);
+    console.log(`✅ Parsed ${matched.length} matches`);
+    console.log(`🔍 First match:`, JSON.stringify(matched[0]));
+    
+    const nullCount = matched.filter(m => m.photo === null).length;
+    console.log(`⚠️ ${nullCount} out of ${matched.length} facts have null photos`);
     
     return {
       statusCode: 200,
