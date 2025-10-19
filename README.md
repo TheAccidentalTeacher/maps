@@ -30,7 +30,11 @@
 ### 🎮 Feature Documentation
 - **[ALASKA_EXPANSION_COMPLETE.md](./ALASKA_EXPANSION_COMPLETE.md)** - 5-round Alaska Adventure game
 - **[MYSTERY_CHALLENGE_OVERHAUL.md](./MYSTERY_CHALLENGE_OVERHAUL.md)** - Coordinate-based challenge game
+- **[LOCATION_EXPLORER_SIDEBAR_PLAN.md](./LOCATION_EXPLORER_SIDEBAR_PLAN.md)** - Interactive sidebar with 8 cards
+- **[NUCLEAR_SAFETY_SYSTEM.md](./NUCLEAR_SAFETY_SYSTEM.md)** - 3-layer content filtering system
+- **[VISION_AI_PHOTO_MATCHING.md](./VISION_AI_PHOTO_MATCHING.md)** - AI-powered photo-fact validation
 - **[GEN_ALPHA_CULTURE_RESEARCH.md](./GEN_ALPHA_CULTURE_RESEARCH.md)** - Cultural research for Fun Mode
+- **[ACHIEVEMENTS_IMPLEMENTATION.md](./ACHIEVEMENTS_IMPLEMENTATION.md)** - Achievement system with 45 achievements
 
 ### 🐛 Maintenance
 - **[BUGS_DETAILED.md](./BUGS_DETAILED.md)** - Known issues and fixes
@@ -63,14 +67,20 @@ Geographic Detective Academy is an interactive web-based geography learning appl
 
 - ✅ **Working with 15 students** in Alaska classroom
 - ✅ **7 game modes** fully functional
-- ✅ **50 Alaska locations** with geographical clues
-- ✅ **Progressive reveal system** in planning phase
-- ✅ **Fun Mode toggle** for cultural engagement
-- 🚧 **SaaS platform** in development
-
+- ✅ **Location Explorer Sidebar** with 8 interactive cards
+- ✅ **Nuclear Safety System** with 3-layer content filtering
+- ✅ **AI-powered photo matching** using Vision AI
+- ✅ **Gen Alpha loading animations** with cultural engagement
 ### Technology Stack
 
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript (single-file architecture)
+- **Mapping:** Leaflet.js 1.9.4 with OpenStreetMap tiles
+- **APIs:** Nominatim, REST Countries, Unsplash, Pexels, OpenWeatherMap
+- **AI Integration:** Claude 3.5 Sonnet, GPT-4o-mini, Perplexity, Vision AI
+- **Serverless:** Netlify Functions for API proxying
+- **Data Storage:** Browser localStorage (client-side persistence)
+- **Development:** Node.js local dev server for testing
+- **Deployment:** Netlify (production-ready)aScript (single-file architecture)
 - **Mapping:** Leaflet.js 1.9.4 with OpenStreetMap tiles
 - **Data Storage:** Browser localStorage (client-side persistence)
 - **Development:** Python http.server for local testing

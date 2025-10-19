@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Service Worker Killer</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            border: 2px solid #0f0;
+            background: #001100;
+        }
+        h1 { color: #0f0; margin-bottom: 30px; }
+        .status { font-size: 18px; margin: 20px 0; line-height: 1.6; }
+        .done { color: #0ff; font-weight: bold; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ SERVICE WORKER EXTERMINATOR ⚡</h1>
+        <div id="status" class="status">Nuking service workers from orbit...</div>
+    </div>
+
+    <script>
+        (async function() {
+            const statusEl = document.getElementById('status');
+            let log = '';
+            
+            function addLog(msg) {
+                log += msg + '<br>';
+                statusEl.innerHTML = log;
+            }
+            
+            try {
+                addLog('🔍 Scanning for service workers...');
+                await new Promise(r => setTimeout(r, 500));
+                
+                // NUCLEAR OPTION: Unregister ALL service workers
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    addLog(`Found ${registrations.length} service worker(s)`);
+                    
+                    for (let reg of registrations) {
+                        addLog(`💀 Terminating: ${reg.scope}`);
+                        const success = await reg.unregister();
+                        addLog(success ? '✅ DESTROYED' : '❌ FAILED');
+                    }
+                }
+                
+                await new Promise(r => setTimeout(r, 500));
+                addLog('<br>🧹 Clearing all caches...');
+                
+                // Clear ALL caches
+                if ('caches' in window) {
+                    const names = await caches.keys();
+                    for (let name of names) {
+                        await caches.delete(name);
+                        addLog(`Deleted cache: ${name}`);
+                    }
+                }
+                
+                await new Promise(r => setTimeout(r, 500));
+                addLog('<br><div class="done">✅ ALL CLEAR!</div>');
+                addLog('<br>Redirecting to map in 2 seconds...');
+                
+                // Auto-redirect
+                setTimeout(() => {
+                    window.location.href = '/index.html';
+                }, 2000);
+                
+            } catch (error) {
+                addLog(`<br><span style="color:#f00;">ERROR: ${error.message}</span>`);
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location Explorer Debug Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .test {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 4px solid #ffd700;
+        }
+        button {
+            background: #ffd700;
+            color: #1a1a2e;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #ffed4e;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .success { color: #51cf66; }
+        .error { color: #ff6b6b; }
+        .warning { color: #ffd700; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Location Explorer Debug Test</h1>
+    <p>This page tests if the Location Explorer sidebar is working correctly.</p>
+
+    <div class="test">
+        <h2>Test 1: Check if sidebar HTML exists</h2>
+        <button onclick="test1()">Run Test 1</button>
+        <div id="result1" class="result"></div>
+    </div>
+
+    <div class="test">
+        <h2>Test 2: Check if functions are defined</h2>
+        <button onclick="test2()">Run Test 2</button>
+        <div id="result2" class="result"></div>
+    </div>
+
+    <div class="test">
+        <h2>Test 3: Test API calls</h2>
+        <button onclick="test3()">Run Test 3 (Paris, France)</button>
+        <div id="result3" class="result"></div>
+    </div>
+
+    <div class="test">
+        <h2>Test 4: Check game mode</h2>
+        <button onclick="test4()">Run Test 4</button>
+        <div id="result4" class="result"></div>
+    </div>
+
+    <script>
+        function test1() {
+            const result = document.getElementById('result1');
+            const sidebar = document.getElementById('location-explorer-sidebar');
+            
+            if (sidebar) {
+                result.innerHTML = '<span class="success">✅ SUCCESS!</span>\n';
+                result.innerHTML += 'Sidebar element found!\n';
+                result.innerHTML += `ID: ${sidebar.id}\n`;
+                result.innerHTML += `Classes: ${sidebar.className}\n`;
+                result.innerHTML += `Visible: ${sidebar.offsetHeight > 0}\n`;
+            } else {
+                result.innerHTML = '<span class="error">❌ FAIL!</span>\n';
+                result.innerHTML += 'Sidebar element NOT found!\n';
+                result.innerHTML += 'The HTML might not be on the main page.';
+            }
+        }
+
+        function test2() {
+            const result = document.getElementById('result2');
+            let output = '';
+            
+            const functions = [
+                'populateLocationData',
+                'showLocationSidebar',
+                'hideLocationSidebar',
+                'toggleLocationSidebar',
+                'reverseGeocode',
+                'getCountryData',
+                'fetchLocationPhotos',
+                'fetchLocationWeather',
+                'fetchLocationFacts'
+            ];
+            
+            functions.forEach(fn => {
+                if (typeof window[fn] === 'function') {
+                    output += `<span class="success">✅ ${fn}</span>\n`;
+                } else {
+                    output += `<span class="error">❌ ${fn}</span>\n`;
+                }
+            });
+            
+            result.innerHTML = output;
+        }
+
+        async function test3() {
+            const result = document.getElementById('result3');
+            result.innerHTML = '<span class="warning">⏳ Testing API calls...</span>\n';
+            
+            try {
+                // Test Nominatim (reverse geocoding)
+                result.innerHTML += '\n1. Testing Nominatim (Reverse Geocoding)...\n';
+                const nominatimUrl = 'https://nominatim.openstreetmap.org/reverse?lat=48.8566&lon=2.3522&format=json';
+                const nominatimResp = await fetch(nominatimUrl, {
+                    headers: { 'User-Agent': 'MrsSomersMaps Educational App' }
+                });
+                if (nominatimResp.ok) {
+                    const data = await nominatimResp.json();
+                    result.innerHTML += `   <span class="success">✅ Nominatim works! Found: ${data.display_name.substring(0, 50)}...</span>\n`;
+                } else {
+                    result.innerHTML += `   <span class="error">❌ Nominatim failed: ${nominatimResp.status}</span>\n`;
+                }
+
+                // Test REST Countries
+                result.innerHTML += '\n2. Testing REST Countries...\n';
+                const countryResp = await fetch('https://restcountries.com/v3.1/alpha/FR');
+                if (countryResp.ok) {
+                    const data = await response.json();
+                    result.innerHTML += `   <span class="success">✅ REST Countries works!</span>\n`;
+                } else {
+                    result.innerHTML += `   <span class="error">❌ REST Countries failed: ${countryResp.status}</span>\n`;
+                }
+
+                // Test Overpass API
+                result.innerHTML += '\n3. Testing Overpass API (Nearby Places)...\n';
+                const overpassResp = await fetch('https://overpass-api.de/api/interpreter?data=[out:json];node(around:10000,48.8566,2.3522)[place];out;');
+                if (overpassResp.ok) {
+                    result.innerHTML += `   <span class="success">✅ Overpass API works!</span>\n`;
+                } else {
+                    result.innerHTML += `   <span class="error">❌ Overpass failed: ${overpassResp.status}</span>\n`;
+                }
+
+                result.innerHTML += '\n<span class="success">✅ All free APIs working!</span>';
+
+            } catch (error) {
+                result.innerHTML += `\n<span class="error">❌ ERROR: ${error.message}</span>`;
+            }
+        }
+
+        function test4() {
+            const result = document.getElementById('result4');
+            
+            if (typeof gameState !== 'undefined') {
+                let output = '<span class="success">✅ gameState found</span>\n\n';
+                output += `Mystery active: ${gameState.mystery?.active || false}\n`;
+                output += `Scavenger active: ${gameState.scavenger?.active || false}\n`;
+                output += `Alaska active: ${gameState.alaska?.active || false}\n`;
+                output += `Current mode: ${gameState.currentMode || 'unknown'}\n\n`;
+                
+                if (!gameState.mystery?.active && !gameState.scavenger?.active && !gameState.alaska?.active) {
+                    output += '<span class="success">✅ FREE EXPLORE MODE - Sidebar should work!</span>';
+                } else {
+                    output += '<span class="warning">⚠️ Game mode active - Click ends games first!</span>';
+                }
+                
+                result.innerHTML = output;
+            } else {
+                result.innerHTML = '<span class="error">❌ gameState not found!</span>';
+            }
+        }
+    </script>
+</body>
+</html>

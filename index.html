@@ -1170,6 +1170,1157 @@
                 transform: translate(-50%, -50%) scale(0.8);
             }
         }
+
+        /* ========================================
+           LOCATION EXPLORER SIDEBAR STYLES
+           Phase 1.1: Collapsible sidebar + animations
+           ======================================== */
+        
+        .location-sidebar {
+            position: fixed;
+            top: 0;
+            right: -450px; /* Hidden by default */
+            width: 450px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border-left: 2px solid #ffd700;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s ease-in-out;
+        }
+
+        .location-sidebar.active {
+            right: 0;
+        }
+
+        /* Sidebar Header */
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 215, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .sidebar-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-icon {
+            font-size: 24px;
+        }
+
+        .sidebar-title h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .sidebar-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .sidebar-control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-control-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Sidebar Content (Scrollable) */
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px;
+            padding-bottom: 80px; /* Space for footer */
+        }
+
+        .sidebar-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 215, 0, 0.5);
+        }
+
+        /* Collection Badge */
+        .collection-badge {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .collection-icon {
+            font-size: 32px;
+        }
+
+        .collection-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        #locations-explored-count {
+            font-size: 24px;
+            color: #fff;
+        }
+
+        /* Location Cards */
+        .location-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .location-card:hover {
+            border-color: rgba(255, 215, 0, 0.4);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.1);
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s ease;
+        }
+
+        .card-header:hover {
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        .card-header h4 {
+            margin: 0;
+            font-size: 16px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .card-toggle {
+            font-size: 14px;
+            color: #ffd700;
+            transition: transform 0.3s ease;
+        }
+
+        .location-card.collapsed .card-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .card-content {
+            padding: 15px;
+            color: #ffffff;
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .location-card.collapsed .card-content {
+            max-height: 0;
+            padding: 0 15px;
+        }
+
+        /* Location Header Content */
+        .location-header-content {
+            text-align: center;
+        }
+
+        .country-flag {
+            font-size: 80px;
+            margin-bottom: 15px;
+            animation: wave 2s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .location-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 10px 0;
+        }
+
+        .location-badges {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .location-badge {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .location-coordinates {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .coord-toggle-btn {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .coord-toggle-btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            border-color: rgba(255, 215, 0, 0.6);
+            transform: rotate(180deg);
+        }
+
+        .coord-toggle-icon {
+            font-size: 14px;
+        }
+
+        /* ═══════════════════════════════════════════════════ */
+        /* PHOTO ENLARGEMENT MODAL with AI Captions */
+        /* ═══════════════════════════════════════════════════ */
+        
+        .photo-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .photo-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .photo-modal-content {
+            background: #1e293b;
+            border-radius: 16px;
+            max-width: 1200px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            animation: bounceIn 0.4s ease;
+            position: relative;
+        }
+
+        .photo-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10001;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .photo-modal-close:hover {
+            background: rgba(239, 68, 68, 0.8);
+            transform: rotate(90deg) scale(1.1);
+            border-color: rgba(239, 68, 68, 0.8);
+        }
+
+        .photo-modal-image-container {
+            position: relative;
+            width: 100%;
+            max-height: 60vh;
+            background: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .photo-modal-image-container img {
+            width: 100%;
+            height: auto;
+            max-height: 60vh;
+            object-fit: contain;
+            display: block;
+        }
+        
+        /* Photo modal image (used when not in container) */
+        .photo-modal-image {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            object-fit: contain;
+            display: block;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .photo-loading {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 41, 59, 0.95);
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 2px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .photo-loading.hidden {
+            display: none;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(251, 191, 36, 0.3);
+            border-top-color: #fbbf24;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .photo-loading p {
+            margin: 0;
+            color: #fbbf24;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .photo-modal-info {
+            padding: 25px 30px;
+            overflow-y: auto;
+            max-height: 40vh;
+        }
+
+        .photo-modal-credit {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+            border-radius: 6px;
+        }
+
+        .credit-icon {
+            font-size: 18px;
+        }
+
+        .photo-modal-credit a {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .photo-modal-credit a:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+
+        .photo-modal-caption {
+            margin-bottom: 20px;
+        }
+
+        .photo-modal-caption h3 {
+            margin: 0 0 15px 0;
+            color: #fbbf24;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .photo-description {
+            color: #e2e8f0;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .photo-description p {
+            margin: 0 0 12px 0;
+        }
+
+        .photo-description p:last-child {
+            margin-bottom: 0;
+        }
+
+        .photo-relevance {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
+            border-left: 3px solid #10b981;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #a7f3d0;
+            font-style: italic;
+        }
+
+        .photo-relevance::before {
+            content: '🎯 Why this matters: ';
+            font-weight: 600;
+            color: #6ee7b7;
+            font-style: normal;
+        }
+
+        .photo-modal-meta {
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .photo-search-query {
+            display: inline-block;
+            background: rgba(251, 191, 36, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .photo-search-query::before {
+            content: '🔍 Search: ';
+            font-weight: 600;
+        }
+
+        /* AI Badge on thumbnail */
+        .ai-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(251, 191, 36, 0.95);
+            color: #1e293b;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            z-index: 10;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(251, 191, 36, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* AI/Vision Labels for fact photos */
+        .ai-label, .vision-label {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(251, 191, 36, 0.95);
+            color: #1e293b;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            z-index: 10;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(251, 191, 36, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .vision-label {
+            background: rgba(59, 130, 246, 0.95);
+            border-color: rgba(59, 130, 246, 1);
+            color: white;
+            left: auto;
+            right: 8px;
+        }
+        
+        /* Fact photo modal styles */
+        .photo-modal-fact {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .photo-modal-reason {
+            font-size: 13px;
+            color: #64748b;
+            font-style: italic;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(100, 116, 139, 0.1);
+            border-radius: 6px;
+        }
+
+        /* AI Disclosure in modal */
+        .ai-disclosure {
+            background: rgba(251, 191, 36, 0.1);
+            border-left: 4px solid #fbbf24;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            animation: slideInTop 0.3s ease;
+        }
+
+        .ai-disclosure h4 {
+            color: #fbbf24;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .ai-disclosure p {
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        @keyframes slideInTop {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .photo-modal-content {
+                max-height: 95vh;
+            }
+
+            .photo-modal-image-container {
+                max-height: 50vh;
+            }
+
+            .photo-modal-info {
+                padding: 20px;
+                max-height: 45vh;
+            }
+
+            .photo-modal-caption h3 {
+                font-size: 18px;
+            }
+
+            .photo-description {
+                font-size: 14px;
+            }
+        }
+
+        /* Floating Reopen Sidebar Button */
+        .reopen-sidebar-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border: 3px solid rgba(255, 215, 0, 0.4);
+            border-radius: 50%;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1999; /* Just below sidebar */
+            gap: 2px;
+        }
+
+        .reopen-sidebar-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+            background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+        }
+
+        .reopen-sidebar-btn:active {
+            transform: scale(0.95);
+        }
+
+        .reopen-sidebar-btn.visible {
+            display: flex;
+        }
+
+        .reopen-icon {
+            font-size: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        .reopen-text {
+            font-size: 11px;
+            font-weight: bold;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        
+        /* ========================================
+           GEN ALPHA LOADING ANIMATION (67 DANCE!)
+           ======================================== */
+        
+        .gen-alpha-loading {
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gen-alpha-loading::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.05) 10px,
+                rgba(255,255,255,0.05) 20px
+            );
+            animation: vibeShift 20s linear infinite;
+        }
+        
+        @keyframes vibeShift {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(50px, 50px) rotate(360deg); }
+        }
+        
+        .six-seven-dance {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .six-seven-big {
+            font-size: 120px;
+            display: inline-block;
+            animation: sixSevenDance 0.8s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.8));
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+        }
+        
+        @keyframes sixSevenDance {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg) scale(1);
+            }
+            25% { 
+                transform: translateY(-20px) rotate(-10deg) scale(1.1);
+            }
+            50% { 
+                transform: translateY(0) rotate(0deg) scale(1);
+            }
+            75% { 
+                transform: translateY(-15px) rotate(10deg) scale(1.05);
+            }
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .loading-word {
+            display: inline-block;
+            animation: wordBounce 1.2s ease-in-out infinite;
+        }
+        
+        .loading-word-1 {
+            animation-delay: 0s;
+        }
+        
+        .loading-word-2 {
+            animation-delay: 0.2s;
+        }
+        
+        @keyframes wordBounce {
+            0%, 100% { 
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateY(-10px) scale(1.1);
+                opacity: 0.8;
+            }
+        }
+        
+        .loading-dots {
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .loading-dots .dot {
+            animation: dotPulse 1.4s ease-in-out infinite;
+            opacity: 0;
+        }
+        
+        .loading-dots .dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .loading-dots .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .loading-dots .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes dotPulse {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        .vibe-check {
+            margin-top: 15px;
+            font-size: 16px;
+            color: rgba(255,255,255,0.9);
+            font-style: italic;
+            animation: vibeGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes vibeGlow {
+            0%, 100% { 
+                opacity: 0.7;
+                text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            }
+            50% { 
+                opacity: 1;
+                text-shadow: 0 0 20px rgba(255,255,255,0.8);
+            }
+        }
+
+        /* Hide reopen button when sidebar is active */
+        .location-sidebar.active ~ .reopen-sidebar-btn {
+            display: none !important;
+        }
+        }
+
+        .location-coordinates {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        /* Quick Facts Grid */
+        .fact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .fact-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #ffd700;
+        }
+
+        .fact-label {
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .fact-value {
+            color: #ffffff;
+            text-align: right;
+        }
+
+        /* Comparison Content */
+        .comparison-content {
+            text-align: center;
+        }
+
+        .distance-display {
+            margin-bottom: 20px;
+        }
+
+        .distance-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffd700;
+            display: block;
+        }
+
+        .distance-unit {
+            font-size: 16px;
+            color: #aaa;
+        }
+
+        .comparison-facts {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .comparison-fact {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .comparison-icon {
+            font-size: 24px;
+        }
+
+        /* Loading Placeholder */
+        .loading-placeholder {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+        }
+
+        .placeholder-icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .loading-placeholder p {
+            margin: 0;
+            font-style: italic;
+        }
+
+        /* Sidebar Footer */
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .view-collection-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .view-collection-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .location-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+
+            .location-sidebar.active {
+                right: 0;
+            }
+        }
+
+        /* Nearby Places Styling */
+        .nearby-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nearby-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #ffd700;
+            transition: all 0.2s ease;
+        }
+
+        .nearby-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nearby-item-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .nearby-item-info {
+            flex: 1;
+        }
+
+        .nearby-item-name {
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .nearby-item-type {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .nearby-item-distance {
+            font-size: 14px;
+            color: #ffd700;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .no-nearby {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+
+        /* AI Facts Styling (Card 4) */
+        .fact-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        /* NEW: Fact-Photo List with Scrolling */
+        .fact-photo-list {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        
+        /* Custom Scrollbar for Fact List */
+        .fact-photo-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .fact-photo-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .fact-photo-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 107, 157, 0.5);
+            border-radius: 4px;
+        }
+        
+        .fact-photo-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 107, 157, 0.8);
+        }
+
+        .fact-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #ff6b9d;
+            line-height: 1.6;
+            color: #ffffff;
+        }
+
+        .fact-item::before {
+            margin-right: 8px;
+        }
+
+        /* Photo Grid Styling (Card 5) */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .photo-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-credit {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 5px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            font-size: 10px;
+            color: white;
+        }
+
+        /* Weather Display Styling (Card 6) */
+        .weather-display {
+            text-align: center;
+        }
+
+        .weather-main {
+            margin-bottom: 15px;
+        }
+
+        .weather-icon {
+            width: 80px;
+            height: 80px;
+        }
+
+        .weather-temp {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #ffffff;
+        }
+
+        .temp-secondary {
+            font-size: 18px;
+            color: #888;
+            margin-left: 10px;
+        }
+
+        .weather-desc {
+            text-transform: capitalize;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .weather-details {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+        }
+
+        .weather-detail {
+            padding: 5px 0;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        /* No Data State (Used by all cards) */
+        .no-data {
+            text-align: center;
+            padding: 30px 20px;
+            color: #888;
+        }
+
+        .no-data p {
+            margin: 10px 0;
+        }
+
+        /* Gen Alpha Style (To be toggled in Phase 7) */
+        .location-sidebar.gen-alpha-mode .card-header h4::before {
+            content: '🔥 ';
+        }
+
+        .location-sidebar.gen-alpha-mode .location-name::after {
+            content: ' ✨';
+        }
     </style>
 </head>
 <body>
@@ -1181,6 +2332,26 @@
         <div class="spinner"></div>
         <div class="loading-text" id="loading-text">Loading...</div>
         <div class="loading-subtext" id="loading-subtext">Please wait</div>
+    </div>
+    
+    <!-- Game Completion Modal -->
+    <div id="game-complete-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; align-items: center; justify-content: center;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; border-radius: 20px; max-width: 600px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+            <div style="font-size: 80px; margin-bottom: 20px;" id="completion-emoji">🎉</div>
+            <h1 id="completion-title" style="color: #ffd700; margin: 0 0 20px 0; font-size: 36px;">Game Complete!</h1>
+            <div id="completion-stats" style="background: rgba(0,0,0,0.3); padding: 30px; border-radius: 12px; margin: 20px 0; line-height: 2; color: #fff;">
+                <!-- Stats populated by JS -->
+            </div>
+            <div id="completion-message" style="font-size: 18px; color: #fff; margin: 20px 0;">
+                <!-- Message populated by JS -->
+            </div>
+            <button id="play-again-btn" style="background: #ffd700; color: #1a1a2e; border: none; padding: 15px 40px; border-radius: 30px; font-size: 20px; font-weight: bold; cursor: pointer; margin: 10px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); transition: all 0.3s;">
+                🎮 PLAY AGAIN
+            </button>
+            <button onclick="closeCompletionModal()" style="background: transparent; color: #fff; border: 2px solid #fff; padding: 15px 40px; border-radius: 30px; font-size: 20px; font-weight: bold; cursor: pointer; margin: 10px; transition: all 0.3s;">
+                📊 VIEW ACHIEVEMENTS
+            </button>
+        </div>
     </div>
     
     <div id="header">
@@ -1979,6 +3150,1368 @@
         }
         
         // ========================================
+        // LOCATION EXPLORER SIDEBAR FUNCTIONS
+        // Phase 1.2: Interactive sidebar controls
+        // GLOBAL SCOPE - Accessible from HTML onclick handlers
+        // ========================================
+        
+        // Global variable for currently displayed location
+        let currentLocation = null;
+        
+        // Collection system - stores explored locations
+        let exploredLocations = [];
+        
+        // Style mode: 'gen-alpha' or 'classic'
+        let locationStyleMode = 'classic';
+        
+        // Coordinate display format: 'decimal' or 'dms' (Degrees Minutes Seconds)
+        let coordinateFormat = 'decimal';
+        let currentLat = 0;
+        let currentLng = 0;
+        
+        // Convert decimal degrees to DMS (Degrees Minutes Seconds)
+        function decimalToDMS(decimal, isLat) {
+            const absolute = Math.abs(decimal);
+            const degrees = Math.floor(absolute);
+            const minutesDecimal = (absolute - degrees) * 60;
+            const minutes = Math.floor(minutesDecimal);
+            const seconds = Math.floor((minutesDecimal - minutes) * 60);
+            
+            let direction;
+            if (isLat) {
+                direction = decimal >= 0 ? 'N' : 'S';
+            } else {
+                direction = decimal >= 0 ? 'E' : 'W';
+            }
+            
+            return `${degrees}° ${minutes}' ${seconds}" ${direction}`;
+        }
+        
+        // Toggle between decimal and DMS format
+        function toggleCoordinateFormat() {
+            coordinateFormat = coordinateFormat === 'decimal' ? 'dms' : 'decimal';
+            
+            // Save preference
+            try {
+                localStorage.setItem('coordinateFormat', coordinateFormat);
+            } catch (e) {
+                console.warn('Could not save coordinate format preference:', e);
+            }
+            
+            // Update display
+            updateCoordinateDisplay();
+            
+            console.log('📍 Coordinate format changed to:', coordinateFormat.toUpperCase());
+        }
+        
+        // Update the coordinate display based on current format
+        function updateCoordinateDisplay() {
+            const coordsElement = document.getElementById('location-coords');
+            if (!coordsElement) return;
+            
+            if (coordinateFormat === 'decimal') {
+                // Decimal format: 7.7110°N, 6.6797°E
+                const latDir = currentLat >= 0 ? 'N' : 'S';
+                const lonDir = currentLng >= 0 ? 'E' : 'W';
+                coordsElement.textContent = `${Math.abs(currentLat).toFixed(4)}°${latDir}, ${Math.abs(currentLng).toFixed(4)}°${lonDir}`;
+            } else {
+                // DMS format: 7° 42' 40" N, 6° 40' 47" E
+                coordsElement.textContent = `${decimalToDMS(currentLat, true)}, ${decimalToDMS(currentLng, false)}`;
+            }
+        }
+        
+        // Load coordinate format preference
+        function loadCoordinateFormatPreference() {
+            try {
+                const saved = localStorage.getItem('coordinateFormat');
+                if (saved && (saved === 'decimal' || saved === 'dms')) {
+                    coordinateFormat = saved;
+                    console.log('📍 Loaded coordinate format preference:', coordinateFormat.toUpperCase());
+                }
+            } catch (e) {
+                console.warn('Could not load coordinate format preference:', e);
+            }
+        }
+        
+        // Load explored locations from localStorage
+        function loadExploredLocations() {
+            try {
+                const saved = localStorage.getItem('exploredLocations');
+                if (saved) {
+                    exploredLocations = JSON.parse(saved);
+                    updateCollectionCount();
+                    console.log('📍 Loaded', exploredLocations.length, 'explored locations');
+                }
+            } catch (e) {
+                console.warn('Could not load explored locations:', e);
+            }
+        }
+        
+        // Save explored locations to localStorage
+        function saveExploredLocations() {
+            try {
+                localStorage.setItem('exploredLocations', JSON.stringify(exploredLocations));
+                updateCollectionCount();
+            } catch (e) {
+                console.warn('Could not save explored locations:', e);
+            }
+        }
+        
+        // Update collection counter badge
+        function updateCollectionCount() {
+            const countElement = document.getElementById('locations-explored-count');
+            if (countElement) {
+                countElement.textContent = exploredLocations.length;
+            }
+        }
+        
+        // Toggle sidebar visibility
+        function toggleLocationSidebar() {
+            const sidebar = document.getElementById('location-explorer-sidebar');
+            const reopenBtn = document.getElementById('reopen-sidebar-btn');
+            if (sidebar) {
+                const isClosing = sidebar.classList.contains('active');
+                sidebar.classList.toggle('active');
+                
+                // Show reopen button when closing sidebar (but only if we have location data)
+                if (reopenBtn && currentLocation) {
+                    if (isClosing) {
+                        reopenBtn.classList.add('visible');
+                    } else {
+                        reopenBtn.classList.remove('visible');
+                    }
+                }
+                
+                console.log('📍 Sidebar toggled:', sidebar.classList.contains('active') ? 'open' : 'closed');
+            }
+        }
+        
+        // Show sidebar (called when user drops a pin)
+        function showLocationSidebar() {
+            const sidebar = document.getElementById('location-explorer-sidebar');
+            const reopenBtn = document.getElementById('reopen-sidebar-btn');
+            if (sidebar) {
+                sidebar.classList.add('active');
+                // Hide reopen button when opening sidebar
+                if (reopenBtn) {
+                    reopenBtn.classList.remove('visible');
+                }
+                console.log('📍 Sidebar opened');
+            }
+        }
+        
+        // Hide sidebar
+        function hideLocationSidebar() {
+            const sidebar = document.getElementById('location-explorer-sidebar');
+            const reopenBtn = document.getElementById('reopen-sidebar-btn');
+            if (sidebar) {
+                sidebar.classList.remove('active');
+                // Show reopen button when hiding sidebar (if we have location data)
+                if (reopenBtn && currentLocation) {
+                    reopenBtn.classList.add('visible');
+                }
+                console.log('📍 Sidebar closed');
+            }
+        }
+        
+        // Reopen sidebar with current location data (no new API calls!)
+        function reopenLocationSidebar() {
+            const sidebar = document.getElementById('location-explorer-sidebar');
+            const reopenBtn = document.getElementById('reopen-sidebar-btn');
+            
+            if (!sidebar) return;
+            
+            // Simply show the sidebar again - data is already loaded!
+            sidebar.classList.add('active');
+            
+            // Hide reopen button
+            if (reopenBtn) {
+                reopenBtn.classList.remove('visible');
+            }
+            
+            console.log('📍 Sidebar reopened with existing location data');
+        }
+        
+        // Toggle individual card expand/collapse
+        function toggleCard(cardId) {
+            const card = document.getElementById(cardId);
+            if (card) {
+                card.classList.toggle('collapsed');
+                console.log('🃏 Card', cardId, card.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+            }
+        }
+        
+        // Toggle between Gen Alpha and Classic styles
+        function toggleLocationStyle() {
+            const sidebar = document.getElementById('location-explorer-sidebar');
+            const toggleBtn = document.getElementById('style-toggle-btn');
+            
+            if (!sidebar || !toggleBtn) return;
+            
+            // Toggle mode
+            locationStyleMode = locationStyleMode === 'classic' ? 'gen-alpha' : 'classic';
+            
+            // Update sidebar class
+            if (locationStyleMode === 'gen-alpha') {
+                sidebar.classList.add('gen-alpha-mode');
+                toggleBtn.textContent = '🔥';
+                console.log('🔥 Gen Alpha mode activated');
+            } else {
+                sidebar.classList.remove('gen-alpha-mode');
+                toggleBtn.textContent = '📚';
+                console.log('📚 Classic mode activated');
+            }
+            
+            // Save preference
+            try {
+                localStorage.setItem('locationStyleMode', locationStyleMode);
+            } catch (e) {
+                console.warn('Could not save style preference:', e);
+            }
+        }
+        
+        // Load style preference from localStorage
+        function loadLocationStylePreference() {
+            try {
+                const saved = localStorage.getItem('locationStyleMode');
+                if (saved) {
+                    locationStyleMode = saved;
+                    const sidebar = document.getElementById('location-explorer-sidebar');
+                    const toggleBtn = document.getElementById('style-toggle-btn');
+                    
+                    if (locationStyleMode === 'gen-alpha' && sidebar) {
+                        sidebar.classList.add('gen-alpha-mode');
+                        if (toggleBtn) toggleBtn.textContent = '🔥';
+                    }
+                    
+                    console.log('🎨 Style preference loaded:', locationStyleMode);
+                }
+            } catch (e) {
+                console.warn('Could not load style preference:', e);
+            }
+        }
+        
+        // Populate location data in sidebar (Phase 1.3 - REAL DATA!)
+        async function populateLocationData(lat, lng) {
+            console.log('📍 Populating location data for:', lat, lng);
+            
+            // Store current location
+            currentLocation = { lat, lng, timestamp: Date.now() };
+            
+            // Show sidebar
+            showLocationSidebar();
+            
+            // Show loading state
+            showLoadingState();
+            
+            try {
+                // Step 1: Reverse Geocoding (get location name, country, etc.)
+                console.log('🔍 Step 1: Calling reverseGeocode...');
+                const geocodeData = await reverseGeocode(lat, lng);
+                console.log('🔍 geocodeData:', geocodeData);
+                
+                // Step 2: Get country details if we found a country
+                let countryData = null;
+                if (geocodeData.country) {
+                    console.log('🔍 Step 2: Getting country data for:', geocodeData.countryCode);
+                    countryData = await getCountryData(geocodeData.countryCode);
+                    console.log('🔍 countryData:', countryData);
+                } else {
+                    console.log('⚠️ No country found in geocodeData');
+                }
+                
+                // Step 3: Calculate distance and bearing from Glennallen
+                const GLENNALLEN = { lat: 62.1089, lon: -145.5467 };
+                const distance = calculateDistance(GLENNALLEN.lat, GLENNALLEN.lon, lat, lng);
+                const bearing = calculateBearing(GLENNALLEN.lat, GLENNALLEN.lon, lat, lng);
+                console.log('🔍 Step 3: Distance:', distance, 'km, Bearing:', bearing);
+                
+                // Step 4: Populate all cards with data
+                console.log('🔍 Step 4: Populating cards...');
+                populateLocationHeader(geocodeData, countryData, lat, lng);
+                populateQuickFacts(geocodeData, countryData);
+                populateComparison(distance, bearing, geocodeData);
+                
+                // Step 5: Populate nearby places (Phase 2)
+                populateNearbyPlaces(lat, lng);
+                
+                // Step 6: Populate AI Facts, Photos, and Weather (Phase 3)
+                // These will only work after deployment to Netlify
+                const locationName = geocodeData.city || geocodeData.town || geocodeData.village || geocodeData.state || geocodeData.country || 'location';
+                const countryName = countryData?.name || geocodeData.country || 'Unknown';
+                
+                // NEW FLOW: Fetch AI facts → Match photos to facts → Display together!
+                console.log('🧠 Fetching AI facts + matching photos...');
+                
+                // Show Gen Alpha loading animation!
+                showGenAlphaLoading();
+                
+                fetchLocationFacts(locationName, countryName)
+                    .then(async facts => {
+                        if (facts && facts.length > 0) {
+                            console.log(`✅ Got ${facts.length} facts, now matching photos...`);
+                            
+                            // Match photos to facts using vision AI
+                            try {
+                                const matchedData = await matchPhotosToFacts(facts, locationName, countryName);
+                                populateAIFactsWithPhotos(matchedData);
+                            } catch (err) {
+                                console.log('⚠️ Photo matching failed, showing facts only:', err.message);
+                                populateAIFacts(facts);
+                            }
+                        } else {
+                            populateAIFacts([]);
+                        }
+                    })
+                    .catch(err => {
+                        console.log('ℹ️ AI facts not available yet (needs deployment)');
+                        populateAIFacts([]);
+                    });
+                
+                // Fetch general photos for the Photos card (separate from fact photos)
+                console.log('📸 Fetching general location photos...');
+                fetchLocationPhotos(locationName, countryName)
+                    .then(photos => populatePhotos(photos))
+                    .catch(err => {
+                        console.log('ℹ️ Photos not available yet (needs deployment)');
+                        populatePhotos([]);
+                    });
+                
+                // Fetch weather (async, don't wait)
+                fetchLocationWeather(lat, lng)
+                    .then(weather => populateWeather(weather))
+                    .catch(err => {
+                        console.log('ℹ️ Weather not available yet (needs deployment)');
+                        populateWeather(null);
+                    });
+                
+                // Step 7: Add to collection (if new location)
+                const locationData = {
+                    lat,
+                    lng,
+                    name: geocodeData.display_name || `${lat.toFixed(4)}°, ${lng.toFixed(4)}°`,
+                    country: geocodeData.country,
+                    countryCode: geocodeData.countryCode,
+                    city: geocodeData.city || geocodeData.town || geocodeData.village,
+                    distance: distance
+                };
+                addToCollection(locationData);
+                
+                console.log('✅ Location data loaded successfully!');
+                
+            } catch (error) {
+                console.error('❌ Error loading location data:', error);
+                showErrorState(error.message);
+            }
+        }
+        
+        // Reverse geocoding using Nominatim API (free, no key required)
+        async function reverseGeocode(lat, lng) {
+            const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`;
+            
+            const response = await fetch(url, {
+                headers: {
+                    'User-Agent': 'MrsSomersMaps Educational App'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Geocoding failed');
+            }
+            
+            const data = await response.json();
+            
+            // Extract relevant information
+            return {
+                display_name: data.display_name,
+                country: data.address?.country,
+                countryCode: data.address?.country_code?.toUpperCase(),
+                city: data.address?.city || data.address?.town || data.address?.village || data.address?.municipality,
+                state: data.address?.state,
+                ocean: data.address?.ocean || data.address?.sea,
+                isWater: data.type === 'body_of_water' || data.class === 'natural' && data.type === 'water',
+                raw: data
+            };
+        }
+        
+        // Get country data from REST Countries API (free, no key required)
+        async function getCountryData(countryCode) {
+            if (!countryCode) return null;
+            
+            const url = `https://restcountries.com/v3.1/alpha/${countryCode}`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) return null;
+                
+                const data = await response.json();
+                const country = data[0];
+                
+                return {
+                    name: country.name.common,
+                    capital: country.capital ? country.capital[0] : 'N/A',
+                    population: country.population,
+                    area: country.area,
+                    continent: country.continents ? country.continents[0] : 'Unknown',
+                    flag: country.flag, // Emoji flag
+                    flagImage: country.flags?.png || country.flags?.svg, // Actual flag image URL
+                    flagAlt: country.flags?.alt || country.name.common + ' flag',
+                    timezone: country.timezones ? country.timezones[0] : 'Unknown',
+                    currencies: country.currencies,
+                    languages: country.languages
+                };
+            } catch (error) {
+                console.warn('Could not fetch country data:', error);
+                return null;
+            }
+        }
+        
+        // Populate Card 1: Location Header
+        function populateLocationHeader(geocodeData, countryData, lat, lng) {
+            // Flag - Use actual flag image if available (BIGGER SIZE: 64x48)
+            const flagElement = document.getElementById('location-flag');
+            if (flagElement) {
+                if (countryData?.flagImage) {
+                    // Replace text content with an image - BIGGER!
+                    flagElement.innerHTML = `<img src="${countryData.flagImage}" alt="${countryData.flagAlt || 'Flag'}" style="width: 64px; height: 48px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" />`;
+                } else {
+                    // Fallback to emoji or globe
+                    flagElement.textContent = countryData?.flag || '🌍';
+                }
+            }
+            
+            // Location name - Prefer English names
+            const nameElement = document.getElementById('location-name');
+            if (nameElement) {
+                // Priority: Use countryData for English name, then fall back to geocode data
+                let name = geocodeData.city || geocodeData.town || geocodeData.village || 
+                           geocodeData.state || geocodeData.region ||
+                           (countryData?.name) || geocodeData.country || 'Unknown Location';
+                
+                if (geocodeData.isWater && geocodeData.ocean) {
+                    name = geocodeData.ocean;
+                }
+                nameElement.textContent = name;
+            }
+            
+            // Coordinates - Store and display in current format
+            currentLat = lat;
+            currentLng = lng;
+            updateCoordinateDisplay();
+            
+            // Land/Ocean badge
+            const badgeElement = document.getElementById('location-type-badge');
+            if (badgeElement) {
+                if (geocodeData.isWater || geocodeData.ocean) {
+                    badgeElement.textContent = '🌊 Ocean';
+                    badgeElement.style.background = 'rgba(59, 130, 246, 0.2)';
+                    badgeElement.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+                    badgeElement.style.color = '#60a5fa';
+                } else {
+                    badgeElement.textContent = '🏔️ Land';
+                    badgeElement.style.background = 'rgba(34, 197, 94, 0.2)';
+                    badgeElement.style.borderColor = 'rgba(34, 197, 94, 0.4)';
+                    badgeElement.style.color = '#4ade80';
+                }
+            }
+        }
+        
+        // Populate Card 2: Quick Facts
+        function populateQuickFacts(geocodeData, countryData) {
+            console.log('🔍 populateQuickFacts called with:', { geocodeData, countryData });
+            
+            // Country
+            const countryElement = document.getElementById('fact-country');
+            if (countryElement) {
+                const countryValue = geocodeData.country || 'Unknown';
+                console.log('🔍 Setting country to:', countryValue);
+                countryElement.textContent = countryValue;
+            } else {
+                console.error('❌ fact-country element not found!');
+            }
+            
+            // Capital
+            const capitalElement = document.getElementById('fact-capital');
+            if (capitalElement) {
+                const capitalValue = countryData?.capital || 'N/A';
+                console.log('🔍 Setting capital to:', capitalValue);
+                capitalElement.textContent = capitalValue;
+            } else {
+                console.error('❌ fact-capital element not found!');
+            }
+            
+            // Population
+            const populationElement = document.getElementById('fact-population');
+            if (populationElement) {
+                if (countryData?.population) {
+                    const popValue = countryData.population.toLocaleString();
+                    console.log('🔍 Setting population to:', popValue);
+                    populationElement.textContent = popValue;
+                } else {
+                    populationElement.textContent = 'N/A';
+                }
+            } else {
+                console.error('❌ fact-population element not found!');
+            }
+            
+            // Area
+            const areaElement = document.getElementById('fact-area');
+            if (areaElement) {
+                if (countryData?.area) {
+                    const areaValue = `${countryData.area.toLocaleString()} km²`;
+                    console.log('🔍 Setting area to:', areaValue);
+                    areaElement.textContent = areaValue;
+                } else {
+                    areaElement.textContent = 'N/A';
+                }
+            } else {
+                console.error('❌ fact-area element not found!');
+            }
+            
+            // Continent
+            const continentElement = document.getElementById('fact-continent');
+            if (continentElement) {
+                const continentValue = countryData?.continent || 'Unknown';
+                console.log('🔍 Setting continent to:', continentValue);
+                continentElement.textContent = continentValue;
+            } else {
+                console.error('❌ fact-continent element not found!');
+            }
+            
+            // Timezone
+            const timezoneElement = document.getElementById('fact-timezone');
+            if (timezoneElement) {
+                const timezoneValue = countryData?.timezone || 'Unknown';
+                console.log('🔍 Setting timezone to:', timezoneValue);
+                timezoneElement.textContent = timezoneValue;
+            } else {
+                console.error('❌ fact-timezone element not found!');
+            }
+            
+            console.log('✅ populateQuickFacts complete');
+        }
+        
+        // Populate Card 3: Comparison to Home
+        function populateComparison(distance, bearing, geocodeData) {
+            // Distance
+            const distanceElement = document.getElementById('distance-value');
+            if (distanceElement) {
+                // Convert km to miles
+                const miles = distance * 0.621371;
+                distanceElement.textContent = miles.toLocaleString(undefined, { maximumFractionDigits: 0 });
+            }
+            
+            // Bearing
+            const bearingElement = document.getElementById('bearing-text');
+            if (bearingElement) {
+                bearingElement.textContent = `${bearing} from Glennallen`;
+            }
+            
+            // Timezone difference
+            const timezoneElement = document.getElementById('timezone-diff-text');
+            if (timezoneElement) {
+                // Alaska is UTC-9 (AKST) or UTC-8 (AKDT)
+                // For simplicity, we'll show "Same timezone" for Alaska, otherwise "Different timezone"
+                if (geocodeData.state === 'Alaska') {
+                    timezoneElement.textContent = 'Same timezone ⏰';
+                } else {
+                    timezoneElement.textContent = 'Different timezone 🌐';
+                }
+            }
+        }
+        
+        // Show loading state in all cards
+        function showLoadingState() {
+            // Location name
+            const nameElement = document.getElementById('location-name');
+            if (nameElement) {
+                nameElement.textContent = 'Loading...';
+            }
+            
+            // Show loading in facts
+            ['fact-country', 'fact-capital', 'fact-population', 'fact-area', 'fact-continent', 'fact-timezone'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = '...';
+            });
+            
+            // Show loading in comparison
+            const distanceElement = document.getElementById('distance-value');
+            if (distanceElement) distanceElement.textContent = '...';
+        }
+        
+        // Show error state
+        function showErrorState(message) {
+            const nameElement = document.getElementById('location-name');
+            if (nameElement) {
+                nameElement.textContent = 'Error loading data';
+            }
+            console.error('Location data error:', message);
+        }
+        
+        // ========================================
+        // PHASE 2: NEARBY PLACES CARD
+        // ========================================
+        
+        // Fetch nearby places using Overpass API (OpenStreetMap)
+        async function fetchNearbyPlaces(lat, lng) {
+            const radius = 10000; // 10km radius
+            
+            // Overpass query for interesting places
+            // Looking for: cities, towns, villages, peaks, lakes, parks, landmarks
+            const query = `
+                [out:json][timeout:10];
+                (
+                    node["place"~"city|town|village"](around:${radius},${lat},${lng});
+                    node["natural"~"peak|volcano|lake"](around:${radius},${lat},${lng});
+                    node["tourism"~"attraction|viewpoint"](around:${radius},${lat},${lng});
+                    way["leisure"="park"](around:${radius},${lat},${lng});
+                );
+                out body 20;
+            `;
+            
+            const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Overpass API request failed');
+                
+                const data = await response.json();
+                return data.elements || [];
+            } catch (error) {
+                console.warn('Could not fetch nearby places:', error);
+                return [];
+            }
+        }
+        
+        // Populate nearby places card
+        async function populateNearbyPlaces(lat, lng) {
+            const contentElement = document.getElementById('nearby-content');
+            if (!contentElement) return;
+            
+            // Show loading
+            contentElement.innerHTML = `
+                <div class="loading-placeholder">
+                    <span class="placeholder-icon">⏳</span>
+                    <p>Searching for nearby places...</p>
+                </div>
+            `;
+            
+            try {
+                const places = await fetchNearbyPlaces(lat, lng);
+                
+                if (places.length === 0) {
+                    contentElement.innerHTML = `
+                        <div class="no-nearby">
+                            <span style="font-size: 32px;">🏜️</span>
+                            <p>No nearby places found within 10km</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Calculate distances and sort by proximity
+                const placesWithDistance = places
+                    .map(place => {
+                        const placeLat = place.lat || (place.center ? place.center.lat : null);
+                        const placeLon = place.lon || (place.center ? place.center.lon : null);
+                        
+                        if (!placeLat || !placeLon) return null;
+                        
+                        const distance = calculateDistance(lat, lng, placeLat, placeLon);
+                        
+                        return {
+                            name: place.tags?.name || 'Unnamed',
+                            type: place.tags?.place || place.tags?.natural || place.tags?.tourism || place.tags?.leisure || 'location',
+                            distance: distance,
+                            lat: placeLat,
+                            lon: placeLon,
+                            tags: place.tags
+                        };
+                    })
+                    .filter(p => p !== null && p.name !== 'Unnamed')
+                    .sort((a, b) => a.distance - b.distance)
+                    .slice(0, 10); // Top 10 closest
+                
+                if (placesWithDistance.length === 0) {
+                    contentElement.innerHTML = `
+                        <div class="no-nearby">
+                            <span style="font-size: 32px;">🏜️</span>
+                            <p>No named places found nearby</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Render list
+                let html = '<div class="nearby-list">';
+                
+                placesWithDistance.forEach(place => {
+                    const icon = getPlaceIcon(place.type);
+                    const distanceMiles = (place.distance * 0.621371).toFixed(1);
+                    const distanceKm = place.distance.toFixed(1);
+                    
+                    html += `
+                        <div class="nearby-item">
+                            <span class="nearby-item-icon">${icon}</span>
+                            <div class="nearby-item-info">
+                                <div class="nearby-item-name">${escapeHtml(place.name)}</div>
+                                <div class="nearby-item-type">${capitalizeFirst(place.type)}</div>
+                            </div>
+                            <div class="nearby-item-distance">
+                                ${distanceMiles} mi
+                                <div style="font-size: 10px; color: #666;">${distanceKm} km</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                contentElement.innerHTML = html;
+                
+                console.log('✅ Loaded', placesWithDistance.length, 'nearby places');
+                
+            } catch (error) {
+                console.error('Error populating nearby places:', error);
+                contentElement.innerHTML = `
+                    <div class="no-nearby">
+                        <span style="font-size: 32px;">⚠️</span>
+                        <p>Could not load nearby places</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Get appropriate icon for place type
+        function getPlaceIcon(type) {
+            const icons = {
+                'city': '🏙️',
+                'town': '🏘️',
+                'village': '🏡',
+                'peak': '⛰️',
+                'volcano': '🌋',
+                'lake': '🏞️',
+                'park': '🌳',
+                'attraction': '🎭',
+                'viewpoint': '👁️',
+                'default': '📍'
+            };
+            return icons[type] || icons['default'];
+        }
+        
+        // Capitalize first letter
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Add location to collection
+        function addToCollection(locationData) {
+            // Check if already collected (within 1km)
+            const isDuplicate = exploredLocations.some(loc => {
+                const distance = calculateDistance(
+                    loc.lat, loc.lng,
+                    locationData.lat, locationData.lng
+                );
+                return distance < 1; // Less than 1km apart
+            });
+            
+            if (!isDuplicate) {
+                exploredLocations.push({
+                    ...locationData,
+                    exploredAt: Date.now()
+                });
+                saveExploredLocations();
+                console.log('✅ Location added to collection!');
+                return true;
+            } else {
+                console.log('ℹ️ Location already in collection');
+                return false;
+            }
+        }
+        
+        // Calculate distance between two points (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; // Distance in km
+        }
+        
+        // Calculate RHUMB LINE bearing between two points (constant compass direction)
+        // This is more intuitive than great circle bearing for educational purposes
+        function calculateBearing(lat1, lon1, lat2, lon2) {
+            // Convert to radians
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            let Δλ = (lon2 - lon1) * Math.PI / 180;
+            
+            // Normalize longitude difference to [-180, 180]
+            if (Δλ > Math.PI) Δλ -= 2 * Math.PI;
+            if (Δλ < -Math.PI) Δλ += 2 * Math.PI;
+            
+            // Calculate Δψ (difference in the isometric latitude)
+            const Δψ = Math.log(Math.tan(φ2/2 + Math.PI/4) / Math.tan(φ1/2 + Math.PI/4));
+            
+            // Calculate bearing
+            const θ = Math.atan2(Δλ, Δψ);
+            const bearing = (θ * 180 / Math.PI + 360) % 360;
+            
+            // DEBUG
+            console.log('🧭 Rhumb Line Bearing (Constant Compass Direction):');
+            console.log('  From:', lat1.toFixed(4) + '°', lon1.toFixed(4) + '°');
+            console.log('  To:', lat2.toFixed(4) + '°', lon2.toFixed(4) + '°');
+            console.log('  Bearing:', bearing.toFixed(2) + '°');
+            
+            // Convert to compass direction
+            const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+            const index = Math.round(bearing / 22.5) % 16;
+            console.log('  Direction:', directions[index]);
+            
+            return directions[index];
+        }
+        
+        // View explored locations collection (opens modal - Phase 6)
+        function viewExploredLocations() {
+            console.log('🗂️ Viewing collection of', exploredLocations.length, 'locations');
+            
+            if (exploredLocations.length === 0) {
+                alert('📍 No locations explored yet!\n\nDrop a pin on the map to start your collection!');
+                return;
+            }
+            
+            // Phase 6 will add:
+            // - Modal popup with grid of collected locations
+            // - Click to revisit location
+            // - Delete from collection
+            // - Export/share collection
+            
+            // For now, show simple list in console
+            console.table(exploredLocations.map(loc => ({
+                name: loc.name || 'Unknown',
+                lat: loc.lat.toFixed(4),
+                lng: loc.lng.toFixed(4),
+                exploredAt: new Date(loc.exploredAt).toLocaleDateString()
+            })));
+            
+            alert(`📍 Your Collection (${exploredLocations.length} places)\n\nCheck the console for details!\n\nCollection modal coming in Phase 6!`);
+        }
+        
+        // Initialize Location Explorer on page load
+        function initLocationExplorer() {
+            loadExploredLocations();
+            loadLocationStylePreference();
+            loadCoordinateFormatPreference();
+            console.log('📍 Location Explorer initialized');
+        }
+        
+        // ========================================
+        // NETLIFY FUNCTIONS API CALLERS (Phase 3)
+        // ========================================
+        
+        /**
+         * Fetch photos from Unsplash/Pexels via Netlify Function
+         * @param {string} location - Location name
+         * @param {string} query - Search query
+         * @returns {Promise<Array>} Array of photo objects
+         */
+        /**
+         * Fetch location photos from Unsplash/Pexels via Netlify Function
+         * NOW with AI-powered smart search queries! 🧠
+         * @param {string} location - City/location name
+         * @param {string} country - Country name for context
+         * @returns {Promise<Array>} Array of photo objects
+         */
+        async function fetchLocationPhotos(location, country) {
+            try {
+                const params = new URLSearchParams({ location, country });
+                const response = await fetch(`/.netlify/functions/get-photos?${params}`);
+                
+                if (!response.ok) {
+                    console.warn('Photos API returned error:', response.status);
+                    return [];
+                }
+                
+                const data = await response.json();
+                console.log('✅ Received', data.photos?.length || 0, 'photos from AI-powered search');
+                return data.photos || [];
+            } catch (error) {
+                console.error('Error fetching photos:', error);
+                return [];
+            }
+        }
+        
+        /**
+         * Fetch weather data from OpenWeatherMap via Netlify Function
+         * @param {number} lat - Latitude
+         * @param {number} lon - Longitude
+         * @returns {Promise<Object|null>} Weather object or null
+         */
+        async function fetchLocationWeather(lat, lon) {
+            try {
+                const params = new URLSearchParams({ lat: lat.toString(), lon: lon.toString() });
+                const response = await fetch(`/.netlify/functions/get-weather?${params}`);
+                
+                if (!response.ok) {
+                    console.warn('Weather API returned error:', response.status);
+                    return null;
+                }
+                
+                const data = await response.json();
+                return data.weather || null;
+            } catch (error) {
+                console.error('Error fetching weather:', error);
+                return null;
+            }
+        }
+        
+        /**
+         * Fetch AI-generated fun facts from OpenAI via Netlify Function
+         * @param {string} location - Location name
+         * @param {string} country - Country name
+         * @returns {Promise<Array>} Array of fact strings
+         */
+        async function fetchLocationFacts(location, country) {
+            try {
+                const params = new URLSearchParams({ location, country });
+                const response = await fetch(`/.netlify/functions/get-ai-facts?${params}`);
+                
+                if (!response.ok) {
+                    console.warn('AI Facts API returned error:', response.status);
+                    return [];
+                }
+                
+                const data = await response.json();
+                return data.facts || [];
+            } catch (error) {
+                console.error('Error fetching AI facts:', error);
+                return [];
+            }
+        }
+        
+        /**
+         * Match photos to AI facts using vision validation
+         * @param {Array<string>} facts - Array of fact strings
+         * @param {string} location - Location name
+         * @param {string} country - Country name
+         * @returns {Promise<Array>} - Array of {fact, photo} objects
+         */
+        async function matchPhotosToFacts(facts, location, country) {
+            try {
+                console.log('🎯 Matching photos to', facts.length, 'facts...');
+                
+                const response = await fetch('/.netlify/functions/match-photos-to-facts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ facts, location, country })
+                });
+                
+                if (!response.ok) {
+                    console.warn('Photo matching API returned error:', response.status);
+                    return facts.map(fact => ({ fact, photo: null }));
+                }
+                
+                const data = await response.json();
+                console.log('✅ Matched', data.matched?.length || 0, 'photos to facts');
+                return data.matched || facts.map(fact => ({ fact, photo: null }));
+            } catch (error) {
+                console.error('Error matching photos to facts:', error);
+                return facts.map(fact => ({ fact, photo: null }));
+            }
+        }
+        
+        /**
+         * Open fact photo modal (for enlarging fact-specific photos)
+         * @param {number} index - Index of the fact photo
+         */
+        function openFactPhoto(index) {
+            console.log('🖼️ Opening fact photo at index:', index);
+            console.log('📦 Available fact photos:', window.currentFactPhotos?.length || 0);
+            
+            if (!window.currentFactPhotos || !window.currentFactPhotos[index]) {
+                console.warn('❌ No fact photo at index', index);
+                console.log('Available indices:', window.currentFactPhotos ? Object.keys(window.currentFactPhotos) : 'none');
+                return;
+            }
+            
+            const item = window.currentFactPhotos[index];
+            const photo = item.photo;
+            
+            if (!photo || !photo.url) {
+                console.warn('❌ No photo URL for fact', index);
+                return;
+            }
+            
+            console.log('✅ Opening photo:', photo.photographer || 'Unknown');
+            
+            // Create modal overlay with ACTIVE class!
+            const modalHTML = `
+                <div id="photo-modal" class="photo-modal active" onclick="closePhotoModal()">
+                    <div class="photo-modal-content" onclick="event.stopPropagation()">
+                        <button class="photo-modal-close" onclick="closePhotoModal()">&times;</button>
+                        <img src="${photo.url}" alt="${escapeHtml(photo.alt || item.fact)}" class="photo-modal-image" />
+                        <div class="photo-modal-info">
+                            <div class="photo-modal-fact">${escapeHtml(item.fact)}</div>
+                            ${photo.photographer ? `
+                                <div class="photo-modal-credit">
+                                    📷 Photo by ${escapeHtml(photo.photographer)}
+                                    ${photo.aiGenerated ? ' (AI Generated)' : ''}
+                                    ${photo.visionValidated ? ' • Vision Verified ✓' : ''}
+                                </div>
+                            ` : ''}
+                            ${photo.visionReason ? `
+                                <div class="photo-modal-reason">
+                                    💡 ${escapeHtml(photo.visionReason)}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('photo-modal');
+            if (existingModal) existingModal.remove();
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+        
+        /**
+         * Open regular photo modal (for Fast Facts section photos)
+         * @param {number} index - Index of the photo
+         */
+        function openPhotoModal(index) {
+            console.log('📸 Opening regular photo at index:', index);
+            console.log('📦 Available photos:', window.currentPhotos?.length || 0);
+            
+            if (!window.currentPhotos || !window.currentPhotos[index]) {
+                console.warn('❌ No photo at index', index);
+                return;
+            }
+            
+            const photo = window.currentPhotos[index];
+            
+            console.log('✅ Opening photo by:', photo.photographer || 'Unknown');
+            
+            // Create modal overlay with ACTIVE class!
+            const modalHTML = `
+                <div id="photo-modal" class="photo-modal active" onclick="closePhotoModal()">
+                    <div class="photo-modal-content" onclick="event.stopPropagation()">
+                        <button class="photo-modal-close" onclick="closePhotoModal()">&times;</button>
+                        <img src="${photo.url}" alt="${escapeHtml(photo.description || 'Location photo')}" class="photo-modal-image" />
+                        <div class="photo-modal-info">
+                            ${photo.description ? `
+                                <div class="photo-modal-caption">
+                                    <h3>${escapeHtml(photo.description)}</h3>
+                                </div>
+                            ` : ''}
+                            ${photo.photographer ? `
+                                <div class="photo-modal-credit">
+                                    📷 Photo by ${escapeHtml(photo.photographer)}
+                                    ${photo.photographerUrl ? `<br><a href="${photo.photographerUrl}" target="_blank" rel="noopener noreferrer">View profile</a>` : ''}
+                                    ${photo.isAIGenerated ? '<br><span class="ai-badge">🤖 AI Generated</span>' : ''}
+                                </div>
+                            ` : ''}
+                            ${photo.source ? `
+                                <div class="photo-modal-meta">
+                                    Source: ${escapeHtml(photo.source)}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('photo-modal');
+            if (existingModal) existingModal.remove();
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+        
+        /**
+         * Close photo modal
+         */
+        function closePhotoModal() {
+            const modal = document.getElementById('photo-modal');
+            if (modal) {
+                modal.remove();
+            }
+            // Restore body scroll
+            document.body.style.overflow = '';
+        }
+        
+        // Add keyboard support for closing modals (ESC key)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' || e.keyCode === 27) {
+                closePhotoModal();
+            }
+        });
+        
+        // ========================================
+        // GEN ALPHA LOADING ANIMATION (67 DANCE!)
+        // ========================================
+        
+        /**
+         * Show a BUSSIN Gen Alpha loading screen with dancing 67!
+         */
+        function showGenAlphaLoading() {
+            const card = document.getElementById('card-ai-facts');
+            if (!card) return;
+            
+            const contentElement = card.querySelector('.card-content');
+            if (!contentElement) return;
+            
+            contentElement.innerHTML = `
+                <div class="gen-alpha-loading">
+                    <div class="six-seven-dance">
+                        <span class="six-seven-big">6️⃣7️⃣</span>
+                        <div class="loading-text">
+                            <span class="loading-word loading-word-1">Generating</span>
+                            <span class="loading-word loading-word-2">facts...</span>
+                            <span class="loading-dots">
+                                <span class="dot">.</span>
+                                <span class="dot">.</span>
+                                <span class="dot">.</span>
+                            </span>
+                        </div>
+                        <div class="vibe-check">✨ vibe check initiated ✨</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ========================================
+        // LOCATION EXPLORER CARD POPULATION (Phase 3)
+        // ========================================
+        
+        /**
+         * Populate AI Facts Card (Card 4) - NOW WITH MATCHED PHOTOS!
+         * @param {Array<Object>} matchedData - Array of {fact, photo} objects
+         */
+        function populateAIFactsWithPhotos(matchedData) {
+            const card = document.getElementById('card-ai-facts');
+            if (!card) return;
+            
+            const contentElement = card.querySelector('.card-content');
+            if (!contentElement) return;
+            
+            if (!matchedData || matchedData.length === 0) {
+                contentElement.innerHTML = `
+                    <div class="no-data">
+                        <span style="font-size: 32px;">🤔</span>
+                        <p>No facts available</p>
+                        <p style="font-size: 12px; color: #666;">AI facts will be available after deployment</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // CRITICAL: Store matched data globally FIRST
+            window.currentFactPhotos = matchedData;
+            console.log('📦 Stored', matchedData.length, 'fact photos for modal access');
+            
+            let html = '<div class="fact-photo-list" style="max-height: 600px; overflow-y: auto; padding-right: 8px;">';
+            matchedData.forEach((item, index) => {
+                const { fact, photo } = item;
+                const aiLabel = photo && photo.aiGenerated ? '<span class="ai-label">🤖 AI Generated</span>' : '';
+                const visionLabel = photo && photo.visionValidated ? '<span class="vision-label">👁️ Vision Verified</span>' : '';
+                
+                html += `
+                    <div class="fact-photo-item" style="margin-bottom: 24px; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        ${photo && photo.url ? `
+                            <div class="fact-photo" style="position: relative; width: 100%; height: 200px; overflow: hidden; cursor: pointer;" 
+                                 onclick="openFactPhoto(${index})" 
+                                 title="Click to enlarge"
+                                 data-index="${index}">
+                                <img src="${photo.url}" 
+                                     alt="${escapeHtml(photo.alt || fact)}" 
+                                     loading="lazy"
+                                     style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; pointer-events: none;" 
+                                     onmouseover="this.style.transform='scale(1.05)'"
+                                     onmouseout="this.style.transform='scale(1)'" />
+                                ${aiLabel}
+                                ${visionLabel}
+                                ${photo.photographer ? `
+                                    <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; pointer-events: none;">
+                                        📷 ${escapeHtml(photo.photographer)}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                        <div class="fact-text" style="padding: 16px; background: white;">
+                            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #2c3e50;">
+                                ${escapeHtml(fact)}
+                            </p>
+                            ${photo && photo.visionReason ? `
+                                <p style="margin: 8px 0 0 0; font-size: 12px; color: #7f8c8d; font-style: italic;">
+                                    💡 ${escapeHtml(photo.visionReason)}
+                                </p>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            contentElement.innerHTML = html;
+            
+            // Data already stored above - no need to store twice!
+            
+            console.log('✅ Loaded', matchedData.length, 'facts with matched photos');
+        }
+        
+        /**
+         * Populate AI Facts Card (Card 4) - FALLBACK (facts only, no photos)
+         * @param {Array<string>} facts - Array of fact strings
+         */
+        function populateAIFacts(facts) {
+            const card = document.getElementById('card-ai-facts');
+            if (!card) return;
+            
+            const contentElement = card.querySelector('.card-content');
+            if (!contentElement) return;
+            
+            if (!facts || facts.length === 0) {
+                contentElement.innerHTML = `
+                    <div class="no-data">
+                        <span style="font-size: 32px;">🤔</span>
+                        <p>No facts available</p>
+                        <p style="font-size: 12px; color: #666;">AI facts will be available after deployment</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<ul class="fact-list">';
+            facts.forEach(fact => {
+                html += `<li class="fact-item">✨ ${escapeHtml(fact)}</li>`;
+            });
+            html += '</ul>';
+            
+            contentElement.innerHTML = html;
+            console.log('✅ Loaded', facts.length, 'AI facts');
+        }
+        
+        /**
+         * Populate Photos Card (Card 5) - NOW with clickable enlargement!
+         * @param {Array<Object>} photos - Array of photo objects
+         */
+        function populatePhotos(photos) {
+            const card = document.getElementById('card-photo');
+            if (!card) return;
+            
+            const contentElement = card.querySelector('.card-content');
+            if (!contentElement) return;
+            
+            if (!photos || photos.length === 0) {
+                contentElement.innerHTML = `
+                    <div class="no-data">
+                        <span style="font-size: 32px;">📷</span>
+                        <p>No photos available</p>
+                        <p style="font-size: 12px; color: #666;">Photos will be available after deployment</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Show up to 4 photos in a grid with photographer credits
+            const photosToShow = photos.slice(0, 4);
+            let html = '<div class="photo-grid">';
+            
+            photosToShow.forEach((photo, index) => {
+                const aiAttribute = photo.isAIGenerated ? ' data-ai-generated="true"' : '';
+                const aiBadge = photo.isAIGenerated ? '<div class="ai-badge">🤖 AI</div>' : '';
+                
+                html += `
+                    <div class="photo-item"${aiAttribute} onclick="openPhotoModal(${index})" style="cursor: pointer; position: relative;" title="Click to enlarge">
+                        ${aiBadge}
+                        <img src="${photo.thumbnail}" 
+                             alt="${escapeHtml(photo.description || 'Location photo')}" 
+                             loading="lazy" />
+                        <div class="photo-credit" title="Photo by ${escapeHtml(photo.photographer)}">
+                            📷 ${escapeHtml(photo.photographer)}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            contentElement.innerHTML = html;
+            
+            // Store photos globally for modal access
+            window.currentPhotos = photos;
+            
+            const realCount = photos.filter(p => !p.isAIGenerated).length;
+            const aiCount = photos.filter(p => p.isAIGenerated).length;
+            console.log(`✅ Loaded ${photosToShow.length} photos (${realCount} real, ${aiCount} AI) - click to enlarge!`);
+        }
+        
+        /**
+         * Populate Weather Card (Card 6)
+         * @param {Object} weather - Weather data object
+         */
+        function populateWeather(weather) {
+            const card = document.getElementById('card-weather');
+            if (!card) return;
+            
+            const contentElement = card.querySelector('.card-content');
+            if (!contentElement) return;
+            
+            if (!weather) {
+                contentElement.innerHTML = `
+                    <div class="no-data">
+                        <span style="font-size: 32px;">☁️</span>
+                        <p>Weather unavailable</p>
+                        <p style="font-size: 12px; color: #666;">Weather will be available after deployment</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = `
+                <div class="weather-display">
+                    <div class="weather-main">
+                        <img src="http://openweathermap.org/img/wn/${weather.icon}@2x.png" 
+                             alt="${escapeHtml(weather.description)}" 
+                             class="weather-icon" />
+                        <div class="weather-temp">
+                            ${Math.round(weather.temp.fahrenheit)}°F
+                            <span class="temp-secondary">(${Math.round(weather.temp.celsius)}°C)</span>
+                        </div>
+                        <div class="weather-desc">${escapeHtml(weather.description)}</div>
+                    </div>
+                    <div class="weather-details">
+                        <div class="weather-detail">💨 Wind: ${weather.wind.speed} mph ${weather.wind.direction}</div>
+                        <div class="weather-detail">💧 Humidity: ${weather.humidity}%</div>
+                        <div class="weather-detail">👁️ Visibility: ${weather.visibility} mi</div>
+                    </div>
+                </div>
+            `;
+            
+            contentElement.innerHTML = html;
+            console.log('✅ Loaded weather data');
+        }
+        
+        // ========================================
         // MAIN INITIALIZATION
         // ========================================
         
@@ -2191,7 +4724,9 @@
                 solved: 0,
                 current: null,
                 timer: null,
-                active: false
+                active: false,
+                roundsPlayed: 0,
+                fastestTime: 999
             },
             scavenger: {
                 challenges: [],
@@ -2221,6 +4756,282 @@
                 foundLocations: [] // Track which locations have been found
             }
         };
+        
+        // ========================================
+        // LOCATION EXPLORER SIDEBAR FUNCTIONS
+        // Phase 1.2: Interactive sidebar controls
+        // ========================================
+        
+        // Global variable for currently displayed location
+        let currentLocation = null;
+        
+        // Collection system - stores explored locations
+        let exploredLocations = [];
+        
+        // Style mode: 'gen-alpha' or 'classic'
+        let locationStyleMode = 'classic';
+        
+        // Load explored locations from localStorage
+        function loadExploredLocations() {
+            try {
+                const saved = localStorage.getItem('exploredLocations');
+                if (saved) {
+                    exploredLocations = JSON.parse(saved);
+                    updateCollectionCount();
+                    console.log('📍 Loaded', exploredLocations.length, 'explored locations');
+                }
+            } catch (e) {
+                console.warn('Could not load explored locations:', e);
+            }
+        }
+        
+        // Save explored locations to localStorage
+        function saveExploredLocations() {
+            try {
+                localStorage.setItem('exploredLocations', JSON.stringify(exploredLocations));
+                updateCollectionCount();
+            } catch (e) {
+                console.warn('Could not save explored locations:', e);
+            }
+        }
+        
+        // Update collection counter badge
+        function updateCollectionCount() {
+            const countElement = document.getElementById('locations-explored-count');
+            if (countElement) {
+                countElement.textContent = exploredLocations.length;
+            }
+        }
+        
+        // Toggle sidebar visibility
+        function toggleLocationSidebar() {
+            const sidebar = document.getElementById('location-explorer-sidebar');
+            const reopenBtn = document.getElementById('reopen-sidebar-btn');
+            if (sidebar) {
+                const isClosing = sidebar.classList.contains('active');
+                sidebar.classList.toggle('active');
+                
+                // Show reopen button when closing sidebar (but only if we have location data)
+                if (reopenBtn && currentLocation) {
+                    if (isClosing) {
+                        reopenBtn.classList.add('visible');
+                    } else {
+                        reopenBtn.classList.remove('visible');
+                    }
+                }
+                
+                console.log('📍 Sidebar toggled:', sidebar.classList.contains('active') ? 'open' : 'closed');
+            }
+        }
+        
+        // Show sidebar (called when user drops a pin)
+        function showLocationSidebar() {
+            const sidebar = document.getElementById('location-explorer-sidebar');
+            const reopenBtn = document.getElementById('reopen-sidebar-btn');
+            if (sidebar) {
+                sidebar.classList.add('active');
+                // Hide reopen button when opening sidebar
+                if (reopenBtn) {
+                    reopenBtn.classList.remove('visible');
+                }
+                console.log('📍 Sidebar opened');
+            }
+        }
+        
+        // Hide sidebar
+        function hideLocationSidebar() {
+            const sidebar = document.getElementById('location-explorer-sidebar');
+            const reopenBtn = document.getElementById('reopen-sidebar-btn');
+            if (sidebar) {
+                sidebar.classList.remove('active');
+                // Show reopen button when hiding sidebar (if we have location data)
+                if (reopenBtn && currentLocation) {
+                    reopenBtn.classList.add('visible');
+                }
+                console.log('📍 Sidebar closed');
+            }
+        }
+        
+        // Reopen sidebar with current location data (no new API calls!)
+        function reopenLocationSidebar() {
+            const sidebar = document.getElementById('location-explorer-sidebar');
+            const reopenBtn = document.getElementById('reopen-sidebar-btn');
+            
+            if (!sidebar) return;
+            
+            // Simply show the sidebar again - data is already loaded!
+            sidebar.classList.add('active');
+            
+            // Hide reopen button
+            if (reopenBtn) {
+                reopenBtn.classList.remove('visible');
+            }
+            
+            console.log('📍 Sidebar reopened with existing location data');
+        }
+        
+        // Toggle individual card expand/collapse
+        function toggleCard(cardId) {
+            const card = document.getElementById(cardId);
+            if (card) {
+                card.classList.toggle('collapsed');
+                console.log('🃏 Card', cardId, card.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+            }
+        }
+        
+        // Toggle between Gen Alpha and Classic styles
+        function toggleLocationStyle() {
+            const sidebar = document.getElementById('location-explorer-sidebar');
+            const toggleBtn = document.getElementById('style-toggle-btn');
+            
+            if (!sidebar || !toggleBtn) return;
+            
+            // Toggle mode
+            locationStyleMode = locationStyleMode === 'classic' ? 'gen-alpha' : 'classic';
+            
+            // Update sidebar class
+            if (locationStyleMode === 'gen-alpha') {
+                sidebar.classList.add('gen-alpha-mode');
+                toggleBtn.textContent = '🔥';
+                console.log('🔥 Gen Alpha mode activated');
+            } else {
+                sidebar.classList.remove('gen-alpha-mode');
+                toggleBtn.textContent = '📚';
+                console.log('📚 Classic mode activated');
+            }
+            
+            // Save preference
+            try {
+                localStorage.setItem('locationStyleMode', locationStyleMode);
+            } catch (e) {
+                console.warn('Could not save style preference:', e);
+            }
+        }
+        
+        // Load style preference from localStorage
+        function loadLocationStylePreference() {
+            try {
+                const saved = localStorage.getItem('locationStyleMode');
+                if (saved) {
+                    locationStyleMode = saved;
+                    const sidebar = document.getElementById('location-explorer-sidebar');
+                    const toggleBtn = document.getElementById('style-toggle-btn');
+                    
+                    if (locationStyleMode === 'gen-alpha' && sidebar) {
+                        sidebar.classList.add('gen-alpha-mode');
+                        if (toggleBtn) toggleBtn.textContent = '🔥';
+                    }
+                    
+                    console.log('🎨 Style preference loaded:', locationStyleMode);
+                }
+            } catch (e) {
+                console.warn('Could not load style preference:', e);
+            }
+        }
+        
+        // Add location to collection
+        function addToCollection(locationData) {
+            // Check if already collected (within 1km)
+            const isDuplicate = exploredLocations.some(loc => {
+                const distance = calculateDistance(
+                    loc.lat, loc.lng,
+                    locationData.lat, locationData.lng
+                );
+                return distance < 1; // Less than 1km apart
+            });
+            
+            if (!isDuplicate) {
+                exploredLocations.push({
+                    ...locationData,
+                    exploredAt: Date.now()
+                });
+                saveExploredLocations();
+                console.log('✅ Location added to collection!');
+                return true;
+            } else {
+                console.log('ℹ️ Location already in collection');
+                return false;
+            }
+        }
+        
+        // Calculate distance between two points (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; // Distance in km
+        }
+        
+        // Calculate RHUMB LINE bearing between two points (constant compass direction)
+        // This is more intuitive than great circle bearing for educational purposes
+        function calculateBearing(lat1, lon1, lat2, lon2) {
+            // Convert to radians
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            let Δλ = (lon2 - lon1) * Math.PI / 180;
+            
+            // Normalize longitude difference to [-180, 180]
+            if (Δλ > Math.PI) Δλ -= 2 * Math.PI;
+            if (Δλ < -Math.PI) Δλ += 2 * Math.PI;
+            
+            // Calculate Δψ (difference in the isometric latitude)
+            const Δψ = Math.log(Math.tan(φ2/2 + Math.PI/4) / Math.tan(φ1/2 + Math.PI/4));
+            
+            // Calculate bearing
+            const θ = Math.atan2(Δλ, Δψ);
+            const bearing = (θ * 180 / Math.PI + 360) % 360;
+            
+            // DEBUG
+            console.log('🧭 Rhumb Line Bearing (Constant Compass Direction):');
+            console.log('  From:', lat1.toFixed(4) + '°', lon1.toFixed(4) + '°');
+            console.log('  To:', lat2.toFixed(4) + '°', lon2.toFixed(4) + '°');
+            console.log('  Bearing:', bearing.toFixed(2) + '°');
+            
+            // Convert to compass direction
+            const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+            const index = Math.round(bearing / 22.5) % 16;
+            console.log('  Direction:', directions[index]);
+            
+            return directions[index];
+        }
+        
+        // View explored locations collection (opens modal - Phase 6)
+        function viewExploredLocations() {
+            console.log('🗂️ Viewing collection of', exploredLocations.length, 'locations');
+            
+            if (exploredLocations.length === 0) {
+                alert('📍 No locations explored yet!\n\nDrop a pin on the map to start your collection!');
+                return;
+            }
+            
+            // Phase 6 will add:
+            // - Modal popup with grid of collected locations
+            // - Click to revisit location
+            // - Delete from collection
+            // - Export/share collection
+            
+            // For now, show simple list in console
+            console.table(exploredLocations.map(loc => ({
+                name: loc.name || 'Unknown',
+                lat: loc.lat.toFixed(4),
+                lng: loc.lng.toFixed(4),
+                exploredAt: new Date(loc.exploredAt).toLocaleDateString()
+            })));
+            
+            alert(`📍 Your Collection (${exploredLocations.length} places)\n\nCheck the console for details!\n\nCollection modal coming in Phase 6!`);
+        }
+        
+        // Initialize Location Explorer on page load
+        function initLocationExplorer() {
+            loadExploredLocations();
+            loadLocationStylePreference();
+            console.log('📍 Location Explorer initialized');
+        }
         
         // ========================================
         // UNIVERSAL ACHIEVEMENT SYSTEM
@@ -2742,10 +5553,16 @@
                 },
                 // Guess Mode stats
                 guess: {
+                    roundsPlayed: 0,
+                    correctGuesses: 0,
                     closeGuesses: 0,
                     accuracyRuns: [],
                     speedGuesses: 0,
                     photosSeen: new Set(),
+                    landmarksIdentified: new Set(),
+                    instantIdentifications: 0,
+                    gamesCompleted: 0,
+                    fastCompletions: 0,
                     perfectRounds: 0,
                     croppedPhotoGuesses: 0
                 },
@@ -2828,12 +5645,16 @@
                         if (data.stats.guess) {
                             // Restore Sets and arrays first
                             playerAchievements.stats.guess.photosSeen = new Set(data.stats.guess.photosSeen || []);
+                            playerAchievements.stats.guess.landmarksIdentified = new Set(data.stats.guess.landmarksIdentified || []);
                             playerAchievements.stats.guess.accuracyRuns = data.stats.guess.accuracyRuns || [];
                             // Copy primitive values
                             if (data.stats.guess.roundsPlayed) playerAchievements.stats.guess.roundsPlayed = data.stats.guess.roundsPlayed;
                             if (data.stats.guess.correctGuesses) playerAchievements.stats.guess.correctGuesses = data.stats.guess.correctGuesses;
                             if (data.stats.guess.closeGuesses) playerAchievements.stats.guess.closeGuesses = data.stats.guess.closeGuesses;
-                            if (data.stats.guess.fastestIdentification) playerAchievements.stats.guess.fastestIdentification = data.stats.guess.fastestIdentification;
+                            if (data.stats.guess.instantIdentifications) playerAchievements.stats.guess.instantIdentifications = data.stats.guess.instantIdentifications;
+                            if (data.stats.guess.gamesCompleted) playerAchievements.stats.guess.gamesCompleted = data.stats.guess.gamesCompleted;
+                            if (data.stats.guess.fastCompletions) playerAchievements.stats.guess.fastCompletions = data.stats.guess.fastCompletions;
+                            if (data.stats.guess.perfectRounds) playerAchievements.stats.guess.perfectRounds = data.stats.guess.perfectRounds;
                         }
                         if (data.stats.universal) {
                             // Restore Sets first
@@ -2899,7 +5720,8 @@
                         },
                         guess: {
                             ...playerAchievements.stats.guess,
-                            photosSeen: Array.from(playerAchievements.stats.guess.photosSeen)
+                            photosSeen: Array.from(playerAchievements.stats.guess.photosSeen),
+                            landmarksIdentified: Array.from(playerAchievements.stats.guess.landmarksIdentified)
                         },
                         heist: {
                             ...playerAchievements.stats.heist,
@@ -2927,6 +5749,10 @@
         // Load achievements from localStorage immediately after functions are defined
         loadAchievements();
         console.log('✅ Achievements loaded from localStorage');
+        
+        // Initialize Location Explorer sidebar system
+        initLocationExplorer();
+        console.log('✅ Location Explorer initialized');
         
         // Check if achievement is already unlocked
         function isAchievementUnlocked(achievementId) {
@@ -3437,6 +6263,134 @@
             playerAchievements.stats.universal.playDates.add(today);
             saveAchievements();
             checkUniversalAchievements();
+        }
+        
+        // ========================================
+        // GAME COMPLETION MODAL SYSTEM (Quick Win #2)
+        // ========================================
+        
+        // Show game completion modal with stats
+        window.showGameComplete = function(gameMode, stats) {
+            const modal = document.getElementById('game-complete-modal');
+            const title = document.getElementById('completion-title');
+            const statsDiv = document.getElementById('completion-stats');
+            const message = document.getElementById('completion-message');
+            const emoji = document.getElementById('completion-emoji');
+            const playAgainBtn = document.getElementById('play-again-btn');
+            
+            // Store current game mode for restart
+            modal.dataset.gameMode = gameMode;
+            
+            // Customize based on game mode
+            switch(gameMode) {
+                case 'mystery':
+                    emoji.textContent = '🎯';
+                    title.textContent = '🎯 Mystery Challenge Complete!';
+                    statsDiv.innerHTML = `
+                        <div style="font-size: 48px; color: #ffd700; margin-bottom: 10px;">${stats.score || 0}</div>
+                        <div style="font-size: 20px; color: #fff;">FINAL SCORE</div>
+                        <div style="margin-top: 20px; font-size: 16px; color: #ccc;">
+                            ✅ Correct: ${stats.correct || 0}/5<br>
+                            ⚡ Best Time: ${stats.bestTime || 0}s<br>
+                            🔥 Streak: ${stats.streak || 0}
+                        </div>
+                    `;
+                    message.textContent = (stats.score || 0) > 400 ? "Outstanding detective work! 🔥" : 
+                                          (stats.score || 0) > 300 ? "Great job finding those locations! 👏" :
+                                          "Keep practicing, you'll get faster! 💪";
+                    playAgainBtn.onclick = () => { closeCompletionModal(); startMysteryMode(); };
+                    break;
+                    
+                case 'scavenger':
+                    emoji.textContent = '🌍';
+                    title.textContent = '🌍 Scavenger Hunt Complete!';
+                    statsDiv.innerHTML = `
+                        <div style="font-size: 48px; color: #ffd700; margin-bottom: 10px;">${stats.found || 0}/10</div>
+                        <div style="font-size: 20px; color: #fff;">LOCATIONS FOUND</div>
+                        <div style="margin-top: 20px; font-size: 16px; color: #ccc;">
+                            ⏱️ Time: ${stats.time || 0}s<br>
+                            🎯 Accuracy: ${stats.accuracy || 0}%<br>
+                            ⭐ XP Earned: +${stats.xp || 0}
+                        </div>
+                    `;
+                    message.textContent = (stats.found || 0) === 10 ? "Perfect score! You're a geography master! 🏆" :
+                                          (stats.found || 0) >= 7 ? "Great hunting skills! 🎯" :
+                                          "Keep exploring to improve! 🗺️";
+                    playAgainBtn.onclick = () => { closeCompletionModal(); startScavengerIntro(); };
+                    break;
+                    
+                case 'guess':
+                    emoji.textContent = '📸';
+                    title.textContent = '📸 Guess Mode Complete!';
+                    statsDiv.innerHTML = `
+                        <div style="font-size: 48px; color: #ffd700; margin-bottom: 10px;">${stats.correct || 0}/5</div>
+                        <div style="font-size: 20px; color: #fff;">CORRECT GUESSES</div>
+                        <div style="margin-top: 20px; font-size: 16px; color: #ccc;">
+                            🎯 Accuracy: ${((stats.correct || 0)/5*100).toFixed(0)}%<br>
+                            ⚡ Avg Time: ${stats.avgTime || 0}s<br>
+                            ⭐ XP Earned: +${stats.xp || 0}
+                        </div>
+                    `;
+                    message.textContent = (stats.correct || 0) === 5 ? "Perfect! You know your landmarks! 🌟" :
+                                          (stats.correct || 0) >= 3 ? "Nice work identifying those places! 👍" :
+                                          "Study those landmarks and try again! 📚";
+                    playAgainBtn.onclick = () => { closeCompletionModal(); startGuessIntro(); };
+                    break;
+                    
+                case 'alaska':
+                    emoji.textContent = '🏔️';
+                    title.textContent = '🏔️ Alaska Adventure Complete!';
+                    statsDiv.innerHTML = `
+                        <div style="font-size: 48px; color: #ffd700; margin-bottom: 10px;">Round ${stats.round || 1}/5</div>
+                        <div style="font-size: 20px; color: #fff;">COMPLETED</div>
+                        <div style="margin-top: 20px; font-size: 16px; color: #ccc;">
+                            📍 Found: ${stats.found || 0}/10<br>
+                            🏔️ Total Found: ${stats.totalFound || 0}/50<br>
+                            ⭐ XP Earned: +${stats.xp || 0}
+                        </div>
+                    `;
+                    message.textContent = (stats.round || 1) === 5 ? "You've explored all of Alaska! 🎉" :
+                                          `Round ${stats.round || 1} complete! On to round ${(stats.round || 1) + 1}! 🚀`;
+                    playAgainBtn.onclick = () => { closeCompletionModal(); startAlaskaIntro(); };
+                    break;
+                    
+                default:
+                    emoji.textContent = '🎉';
+                    title.textContent = 'Game Complete!';
+                    statsDiv.innerHTML = '<p>Great job!</p>';
+                    message.textContent = 'Keep exploring!';
+                    playAgainBtn.onclick = closeCompletionModal;
+            }
+            
+            modal.style.display = 'flex';
+            
+            // Add confetti animation
+            createConfetti('#ffd700');
+            setTimeout(() => createConfetti('#764ba2'), 200);
+            setTimeout(() => createConfetti('#667eea'), 400);
+        }
+        
+        // Close completion modal
+        window.closeCompletionModal = function() {
+            document.getElementById('game-complete-modal').style.display = 'none';
+        }
+        
+        // Restart current game (called by Play Again button)
+        window.restartCurrentGame = function() {
+            const modal = document.getElementById('game-complete-modal');
+            const gameMode = modal.dataset.gameMode;
+            closeCompletionModal();
+            
+            // Restart based on stored game mode
+            if (gameMode === 'mystery') {
+                startMysteryMode();
+            } else if (gameMode === 'scavenger') {
+                startScavengerIntro();
+            } else if (gameMode === 'guess') {
+                startGuessIntro();
+            } else if (gameMode === 'alaska') {
+                startAlaskaIntro();
+            }
         }
         
         // ========================================
@@ -4682,12 +7636,23 @@
             }
             
             // Always show distance from Glennallen (useful in all modes)
-            const distFromHome = calculateDistance(GLENNALLEN.lat, GLENNALLEN.lon, lat, lon);
+            const distFromHomeKm = calculateDistance(GLENNALLEN.lat, GLENNALLEN.lon, lat, lon);
+            const distFromHomeMiles = distFromHomeKm * 0.621371; // Convert km to miles
+            const bearingFromHome = calculateBearing(GLENNALLEN.lat, GLENNALLEN.lon, lat, lon);
+            
+            // DEBUG: Log the calculation
+            console.log('🧭 Distance Calculation:');
+            console.log('  From: Glennallen', GLENNALLEN.lat, GLENNALLEN.lon);
+            console.log('  To: Clicked location', lat, lon);
+            console.log('  Distance:', distFromHomeKm.toFixed(2), 'km =', distFromHomeMiles.toFixed(2), 'miles');
+            console.log('  Bearing:', bearingFromHome);
+            
             const distDisplay = document.getElementById('distance-display');
             if (distDisplay) {
                 distDisplay.innerHTML = `
                     <strong style="color: #ffd700;">🏠 Distance from Glennallen:</strong><br>
-                    <span style="font-size: 24px; color: #00ff7f;">${distFromHome.toLocaleString()}</span> miles<br>
+                    <span style="font-size: 24px; color: #00ff7f;">${Math.round(distFromHomeMiles).toLocaleString()}</span> miles<br>
+                    <span style="font-size: 14px; color: #60a5fa;">🧭 ${bearingFromHome} from Glennallen</span><br>
                     <span style="font-size: 12px; color: #888;">Coordinates: ${formatCoord(lat, true)}, ${formatCoord(lon, false)}</span>
                 `;
             }
@@ -4704,6 +7669,9 @@
             } else {
                 // Free Explore mode or any other mode - show location info
                 showLocationInfo(lat, lon);
+                
+                // LOCATION EXPLORER: Also populate sidebar in Explore mode
+                populateLocationData(lat, lon);
             }
         });
         
@@ -4962,6 +7930,17 @@
             
             if (distance < 500) { // Within 500km
                 clearInterval(gameState.mystery.timer);
+                
+                // Calculate time taken (60 - remaining time)
+                const timerEl = document.getElementById('mystery-timer');
+                const timeLeft = parseInt(timerEl.textContent) || 0;
+                const timeTaken = 60 - timeLeft;
+                
+                // Track fastest time
+                if (timeTaken < gameState.mystery.fastestTime) {
+                    gameState.mystery.fastestTime = timeTaken;
+                }
+                
                 const baseXP = 50;
                 const streakBonus = gameState.mystery.streak * 10;
                 const totalXP = baseXP + streakBonus;
@@ -4970,9 +7949,10 @@
                 gameState.mystery.score += totalXP;
                 gameState.mystery.streak++;
                 gameState.mystery.solved++;
+                gameState.mystery.roundsPlayed++;
                 
                 if (gameState.mystery.streak > gameState.mystery.bestStreak) {
-                    gameState.mystery.bestStreak = gameState.mystery.bestStreak;
+                    gameState.mystery.bestStreak = gameState.mystery.streak;
                 }
                 
                 // Update mission progress
@@ -4989,11 +7969,22 @@
                 checkMysteryAchievements();
                 checkUniversalAchievements();
                 
-                // Show Play Again message with button
-                showMysterySuccess();
+                // Check if 5 rounds complete - show completion modal
+                if (gameState.mystery.roundsPlayed % 5 === 0 && gameState.mystery.roundsPlayed > 0) {
+                    showGameComplete('mystery', {
+                        score: gameState.mystery.score,
+                        correct: 5,
+                        streak: gameState.mystery.streak,
+                        bestTime: gameState.mystery.fastestTime
+                    });
+                } else {
+                    // Show Play Again message with button
+                    showMysterySuccess();
+                }
             } else {
                 // Provide helpful distance feedback
                 const distanceKm = Math.round(distance);
+                const distanceMiles = Math.round(distanceKm * 0.621371);
                 let hint = '';
                 if (distanceKm > 5000) {
                     hint = 'Try a different continent!';
@@ -5004,8 +7995,8 @@
                 } else {
                     hint = 'Very close! Keep trying!';
                 }
-                showNotification(`❌ Not quite! ${distanceKm}km away. ${hint}`);
-                showToast('error', 'Try Again!', `You're ${distanceKm.toLocaleString()}km away. ${hint}`, 3000);
+                showNotification(`❌ Not quite! ${distanceMiles} miles away. ${hint}`);
+                showToast('error', 'Try Again!', `You're ${distanceMiles.toLocaleString()} miles away. ${hint}`, 3000);
             }
         }
         
@@ -5453,7 +8444,16 @@
             updateAllDisplays();
             saveState();
             
-            document.getElementById('next-guess-btn').style.display = 'block';
+            // Show next button briefly, then auto-advance after 2 seconds
+            const nextBtn = document.getElementById('next-guess-btn');
+            nextBtn.style.display = 'block';
+            
+            // Auto-advance to next round after showing answer
+            setTimeout(() => {
+                if (gameState.guess.active) {
+                    nextGuessRound();
+                }
+            }, 2000);
         }
         
         // Helper function to get continent for country (for close guess tracking)
@@ -6217,6 +9217,258 @@
             console.log('🧹 Cleaned up all timers and markers');
         });
     </script>
+
+    <!-- ========================================
+         LOCATION EXPLORER SIDEBAR
+         Phase 1.1: Collapsible sidebar structure
+         ======================================== -->
+    <div id="location-explorer-sidebar" class="location-sidebar">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header">
+            <div class="sidebar-title">
+                <span class="sidebar-icon">📍</span>
+                <h3>Location Explorer</h3>
+            </div>
+            <div class="sidebar-controls">
+                <button class="sidebar-control-btn" id="style-toggle-btn" onclick="toggleLocationStyle()" title="Toggle Gen Alpha Style">
+                    🔥
+                </button>
+                <button class="sidebar-control-btn" id="collapse-sidebar-btn" onclick="toggleLocationSidebar()" title="Close Sidebar">
+                    ✕
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar Content (Scrollable) -->
+        <div class="sidebar-content" id="location-sidebar-content">
+            
+            <!-- Collection Counter (Top of sidebar) -->
+            <div class="collection-badge" id="collection-counter">
+                <span class="collection-icon">🌍</span>
+                <span class="collection-text">
+                    <span id="locations-explored-count">0</span> places explored!
+                </span>
+            </div>
+
+            <!-- CARD 1: Location Header -->
+            <div class="location-card" id="card-header">
+                <div class="card-header" onclick="toggleCard('card-header')">
+                    <h4>📍 Location</h4>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="location-header-content">
+                        <div class="country-flag" id="location-flag">🏳️</div>
+                        <h3 class="location-name" id="location-name">Drop a pin to explore!</h3>
+                        <div class="location-badges">
+                            <span class="location-badge" id="land-ocean-badge">🌍</span>
+                            <span class="location-coordinates" id="location-coords">0.00°N, 0.00°E</span>
+                            <button class="coord-toggle-btn" id="coord-toggle-btn" onclick="toggleCoordinateFormat()" title="Toggle coordinate format">
+                                <span class="coord-toggle-icon">🔄</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 2: Quick Facts -->
+            <div class="location-card" id="card-facts">
+                <div class="card-header" onclick="toggleCard('card-facts')">
+                    <h4>🌍 Quick Facts</h4>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="fact-grid" id="quick-facts-content">
+                        <div class="fact-item">
+                            <span class="fact-label">Country:</span>
+                            <span class="fact-value" id="fact-country">—</span>
+                        </div>
+                        <div class="fact-item">
+                            <span class="fact-label">Capital:</span>
+                            <span class="fact-value" id="fact-capital">—</span>
+                        </div>
+                        <div class="fact-item">
+                            <span class="fact-label">Population:</span>
+                            <span class="fact-value" id="fact-population">—</span>
+                        </div>
+                        <div class="fact-item">
+                            <span class="fact-label">Area:</span>
+                            <span class="fact-value" id="fact-area">—</span>
+                        </div>
+                        <div class="fact-item">
+                            <span class="fact-label">Continent:</span>
+                            <span class="fact-value" id="fact-continent">—</span>
+                        </div>
+                        <div class="fact-item">
+                            <span class="fact-label">Time Zone:</span>
+                            <span class="fact-value" id="fact-timezone">—</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 3: Comparison to Home -->
+            <div class="location-card" id="card-comparison">
+                <div class="card-header" onclick="toggleCard('card-comparison')">
+                    <h4>📏 Distance from Home</h4>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="comparison-content" id="comparison-content">
+                        <div class="distance-display">
+                            <span class="distance-value" id="distance-value">—</span>
+                            <span class="distance-unit">miles away</span>
+                        </div>
+                        <div class="comparison-facts">
+                            <div class="comparison-fact">
+                                <span class="comparison-icon">🧭</span>
+                                <span id="bearing-text">—</span>
+                            </div>
+                            <div class="comparison-fact">
+                                <span class="comparison-icon">⏰</span>
+                                <span id="timezone-diff-text">—</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 4: AI-Generated Content (Placeholder for Phase 4) -->
+            <div class="location-card" id="card-ai-facts">
+                <div class="card-header" onclick="toggleCard('card-ai-facts')">
+                    <h4>💡 Did You Know?</h4>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="ai-content" id="ai-facts-content">
+                        <div class="loading-placeholder">
+                            <span class="placeholder-icon">🤖</span>
+                            <p>AI-powered fun facts coming in Phase 4!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 5: Visual/Photo (Placeholder for Phase 3) -->
+            <div class="location-card" id="card-photo">
+                <div class="card-header" onclick="toggleCard('card-photo')">
+                    <h4>📸 Photos</h4>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="photo-content" id="photo-content">
+                        <div class="loading-placeholder">
+                            <span class="placeholder-icon">📷</span>
+                            <p>Beautiful photos coming in Phase 3!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 6: Weather (Placeholder for Phase 3) -->
+            <div class="location-card" id="card-weather">
+                <div class="card-header" onclick="toggleCard('card-weather')">
+                    <h4>☁️ Weather</h4>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="weather-content" id="weather-content">
+                        <div class="loading-placeholder">
+                            <span class="placeholder-icon">🌤️</span>
+                            <p>Live weather data coming in Phase 3!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 7: Nearby Places -->
+            <div class="location-card" id="card-nearby">
+                <div class="card-header" onclick="toggleCard('card-nearby')">
+                    <h4>🗺️ Nearby Places</h4>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="nearby-content" id="nearby-content">
+                        <div class="loading-placeholder">
+                            <span class="placeholder-icon">📍</span>
+                            <p>Loading nearby places...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 8: Challenges (Placeholder for Phase 4) -->
+            <div class="location-card" id="card-challenges">
+                <div class="card-header" onclick="toggleCard('card-challenges')">
+                    <h4>🎯 Challenges</h4>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="challenges-content" id="challenges-content">
+                        <div class="loading-placeholder">
+                            <span class="placeholder-icon">🎮</span>
+                            <p>Mini-challenges coming in Phase 4!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End sidebar-content -->
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <button class="btn view-collection-btn" onclick="viewExploredLocations()">
+                🗂️ View My Collection
+            </button>
+        </div>
+    </div> <!-- End location-explorer-sidebar -->
+
+    <!-- Photo Enlargement Modal with AI Captions -->
+    <div id="photo-modal" class="photo-modal" onclick="closePhotoModal()">
+        <div class="photo-modal-content" onclick="event.stopPropagation()">
+            <button class="photo-modal-close" onclick="closePhotoModal()" title="Close (ESC)">✕</button>
+            
+            <div class="photo-modal-image-container">
+                <img id="photo-modal-image" src="" alt="" />
+                <div class="photo-loading" id="photo-modal-loading">
+                    <div class="spinner"></div>
+                    <p>🧠 AI is analyzing this photo...</p>
+                </div>
+            </div>
+            
+            <div class="photo-modal-info">
+                <div class="photo-modal-credit">
+                    <span class="credit-icon">📷</span>
+                    <a id="photo-modal-photographer-link" href="#" target="_blank" rel="noopener">
+                        <span id="photo-modal-photographer"></span>
+                    </a>
+                </div>
+                
+                <div class="photo-modal-caption">
+                    <h3 id="photo-modal-title">Photo Details</h3>
+                    <div id="photo-modal-description" class="photo-description">
+                        <p>Generating educational caption...</p>
+                    </div>
+                    <div class="photo-relevance" id="photo-modal-relevance"></div>
+                </div>
+                
+                <div class="photo-modal-meta">
+                    <span class="photo-search-query" id="photo-search-query"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Reopen Button (appears when sidebar is closed) -->
+    <button id="reopen-sidebar-btn" class="reopen-sidebar-btn" onclick="reopenLocationSidebar()" title="Reopen Location Explorer">
+        <span class="reopen-icon">📍</span>
+        <span class="reopen-text">Info</span>
+    </button>
+
+    <!-- Photo Modal JavaScript Functions -->
+    <script src="photo-modal-functions.js"></script>
+
 </body>
 </html>
+
 

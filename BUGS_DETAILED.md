@@ -1,10 +1,42 @@
 # 🔍 DETAILED CODE ISSUES REPORT
 **Geographic Detective Academy**
-*Generated: October 15, 2025*
+*Updated: October 18, 2025*
 
 ---
 
-## 🔴 CRITICAL BUGS
+## ✅ RECENTLY FIXED BUGS (October 2025)
+
+### FIXED #1: Photo Modals Not Opening
+**Severity:** HIGH (NOW FIXED ✅)
+**Location:** Lines 4140, 4205
+**Problem:** Modal had `display: none` by default, needed `.active` class to show
+**Fix Applied:** Added `.active` class to modal HTML in `openFactPhoto()` and `openPhotoModal()`
+**Status:** ✅ Working perfectly
+
+### FIXED #2: Distance Showing Kilometers
+**Severity:** MEDIUM (NOW FIXED ✅)
+**Location:** Lines 8949, 7636-7637, 3535
+**Problem:** Distance displayed in km instead of miles for American students
+**Fix Applied:** Changed all distance labels to "miles away" with proper conversion
+**Status:** ✅ Working perfectly
+
+### FIXED #3: No Loading Screen During AI Generation
+**Severity:** MEDIUM (NOW FIXED ✅)
+**Location:** Lines 1843-1979, 4258-4277, 3279
+**Problem:** Card appeared broken while AI facts were generating
+**Fix Applied:** Implemented Gen Alpha loading screen with dancing 67 emoji
+**Status:** ✅ Working perfectly
+
+### FIXED #4: API Error Handling
+**Severity:** HIGH (NOW FIXED ✅)
+**Location:** Throughout API functions
+**Problem:** No fallback when APIs failed
+**Fix Applied:** Claude 3.5 → GPT-4o-mini fallback chain
+**Status:** ✅ Working perfectly
+
+---
+
+## 🔴 REMAINING ISSUES (Low Priority)
 
 ### BUG #1: Memory Leak in Mystery Mode Timer
 **Severity:** HIGH

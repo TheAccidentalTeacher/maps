@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Netlify Functions Locally</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .result {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .loading {
+            color: #ffd700;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+        .success {
+            color: #51cf66;
+        }
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info {
+            background: rgba(33, 150, 243, 0.2);
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Netlify Functions Test Page</h1>
+        <p class="subtitle">Test your serverless functions locally before deploying</p>
+
+        <div class="warning">
+            ⚠️ <strong>Important:</strong> You need to run <code>netlify dev</code> in your terminal first!<br>
+            This page will test the functions running at <strong>http://localhost:8888</strong>
+        </div>
+
+        <div class="info">
+            ℹ️ <strong>Before Testing:</strong><br>
+            1. Open terminal in project folder<br>
+            2. Run: <code>netlify dev --offline</code><br>
+            3. Wait for "Server now ready" message<br>
+            4. Then click the test buttons below
+        </div>
+
+        <!-- Test Photos Function -->
+        <div class="test-section">
+            <h2>📸 Test Photos Function</h2>
+            <p>Fetches photos from Unsplash or Pexels</p>
+            <button onclick="testPhotos()">Test Photos (Paris)</button>
+            <button onclick="testPhotos('Tokyo', 'cherry blossoms')">Test Photos (Tokyo)</button>
+            <button onclick="testPhotos('New York', 'skyline')">Test Photos (New York)</button>
+            <div id="photos-result" class="result"></div>
+        </div>
+
+        <!-- Test Weather Function -->
+        <div class="test-section">
+            <h2>⛅ Test Weather Function</h2>
+            <p>Fetches weather from OpenWeatherMap</p>
+            <button onclick="testWeather(48.8566, 2.3522)">Test Weather (Paris)</button>
+            <button onclick="testWeather(35.6762, 139.6503)">Test Weather (Tokyo)</button>
+            <button onclick="testWeather(40.7128, -74.0060)">Test Weather (New York)</button>
+            <div id="weather-result" class="result"></div>
+        </div>
+
+        <!-- Test AI Facts Function -->
+        <div class="test-section">
+            <h2>✨ Test AI Facts Function</h2>
+            <p>Generates fun facts using OpenAI GPT-4o-mini</p>
+            <button onclick="testFacts('Paris', 'France')">Test Facts (Paris)</button>
+            <button onclick="testFacts('Tokyo', 'Japan')">Test Facts (Tokyo)</button>
+            <button onclick="testFacts('Mount Everest', 'Nepal/China')">Test Facts (Mt. Everest)</button>
+            <div id="facts-result" class="result"></div>
+        </div>
+
+        <div class="info">
+            💡 <strong>Troubleshooting:</strong><br>
+            • If you see "Failed to fetch" → Netlify Dev isn't running<br>
+            • If you see "404 Not Found" → Functions folder path is wrong<br>
+            • If you see "500 Internal Server Error" → Check function logs in terminal<br>
+            • If Weather fails → You need to add OPENWEATHER_API_KEY to .env file
+        </div>
+    </div>
+
+    <script>
+        // Test Photos Function
+        async function testPhotos(location = 'Paris', query = 'eiffel tower') {
+            const resultDiv = document.getElementById('photos-result');
+            resultDiv.innerHTML = '<span class="loading">🔄 Loading photos...</span>';
+            
+            try {
+                const params = new URLSearchParams({ location, query });
+                const response = await fetch(`http://localhost:8888/.netlify/functions/get-photos?${params}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                let html = `<span class="success">✅ SUCCESS!</span>\n\n`;
+                html += `📍 Location: ${location}\n`;
+                html += `🔍 Query: ${query}\n`;
+                html += `📊 Found ${data.photos.length} photos\n`;
+                html += `🌐 Source: ${data.source}\n\n`;
+                
+                data.photos.forEach((photo, i) => {
+                    html += `Photo ${i + 1}:\n`;
+                    html += `  URL: ${photo.url}\n`;
+                    html += `  Photographer: ${photo.photographer}\n`;
+                    html += `  Description: ${photo.description || 'N/A'}\n\n`;
+                });
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ ERROR:</span>\n${error.message}\n\nMake sure Netlify Dev is running:\nnpm run dev`;
+            }
+        }
+
+        // Test Weather Function
+        async function testWeather(lat, lon) {
+            const resultDiv = document.getElementById('weather-result');
+            resultDiv.innerHTML = '<span class="loading">🔄 Loading weather...</span>';
+            
+            try {
+                const params = new URLSearchParams({ lat, lon });
+                const response = await fetch(`http://localhost:8888/.netlify/functions/get-weather?${params}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const w = data.weather;
+                
+                let html = `<span class="success">✅ SUCCESS!</span>\n\n`;
+                html += `📍 Location: ${w.city || 'Unknown'}\n`;
+                html += `🌡️ Temperature: ${Math.round(w.temp.fahrenheit)}°F (${Math.round(w.temp.celsius)}°C)\n`;
+                html += `🤔 Feels Like: ${Math.round(w.feels_like.fahrenheit)}°F (${Math.round(w.feels_like.celsius)}°C)\n`;
+                html += `☁️ Conditions: ${w.description}\n`;
+                html += `💨 Wind: ${w.wind.speed} mph ${w.wind.direction}\n`;
+                html += `💧 Humidity: ${w.humidity}%\n`;
+                html += `👁️ Visibility: ${w.visibility} miles\n`;
+                html += `🌅 Sunrise: ${new Date(w.sunrise * 1000).toLocaleTimeString()}\n`;
+                html += `🌇 Sunset: ${new Date(w.sunset * 1000).toLocaleTimeString()}\n`;
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                let errorMsg = `<span class="error">❌ ERROR:</span>\n${error.message}\n\n`;
+                if (error.message.includes('500')) {
+                    errorMsg += `⚠️ This might be because:\n`;
+                    errorMsg += `1. OPENWEATHER_API_KEY not set in .env file\n`;
+                    errorMsg += `2. Get a FREE key at: https://openweathermap.org/api\n`;
+                    errorMsg += `3. Add to .env: OPENWEATHER_API_KEY=your_key_here\n`;
+                    errorMsg += `4. Restart: npm run dev`;
+                } else {
+                    errorMsg += `Make sure Netlify Dev is running: npm run dev`;
+                }
+                resultDiv.innerHTML = errorMsg;
+            }
+        }
+
+        // Test AI Facts Function
+        async function testFacts(location, country) {
+            const resultDiv = document.getElementById('facts-result');
+            resultDiv.innerHTML = '<span class="loading">🔄 Generating AI facts... (may take 5-10 seconds)</span>';
+            
+            try {
+                const params = new URLSearchParams({ location, country });
+                const response = await fetch(`http://localhost:8888/.netlify/functions/get-ai-facts?${params}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                let html = `<span class="success">✅ SUCCESS!</span>\n\n`;
+                html += `📍 Location: ${location}, ${country}\n`;
+                html += `🤖 Model: ${data.model}\n`;
+                html += `📊 Tokens Used: ${data.usage.total_tokens} (prompt: ${data.usage.prompt_tokens}, completion: ${data.usage.completion_tokens})\n`;
+                html += `💰 Estimated Cost: $${(data.usage.total_tokens / 1000000 * 0.15).toFixed(6)}\n\n`;
+                html += `Fun Facts:\n\n`;
+                
+                data.facts.forEach((fact, i) => {
+                    html += `${i + 1}. ${fact}\n\n`;
+                });
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ ERROR:</span>\n${error.message}\n\nMake sure Netlify Dev is running:\nnpm run dev`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+# Netlify Configuration
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # No build command needed for static site
+  publish = "."
+  functions = "netlify/functions"
+
+[dev]
+  # Local development server settings
+  framework = "#static"
+  command = "python -m http.server 8000"
+  targetPort = 8000
+  port = 8888
+  publish = "."
+  
+[[redirects]]
+  # Redirect API calls to Netlify Functions
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[functions]
+  # Function settings
+  node_bundler = "esbuild"
+  directory = "netlify/functions"
