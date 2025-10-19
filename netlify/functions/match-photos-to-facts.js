@@ -380,17 +380,28 @@ Respond with ONLY the image generation prompt, nothing else.`
     
     // Parse Claude's matching recommendations
     console.log('🔍 Parsing Claude matching...');
-    const matched = parseClaudeMatching(responseText, facts, photos);
+    let matched = parseClaudeMatching(responseText, facts, photos);
     console.log(`✅ Parsed ${matched.length} matches`);
     console.log(`🔍 First match:`, JSON.stringify(matched[0]));
     
     const nullCount = matched.filter(m => m.photo === null).length;
     console.log(`⚠️ ${nullCount} out of ${matched.length} facts have null photos`);
     
+    // 🚨 CRITICAL: If Claude matching failed, fall back to keyword matching
+    if (nullCount === matched.length) {
+      console.warn('❌ Claude matching returned ALL NULLS! Falling back to keyword matching...');
+      matched = simpleMatchPhotosToFacts(facts, photos);
+      const keywordNullCount = matched.filter(m => m.photo === null).length;
+      console.log(`🔄 Keyword matching: ${matched.length - keywordNullCount} matches, ${keywordNullCount} nulls`);
+    }
+    
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ matched, source: 'ai-matched' })
+      body: JSON.stringify({ 
+        matched, 
+        source: nullCount === matched.length ? 'keyword-fallback' : 'ai-matched'
+      })
     };
 
   } catch (error) {
