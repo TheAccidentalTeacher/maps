@@ -60,16 +60,20 @@ exports.handler = async (event, context) => {
     let photos = [];
     const searchQuery = location || country;
 
+    console.log('🔍 Searching for photos:', searchQuery);
+
     // Try Unsplash first
     if (unsplashKey) {
       const unsplashUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery)}&per_page=10&orientation=landscape`;
       
+      console.log('📸 Calling Unsplash API...');
       const unsplashResponse = await fetch(unsplashUrl, {
         headers: { 'Authorization': `Client-ID ${unsplashKey}` }
       });
 
       if (unsplashResponse.ok) {
         const data = await unsplashResponse.json();
+        console.log(`✅ Unsplash returned ${data.results.length} photos for "${searchQuery}"`);
         photos = data.results.map(photo => ({
           id: photo.id,
           url: photo.urls.regular,
@@ -79,11 +83,14 @@ exports.handler = async (event, context) => {
           description: photo.description || photo.alt_description || '',
           source: 'unsplash'
         }));
+      } else {
+        console.error('❌ Unsplash API error:', unsplashResponse.status);
       }
     }
 
     // Fallback to Pexels if needed
     if (photos.length === 0 && pexelsKey) {
+      console.log('📸 Trying Pexels fallback...');
       const pexelsUrl = `https://api.pexels.com/v1/search?query=${encodeURIComponent(searchQuery)}&per_page=10&orientation=landscape`;
       
       const pexelsResponse = await fetch(pexelsUrl, {
@@ -92,6 +99,7 @@ exports.handler = async (event, context) => {
 
       if (pexelsResponse.ok) {
         const data = await pexelsResponse.json();
+        console.log(`✅ Pexels returned ${data.photos?.length || 0} photos for "${searchQuery}"`);
         photos = data.photos.map(photo => ({
           id: photo.id,
           url: photo.src.large,
@@ -104,8 +112,60 @@ exports.handler = async (event, context) => {
       }
     }
 
+    // MULTI-TIER FALLBACK STRATEGY
+    // If no photos found for specific location, try broader searches
+    if (photos.length === 0 && country && location !== country) {
+      console.log(`⚠️ No photos for "${location}", trying country "${country}"...`);
+      
+      // Try country name
+      if (unsplashKey) {
+        const fallbackUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(country)}&per_page=10&orientation=landscape`;
+        const fallbackResponse = await fetch(fallbackUrl, {
+          headers: { 'Authorization': `Client-ID ${unsplashKey}` }
+        });
+        
+        if (fallbackResponse.ok) {
+          const data = await fallbackResponse.json();
+          console.log(`✅ Country fallback returned ${data.results.length} photos`);
+          photos = data.results.map(photo => ({
+            id: photo.id,
+            url: photo.urls.regular,
+            thumbnail: photo.urls.small,
+            photographer: photo.user.name,
+            photographer_url: photo.user.links.html,
+            description: photo.description || photo.alt_description || '',
+            source: 'unsplash'
+          }));
+        }
+      }
+      
+      // Still no photos? Try Pexels with country
+      if (photos.length === 0 && pexelsKey) {
+        console.log('📸 Trying Pexels with country...');
+        const fallbackUrl = `https://api.pexels.com/v1/search?query=${encodeURIComponent(country)}&per_page=10&orientation=landscape`;
+        const fallbackResponse = await fetch(fallbackUrl, {
+          headers: { 'Authorization': pexelsKey }
+        });
+        
+        if (fallbackResponse.ok) {
+          const data = await fallbackResponse.json();
+          console.log(`✅ Pexels country fallback returned ${data.photos?.length || 0} photos`);
+          photos = data.photos.map(photo => ({
+            id: photo.id,
+            url: photo.src.large,
+            thumbnail: photo.src.medium,
+            photographer: photo.photographer,
+            photographer_url: photo.photographer_url,
+            description: photo.alt || '',
+            source: 'pexels'
+          }));
+        }
+      }
+    }
+
     if (photos.length === 0) {
-      // No photos found - return facts without photos
+      // No photos found even with fallbacks - return facts without photos
+      console.log('❌ No photos found after all fallback attempts');
       return {
         statusCode: 200,
         headers,
@@ -115,6 +175,8 @@ exports.handler = async (event, context) => {
         })
       };
     }
+
+    console.log(`✅ Final photo count: ${photos.length} photos to match with ${facts.length} facts`);
 
     // Use Claude to intelligently match photos to facts
     const claudeKey = process.env.ANTHROPIC_API_KEY;
