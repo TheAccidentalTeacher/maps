@@ -4123,6 +4123,7 @@
                 
                 const data = await response.json();
                 console.log('✅ Matched', data.matched?.length || 0, 'photos to facts');
+                console.log('🔍 MATCHED DATA STRUCTURE:', JSON.stringify(data.matched, null, 2));
                 return data.matched || facts.map(fact => ({ fact, photo: null }));
             } catch (error) {
                 console.error('Error matching photos to facts:', error);
@@ -4328,12 +4329,15 @@
             // CRITICAL: Store matched data globally FIRST
             window.currentFactPhotos = matchedData;
             console.log('📦 Stored', matchedData.length, 'fact photos for modal access');
+            console.log('🔍 FIRST MATCHED ITEM:', JSON.stringify(matchedData[0], null, 2));
             
             let html = '<div class="fact-photo-list" style="max-height: 600px; overflow-y: auto; padding-right: 8px;">';
             matchedData.forEach((item, index) => {
                 const { fact, photo } = item;
                 const aiLabel = photo && photo.aiGenerated ? '<span class="ai-label">🤖 AI Generated</span>' : '';
                 const visionLabel = photo && photo.visionValidated ? '<span class="vision-label">👁️ Vision Verified</span>' : '';
+                
+                console.log(`🔍 Item ${index}: fact="${fact?.substring(0,30)}...", photo.url="${photo?.url?.substring(0,50) || 'NULL'}"`);
                 
                 html += `
                     <div class="fact-photo-item" style="margin-bottom: 24px; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
