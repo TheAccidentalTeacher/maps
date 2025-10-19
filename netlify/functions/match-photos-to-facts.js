@@ -192,21 +192,19 @@ exports.handler = async (event, context) => {
         try {
           // Step 1: Use Claude to create a detailed image generation prompt
           const promptCreationRequest = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-api-key': claudeKey,
-              'anthropic-version': '2023-06-01'
-            },
-            body: JSON.stringify({
-              model: 'claude-3-5-sonnet-20241022',
-              max_tokens: 300,
-              temperature: 0.7,
-              messages: [{
-                role: 'user',
-                content: `You are an educational visual designer creating engaging images for middle school students.
-
-Given this geography fact about ${location}:
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': claudeKey,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-3-5-sonnet-20240620',
+            max_tokens: 300,
+            temperature: 0.7,
+            messages: [{
+              role: 'user',
+              content: `You are an educational visual designer creating engaging images for middle school students.Given this geography fact about ${location}:
 "${fact}"
 
 Create a detailed image generation prompt (2-3 sentences) that will produce an educational visualization. This could be:
@@ -351,24 +349,22 @@ Respond with ONLY the image generation prompt, nothing else.`
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': claudeKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1000,
-        temperature: 0.3,
-        messages: [{
-          role: 'user',
-          content: matchingPrompt
-        }]
-      })
-    });
+      'Content-Type': 'application/json',
+      'x-api-key': claudeKey,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-3-5-sonnet-20240620',
+      max_tokens: 1000,
+      temperature: 0.3,
+      messages: [{
+        role: 'user',
+        content: matchingPrompt
+      }]
+    })
+  });
 
-    console.log(`🤖 Claude response status: ${claudeResponse.status}`);
-    
-    if (!claudeResponse.ok) {
+  console.log(`🤖 Claude response status: ${claudeResponse.status}`);    if (!claudeResponse.ok) {
       const errorText = await claudeResponse.text();
       console.error(`❌ Claude API error ${claudeResponse.status}:`, errorText);
       throw new Error(`Claude API error: ${claudeResponse.status}`);
