@@ -5701,45 +5701,45 @@
         // Save achievement data to localStorage
         function saveAchievements() {
             try {
-                // Convert Sets to arrays for JSON serialization
+                // Convert Sets to arrays for JSON serialization (with safety checks)
                 const toSave = {
                     unlocked: playerAchievements.unlocked,
                     lastUpdated: new Date().toISOString(),
                     stats: {
                         explore: {
                             ...playerAchievements.stats.explore,
-                            continentsVisited: Array.from(playerAchievements.stats.explore.continentsVisited),
-                            zoomLevelsUsed: Array.from(playerAchievements.stats.explore.zoomLevelsUsed),
-                            layersUsed: Array.from(playerAchievements.stats.explore.layersUsed)
+                            continentsVisited: Array.from(playerAchievements.stats.explore.continentsVisited || []),
+                            zoomLevelsUsed: Array.from(playerAchievements.stats.explore.zoomLevelsUsed || []),
+                            layersUsed: Array.from(playerAchievements.stats.explore.layersUsed || [])
                         },
                         coordinate: playerAchievements.stats.coordinate,
                         mystery: {
                             ...playerAchievements.stats.mystery,
-                            continentsSolved: Array.from(playerAchievements.stats.mystery.continentsSolved),
-                            uniqueLocationsSolved: Array.from(playerAchievements.stats.mystery.uniqueLocationsSolved)
+                            continentsSolved: Array.from(playerAchievements.stats.mystery.continentsSolved || []),
+                            uniqueLocationsSolved: Array.from(playerAchievements.stats.mystery.uniqueLocationsSolved || [])
                         },
                         scavenger: {
                             ...playerAchievements.stats.scavenger,
-                            continentsVisited: Array.from(playerAchievements.stats.scavenger.continentsVisited)
+                            continentsVisited: Array.from(playerAchievements.stats.scavenger.continentsVisited || [])
                         },
                         guess: {
                             ...playerAchievements.stats.guess,
-                            photosSeen: Array.from(playerAchievements.stats.guess.photosSeen),
-                            landmarksIdentified: Array.from(playerAchievements.stats.guess.landmarksIdentified)
+                            photosSeen: Array.from(playerAchievements.stats.guess.photosSeen || []),
+                            landmarksIdentified: Array.from(playerAchievements.stats.guess.landmarksIdentified || [])
                         },
                         heist: {
                             ...playerAchievements.stats.heist,
-                            continents: Array.from(playerAchievements.stats.heist.continents)
+                            continents: Array.from(playerAchievements.stats.heist.continents || [])
                         },
                         alaska: playerAchievements.stats.alaska,
                         universal: {
                             ...playerAchievements.stats.universal,
-                            modesPlayed: Array.from(playerAchievements.stats.universal.modesPlayed),
-                            modesCompleted: Array.from(playerAchievements.stats.universal.modesCompleted),
-                            modesMastered: Array.from(playerAchievements.stats.universal.modesMastered),
-                            playDates: Array.from(playerAchievements.stats.universal.playDates),
-                            funModeGames: Array.from(playerAchievements.stats.universal.funModeGames),
-                            perfectModes: Array.from(playerAchievements.stats.universal.perfectModes)
+                            modesPlayed: Array.from(playerAchievements.stats.universal.modesPlayed || []),
+                            modesCompleted: Array.from(playerAchievements.stats.universal.modesCompleted || []),
+                            modesMastered: Array.from(playerAchievements.stats.universal.modesMastered || []),
+                            playDates: Array.from(playerAchievements.stats.universal.playDates || []),
+                            funModeGames: Array.from(playerAchievements.stats.universal.funModeGames || []),
+                            perfectModes: Array.from(playerAchievements.stats.universal.perfectModes || [])
                         }
                     }
                 };
