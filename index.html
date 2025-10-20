@@ -2225,6 +2225,114 @@
             margin-right: 8px;
         }
 
+        /* Geography in Real Life Styling (Card 4.5) */
+        .real-life-content {
+            padding: 10px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        
+        /* Custom scrollbar for real-life content */
+        .real-life-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .real-life-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .real-life-content::-webkit-scrollbar-thumb {
+            background: rgba(76, 175, 80, 0.5);
+            border-radius: 4px;
+        }
+        
+        .real-life-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(76, 175, 80, 0.8);
+        }
+
+        .real-life-theme {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .real-life-theme:last-child {
+            margin-bottom: 0;
+        }
+
+        .theme-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .theme-icon {
+            font-size: 24px;
+        }
+
+        .theme-explanation {
+            color: #ffffff;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .student-application {
+            margin-top: 12px;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.1) 100%);
+            border-radius: 8px;
+            border: 2px solid rgba(76, 175, 80, 0.4);
+            position: relative;
+        }
+
+        .student-application::before {
+            content: '🎓';
+            position: absolute;
+            top: -12px;
+            left: 10px;
+            background: #2d3e50;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .student-label {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 13px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .student-example {
+            color: #e0e0e0;
+            font-size: 14px;
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .safety-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 4px;
+            font-size: 11px;
+            color: #4CAF50;
+            margin-top: 10px;
+        }
+
         /* Photo Grid Styling (Card 5) */
         .photo-grid {
             display: grid;
@@ -3455,9 +3563,13 @@
                             try {
                                 const matchedData = await matchPhotosToFacts(facts, locationName, countryName);
                                 populateAIFactsWithPhotos(matchedData);
+                                
+                                // Generate Geography in Real Life content
+                                generateRealLifeGeography(locationName, countryName, facts);
                             } catch (err) {
                                 console.log('⚠️ Photo matching failed, showing facts only:', err.message);
                                 populateAIFacts(facts);
+                                generateRealLifeGeography(locationName, countryName, facts);
                             }
                         } else {
                             populateAIFacts([]);
@@ -4467,6 +4579,101 @@
             const realCount = photos.filter(p => !p.isAIGenerated).length;
             const aiCount = photos.filter(p => p.isAIGenerated).length;
             console.log(`✅ Loaded ${photosToShow.length} photos (${realCount} real, ${aiCount} AI) - click to enlarge!`);
+        }
+        
+        /**
+         * Generate Geography in Real Life content (Card 4.5)
+         * Uses AI to create practical applications of 5 Themes of Geography
+         * with special focus on middle school student life
+         * @param {string} location - Location name
+         * @param {string} country - Country name  
+         * @param {Array<string>} facts - Array of facts about the location
+         */
+        async function generateRealLifeGeography(location, country, facts) {
+            const card = document.getElementById('card-real-life-geography');
+            if (!card) return;
+            
+            const contentElement = card.querySelector('#real-life-content');
+            if (!contentElement) return;
+            
+            // Show loading state
+            contentElement.innerHTML = `
+                <div class="loading-placeholder">
+                    <span class="placeholder-icon">🌍</span>
+                    <p>Connecting geography to real life...</p>
+                </div>
+            `;
+            
+            try {
+                console.log('🌍 Generating real-life geography applications...');
+                
+                // Call AI to generate practical applications
+                const response = await fetch('/.netlify/functions/generate-real-life-geography', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        location, 
+                        country,
+                        facts: facts || []
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to generate content');
+                }
+                
+                const data = await response.json();
+                console.log('✅ Generated real-life geography content');
+                
+                // Render the content (contentElement is #real-life-content with scrolling)
+                let html = '';
+                
+                if (data.themes && data.themes.length > 0) {
+                    data.themes.forEach(theme => {
+                        html += `
+                            <div class="real-life-theme">
+                                <div class="theme-header">
+                                    <span class="theme-icon">${theme.icon}</span>
+                                    <span>${theme.name}</span>
+                                </div>
+                                <div class="theme-explanation">${theme.explanation}</div>
+                                ${theme.studentApplication ? `
+                                    <div class="student-application">
+                                        <div class="student-label">How this connects to YOUR life:</div>
+                                        <div class="student-example">${theme.studentApplication}</div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                        <div class="safety-badge">
+                            <span>✅</span>
+                            <span>Content reviewed for student safety</span>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="no-data">
+                            <span style="font-size: 32px;">🤔</span>
+                            <p>Geography connections unavailable</p>
+                        </div>
+                    `;
+                }
+                
+                contentElement.innerHTML = html;
+                
+            } catch (error) {
+                console.error('❌ Error generating real-life geography:', error);
+                contentElement.innerHTML = `
+                    <div class="no-data">
+                        <span style="font-size: 32px;">🌍</span>
+                        <p>Geography connections coming soon!</p>
+                        <p style="font-size: 12px; color: #666;">This feature needs deployment</p>
+                    </div>
+                `;
+            }
         }
         
         /**
@@ -9348,6 +9555,22 @@
                         <div class="loading-placeholder">
                             <span class="placeholder-icon">🤖</span>
                             <p>AI-powered fun facts coming in Phase 4!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 4.5: Geography in Real Life (NEW!) -->
+            <div class="location-card" id="card-real-life-geography">
+                <div class="card-header" onclick="toggleCard('card-real-life-geography')">
+                    <h4>🌍 Geography in Real Life</h4>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="real-life-content" id="real-life-content">
+                        <div class="loading-placeholder">
+                            <span class="placeholder-icon">🎓</span>
+                            <p>Connecting geography to your world...</p>
                         </div>
                     </div>
                 </div>

@@ -61,13 +61,11 @@ exports.handler = async (event, context) => {
     let photos = [];
     
     // ========================================
-    // TIER 1: Try specific location WITH COUNTRY for disambiguation
+    // TIER 1: Try specific location with Unsplash
     // ========================================
     if (unsplashKey && location) {
-      // Include country to disambiguate (e.g., "Palmyra Maine" not "Palmyra Syria")
-      const searchTerm = country ? `${location} ${country}` : location;
-      console.log(`🔍 TIER 1: Unsplash search for "${searchTerm}"`);
-      const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchTerm)}&per_page=10&orientation=landscape`;
+      console.log(`🔍 TIER 1: Unsplash search for "${location}"`);
+      const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(location)}&per_page=10&orientation=landscape`;
       const response = await fetch(url, {
         headers: { 'Authorization': `Client-ID ${unsplashKey}` }
       });
@@ -92,12 +90,11 @@ exports.handler = async (event, context) => {
     }
 
     // ========================================
-    // TIER 2: Try specific location WITH COUNTRY (Pexels)
+    // TIER 2: Try specific location with Pexels
     // ========================================
     if (photos.length === 0 && pexelsKey && location) {
-      const searchTerm = country ? `${location} ${country}` : location;
-      console.log(`🔍 TIER 2: Pexels search for "${searchTerm}"`);
-      const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(searchTerm)}&per_page=10&orientation=landscape`;
+      console.log(`🔍 TIER 2: Pexels search for "${location}"`);
+      const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(location)}&per_page=10&orientation=landscape`;
       const response = await fetch(url, {
         headers: { 'Authorization': pexelsKey }
       });
@@ -235,32 +232,17 @@ exports.handler = async (event, context) => {
 
     if (claudeKey && photos.length >= facts.length) {
       try {
-        // Build matching prompt for Claude with keyword-based logic
-        const prompt = `You are matching photos to educational facts about ${location}.
+        // Build matching prompt for Claude
+        const prompt = `You are a geography education assistant. Match these AI-generated facts to the most relevant photos.
 
 FACTS:
 ${facts.map((fact, i) => `${i}. ${fact}`).join('\n')}
 
-PHOTOS (with descriptions):
-${photos.map((photo, i) => `${i}. ${photo.description || photo.alt || 'No description'}`).join('\n')}
+PHOTOS:
+${photos.map((photo, i) => `${i}. ${photo.description || 'No description'}`).join('\n')}
 
-Task: Match each fact to the MOST RELEVANT photo based on keywords and context.
-- Bridge facts → bridge/architecture photos
-- Wildlife facts (animals, turtles, dogs, etc.) → animal/nature photos  
-- Geography facts (terrain, elevation, rivers) → landscape/terrain photos
-- Historical facts (buildings, monuments) → historical site photos
-- Industry/economy facts → industrial/workplace photos
-- If no good match exists, use a general landscape photo
-
-CRITICAL: Match based on SUBJECT MATTER, not random assignment!
-A fact about a turtle MUST match a turtle photo, NOT a dog or plant!
-
-Respond with ONLY a JSON array of matches:
-[
-  {"factIndex": 0, "photoIndex": 2},
-  {"factIndex": 1, "photoIndex": 0},
-  ...
-]`;
+Return ONLY a JSON array of matches like: [{"factIndex": 0, "photoIndex": 2}, ...]
+Each fact should be matched to its most relevant photo based on content.`;
 
         const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',

@@ -129,10 +129,10 @@ Follow prompts to:
 4. Add all 4 keys:
 
 ```
-UNSPLASH_ACCESS_KEY = yYnOwhd0dI9s1pkWyZ1MZB7hNj1-xvsNUBcm2YfJxKc
-PEXELS_API_KEY = KiNAVfKn0jpQ0SpcFXWgo2h6WCRAmsQUDJ7BfLJ5Ad1cNiuHhRelQ5VY
-OPENAI_API_KEY = sk-proj-LhXr_8dNtwe18PIt6GnX0UsTmuydDt_gstZ2OeoF...
-OPENWEATHER_API_KEY = (your new key)
+UNSPLASH_ACCESS_KEY = your-unsplash-key-here
+PEXELS_API_KEY = your-pexels-key-here
+OPENAI_API_KEY = your-openai-key-here
+OPENWEATHER_API_KEY = your-openweather-key-here
 ```
 
 ### 4. Deploy!

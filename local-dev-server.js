@@ -1119,9 +1119,244 @@ Be factually accurate, engaging, and educational. No emojis.`;
     }
 });
 
-// Match Photos to AI Facts (NEW - VISION-VALIDATED PHOTO-FACT MATCHING!)
+// Helper: Fetch real photos for matching
+async function fetchRealPhotosForMatching(location, country, fetch) {
+    const unsplashKey = process.env.UNSPLASH_ACCESS_KEY;
+    const pexelsKey = process.env.PEXELS_API_KEY;
+    
+    if (!unsplashKey && !pexelsKey) {
+        console.log('❌ No photo API keys available');
+        return [];
+    }
+
+    let photos = [];
+    // Include country in search to disambiguate (e.g., "Palmyra Maine" not "Palmyra Syria")
+    const searchQuery = (location && country) ? `${location} ${country}` : (location || country);
+    
+    // Try Unsplash first
+    if (unsplashKey) {
+        console.log(`🔍 Searching Unsplash for: ${searchQuery}`);
+        try {
+            const response = await fetch(
+                `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery)}&per_page=10&orientation=landscape`,
+                { headers: { 'Authorization': `Client-ID ${unsplashKey}` } }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.results && data.results.length > 0) {
+                    photos = data.results.map(photo => ({
+                        id: photo.id,
+                        url: photo.urls.regular,
+                        thumbnail: photo.urls.small,
+                        photographer: photo.user.name,
+                        photographer_url: photo.user.links.html,
+                        description: photo.description || photo.alt_description || '',
+                        source: 'unsplash'
+                    }));
+                    console.log(`✅ Unsplash returned ${photos.length} photos`);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Unsplash error:', error.message);
+        }
+    }
+
+    // Try Pexels if Unsplash failed
+    if (photos.length === 0 && pexelsKey) {
+        console.log(`🔍 Searching Pexels for: ${searchQuery}`);
+        try {
+            const response = await fetch(
+                `https://api.pexels.com/v1/search?query=${encodeURIComponent(searchQuery)}&per_page=10&orientation=landscape`,
+                { headers: { 'Authorization': pexelsKey } }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.photos && data.photos.length > 0) {
+                    photos = data.photos.map(photo => ({
+                        id: photo.id,
+                        url: photo.src.large,
+                        thumbnail: photo.src.medium,
+                        photographer: photo.photographer,
+                        photographer_url: photo.photographer_url,
+                        description: photo.alt || '',
+                        source: 'pexels'
+                    }));
+                    console.log(`✅ Pexels returned ${photos.length} photos`);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Pexels error:', error.message);
+        }
+    }
+
+    // Try country fallback if still no photos
+    if (photos.length === 0 && country && location !== country) {
+        console.log(`🔍 Trying country fallback: ${country}`);
+        return await fetchRealPhotosForMatching(country, null, fetch);
+    }
+
+    return photos;
+}
+
+// Helper: AI-powered photo-to-fact matching
+async function matchPhotosToFactsWithAI(facts, photos, location, fetch) {
+    const matched = [];
+    
+    // If no photos, return all facts with null photos
+    if (!photos || photos.length === 0) {
+        return facts.map(fact => ({ fact, photo: null }));
+    }
+
+    // If only 1-2 photos, just cycle them (not enough for AI to be useful)
+    if (photos.length <= 2) {
+        for (let i = 0; i < facts.length; i++) {
+            matched.push({ 
+                fact: facts[i], 
+                photo: photos[i % photos.length] 
+            });
+        }
+        console.log(`✅ Matched ${facts.length} facts to ${photos.length} photos (simple cycling)`);
+        return matched;
+    }
+
+    // Use Claude to intelligently match photos to facts
+    const claudeKey = process.env.ANTHROPIC_API_KEY;
+    const openaiKey = process.env.OPENAI_API_KEY;
+    
+    if (!claudeKey && !openaiKey) {
+        console.log('⚠️ No AI available for smart matching, using cycling');
+        for (let i = 0; i < facts.length; i++) {
+            matched.push({ 
+                fact: facts[i], 
+                photo: photos[i % photos.length] 
+            });
+        }
+        return matched;
+    }
+
+    try {
+        const prompt = `You are matching photos to educational facts about ${location}.
+
+FACTS:
+${facts.map((f, i) => `${i}. ${f}`).join('\n')}
+
+PHOTOS (with descriptions):
+${photos.map((p, i) => `${i}. ${p.description || p.alt || 'No description'}`).join('\n')}
+
+Task: Match each fact to the MOST RELEVANT photo based on keywords and context.
+- Bridge facts → bridge/architecture photos
+- Wildlife facts → animal/nature photos  
+- Geography facts → landscape/terrain photos
+- Historical facts → historical site photos
+- If no good match exists, use a general landscape photo
+
+Respond with ONLY a JSON array of matches:
+[
+  {"factIndex": 0, "photoIndex": 2},
+  {"factIndex": 1, "photoIndex": 0},
+  ...
+]`;
+
+        let matches = null;
+
+        // Try Claude first
+        if (claudeKey) {
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': claudeKey,
+                    'anthropic-version': '2023-06-01'
+                },
+                body: JSON.stringify({
+                    model: 'claude-3-5-sonnet-latest',
+                    max_tokens: 500,
+                    temperature: 0.3,
+                    messages: [{ role: 'user', content: prompt }]
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const content = data.content[0].text;
+                const jsonMatch = content.match(/\[[\s\S]*\]/);
+                if (jsonMatch) {
+                    matches = JSON.parse(jsonMatch[0]);
+                    console.log('✅ Claude matched photos to facts');
+                }
+            }
+        }
+
+        // Fallback to GPT-4
+        if (!matches && openaiKey) {
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${openaiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-4o',
+                    max_tokens: 400,
+                    temperature: 0.3,
+                    response_format: { type: 'json_object' },
+                    messages: [
+                        { role: 'system', content: 'You match photos to facts. Respond with JSON: {"matches": [{"factIndex": 0, "photoIndex": 1}, ...]}' },
+                        { role: 'user', content: prompt }
+                    ]
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const parsed = JSON.parse(data.choices[0].message.content);
+                matches = parsed.matches;
+                console.log('✅ GPT-4 matched photos to facts');
+            }
+        }
+
+        // Apply matches
+        if (matches && matches.length > 0) {
+            for (const match of matches) {
+                if (match.factIndex < facts.length && match.photoIndex < photos.length) {
+                    matched.push({
+                        fact: facts[match.factIndex],
+                        photo: photos[match.photoIndex]
+                    });
+                }
+            }
+        }
+
+        // Fill any missing matches with cycling
+        while (matched.length < facts.length) {
+            const photoIndex = matched.length % photos.length;
+            matched.push({
+                fact: facts[matched.length],
+                photo: photos[photoIndex]
+            });
+        }
+
+        console.log(`✅ Matched ${matched.length} facts to photos using AI`);
+        return matched;
+
+    } catch (error) {
+        console.error('❌ AI matching failed:', error.message);
+        // Fallback to cycling
+        for (let i = 0; i < facts.length; i++) {
+            matched.push({ 
+                fact: facts[i], 
+                photo: photos[i % photos.length] 
+            });
+        }
+        return matched;
+    }
+}
+
+// Match Photos to AI Facts (PHOTO-FIRST, AI FALLBACK)
 app.post('/.netlify/functions/match-photos-to-facts', async (req, res) => {
-    console.log('🎯 Photo-fact matching request');
+    console.log('📸 Photo matching request');
     
     try {
         const { facts, location, country } = req.body;
@@ -1130,259 +1365,447 @@ app.post('/.netlify/functions/match-photos-to-facts', async (req, res) => {
             return res.status(400).json({ error: 'Facts array required' });
         }
         
-        const openaiKey = process.env.OPENAI_API_KEY;
-        const unsplashKey = process.env.UNSPLASH_ACCESS_KEY;
-        const pexelsKey = process.env.PEXELS_API_KEY;
-        const replicateKey = process.env.REPLICATE_API_TOKEN;
+        console.log(`📸 Matching ${facts.length} facts for ${location}...`);
         
-        if (!openaiKey) {
-            return res.json({ 
-                error: 'Vision AI not available',
-                matched: facts.map(fact => ({ fact, photo: null, aiGenerated: false }))
+        const fetch = (await import('node-fetch')).default;
+        
+        // STEP 1: Try to get REAL PHOTOS first
+        const photos = await fetchRealPhotosForMatching(location, country, fetch);
+        
+        // STEP 2: If we have photos, match them to facts with AI
+        if (photos && photos.length > 0) {
+            console.log(`✅ Found ${photos.length} real photos, matching to facts with AI...`);
+            const matched = await matchPhotosToFactsWithAI(facts, photos, location, fetch);
+            return res.json({
+                matched,
+                source: 'real-photos-matched'
             });
         }
         
-        const fetch = (await import('node-fetch')).default;
-        const matchedFacts = [];
+        // STEP 3: FALLBACK - No photos available, generate AI infographics
+        console.log('⚠️ No real photos found, generating AI infographics as fallback...');
         
-        // Process each fact
-        for (const fact of facts) {
-            console.log(`\n📸 Processing fact: ${fact.substring(0, 50)}...`);
-            
-            // ========================================
-            // STEP 1: EXTRACT KEY CONCEPT FROM FACT
-            // ========================================
-            const conceptPrompt = `Extract the single most visual, searchable concept from this fact for finding a SAFE, educational photo for middle school students.
-
-Fact: "${fact}"
-
-🚫 AVOID these topics in your search keywords:
-- Drugs (marijuana, cannabis, weed, hemp)
-- Alcohol, tobacco, vaping
-- Adult/nightlife content
-- Violence, weapons
-- Gambling, casinos
-- Anything controversial
-
-✅ FOCUS on safe, educational visuals:
-- Natural landscapes and features
-- Architecture and landmarks
-- Wildlife and nature
-- Cultural elements (food, clothing, festivals)
-- Historical sites and artifacts
-- Scientific phenomena
-
-Return ONLY 2-3 safe, visual keywords for photo search.
-
-Examples:
-- "mountain landscape sunset"
-- "tropical rainforest canopy"
-- "historic architecture mosque"
-- "wildlife elephant savanna"
-
-Return ONLY the keywords, nothing else.`;
-
-            let searchQuery = '';
+        const replicateKey = process.env.REPLICATE_API_TOKEN;
+        const claudeKey = process.env.ANTHROPIC_API_KEY;
+        const openaiKey = process.env.OPENAI_API_KEY;
+        
+        if (!replicateKey && !openaiKey) {
+            console.log('❌ No AI generation available');
+            return res.json({
+                matched: facts.map(fact => ({ fact, photo: null })),
+                source: 'no-ai-keys'
+            });
+        }
+        
+        const infographics = [];
+        
+        // Generate educational infographics for each fact
+        for (let i = 0; i < facts.length; i++) {
+            const fact = facts[i];
+            console.log(`\n🎨 Creating infographic ${i + 1}/${facts.length} for: "${fact.substring(0, 50)}..."`);
             
             try {
-                const conceptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${openaiKey}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'gpt-4o-mini',
-                        messages: [{ role: 'user', content: conceptPrompt }],
-                        max_tokens: 20,
-                        temperature: 0.3
-                    })
-                });
+                // Step 1: Design the infographic using Claude or GPT-4
+                const promptTemplate = `You are a Gen Alpha educational designer creating FIRE infographics for middle school students (ages 11-14).
+
+📍 LOCATION: ${location}${country ? ', ' + country : ''}
+📚 FACT TO VISUALIZE: "${fact}"
+
+🎯 YOUR MISSION:
+Create an image generation prompt for an educational infographic that:
+1. Uses one of the 5 Themes of Geography (Location, Place, Human-Environment Interaction, Movement, Region)
+2. Makes a real-world connection (compare to Minecraft blocks, USA states, football fields, TikTok facts, etc.)
+3. Uses Gen Alpha aesthetic (bold colors, modern flat design, emoji-style icons, clean typography)
+4. Is 100% educational but ENGAGING (not boring textbook style)
+5. Shows data visually (charts, size comparisons, diagrams, illustrated maps)
+
+🎨 STYLE REQUIREMENTS:
+- Modern flat design or isometric 3D illustration
+- Bright, bold, saturated colors (blues, greens, oranges, purples)
+- Large clear typography with big numbers and stats
+- Visual size comparisons that make facts memorable
+- Clean, simple design (not cluttered)
+- Professional but fun (National Geographic meets Kurzgesagt animation style)
+
+💡 EXAMPLE PROMPTS:
+"Flat design infographic showing Greenland's 836,331 square miles compared to Texas (268,596 sq mi) using layered silhouettes, bold white typography, vibrant teal and coral colors, modern educational poster, clean vector style"
+
+"Isometric illustration of Arctic fox in split-screen summer/winter color change, bold labels showing 'BROWN' and 'WHITE', bright blue background, educational diagram style, clean 3D render"
+
+🚫 AVOID:
+- Realistic photographs
+- Dark or muted colors
+- Small unreadable text
+- Too much detail
+- Cartoonish childish style
+
+Respond with ONLY the image generation prompt (2-3 sentences). Make it BUSSIN! 🔥`;
+
+                let imagePrompt = null;
                 
-                if (conceptResponse.ok) {
-                    const conceptData = await conceptResponse.json();
-                    searchQuery = conceptData.choices[0].message.content.trim();
-                    console.log(`🔍 Search query: "${searchQuery}"`);
-                } else {
-                    // Fallback: extract first meaningful noun from fact
-                    searchQuery = fact.replace(/[🌍🏛️🎨🦁🏗️🔬🎉]/g, '').split(' ').slice(0, 3).join(' ');
-                    console.log(`⚠️ Fallback query: "${searchQuery}"`);
-                }
-            } catch (err) {
-                console.warn('⚠️ Concept extraction failed:', err.message);
-                searchQuery = location;
-            }
-            
-            // ========================================
-            // STEP 2: SEARCH FOR PHOTOS
-            // ========================================
-            let photoUrl = null;
-            let photoAlt = '';
-            let photographer = '';
-            
-            // Try Unsplash first
-            if (unsplashKey && !photoUrl) {
-                try {
-                    const unsplashResponse = await fetch(
-                        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery + ' ' + location)}&per_page=3&orientation=landscape`,
-                        { headers: { 'Authorization': `Client-ID ${unsplashKey}` } }
-                    );
-                    
-                    if (unsplashResponse.ok) {
-                        const data = await unsplashResponse.json();
-                        if (data.results && data.results.length > 0) {
-                            const photo = data.results[0];
-                            photoUrl = photo.urls.regular;
-                            photoAlt = photo.alt_description || searchQuery;
-                            photographer = photo.user.name;
-                            console.log(`✅ Found Unsplash photo by ${photographer}`);
-                        }
-                    }
-                } catch (err) {
-                    console.warn('⚠️ Unsplash failed:', err.message);
-                }
-            }
-            
-            // Try Pexels as backup
-            if (pexelsKey && !photoUrl) {
-                try {
-                    const pexelsResponse = await fetch(
-                        `https://api.pexels.com/v1/search?query=${encodeURIComponent(searchQuery + ' ' + location)}&per_page=3&orientation=landscape`,
-                        { headers: { 'Authorization': pexelsKey } }
-                    );
-                    
-                    if (pexelsResponse.ok) {
-                        const data = await pexelsResponse.json();
-                        if (data.photos && data.photos.length > 0) {
-                            const photo = data.photos[0];
-                            photoUrl = photo.src.large;
-                            photoAlt = photo.alt || searchQuery;
-                            photographer = photo.photographer;
-                            console.log(`✅ Found Pexels photo by ${photographer}`);
-                        }
-                    }
-                } catch (err) {
-                    console.warn('⚠️ Pexels failed:', err.message);
-                }
-            }
-            
-            // ========================================
-            // STEP 3: VISION AI VALIDATION
-            // ========================================
-            let visionMatch = false;
-            let visionReason = '';
-            
-            if (photoUrl) {
-                try {
-                    console.log('👁️ Validating photo with vision AI...');
-                    const validationPrompt = `You are validating if a photo matches an educational fact for middle school students (ages 11-14).
-
-FACT: "${fact}"
-
-🚫 ULTRA-STRICT SAFETY CHECK - Automatically reject if photo shows:
-- Drugs: marijuana, cannabis, weed, pipes, bongs, smoking anything
-- Alcohol: beer, wine, liquor, bars, drinking
-- Adult content: revealing clothing, suggestive poses, nightlife
-- Violence: weapons, guns, fighting, war imagery
-- Inappropriate: gambling, casinos, strip clubs, protests
-- Self-harm or dangerous behavior
-
-✅ Look at the image and answer: Does this photo DIRECTLY illustrate or relate to the fact above AND is it safe for middle school?
-
-Requirements for a MATCH:
-- Photo shows the specific subject mentioned in the fact
-- Visual content supports or demonstrates the fact
-- Photo is educational and relevant
-- Photo is 100% appropriate for 11-14 year olds
-- Photo would be approved by parents/teachers
-- NO forbidden content whatsoever
-
-Requirements for NO MATCH:
-- Photo shows something completely different
-- Photo is generic or unrelated
-- Photo contains ANY inappropriate content (see list above)
-- Photo doesn't support the educational message
-- Photo could be controversial or problematic
-
-Respond with ONLY:
-"YES - [brief reason why it matches]"
-OR
-"NO - [brief reason why it doesn't match]"
-
-Be ULTRA-STRICT - when in doubt, say NO. Student safety is the top priority.`;
-
-                    const visionResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+                // Try Claude first
+                if (claudeKey) {
+                    const promptResponse = await fetch('https://api.anthropic.com/v1/messages', {
                         method: 'POST',
                         headers: {
-                            'Authorization': `Bearer ${openaiKey}`,
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'x-api-key': claudeKey,
+                            'anthropic-version': '2023-06-01'
                         },
                         body: JSON.stringify({
-                            model: 'gpt-4o-mini',
-                            messages: [{
-                                role: 'user',
-                                content: [
-                                    { type: 'text', text: validationPrompt },
-                                    {
-                                        type: 'image_url',
-                                        image_url: {
-                                            url: photoUrl,
-                                            detail: 'low'
-                                        }
-                                    }
-                                ]
-                            }],
-                            max_tokens: 100,
-                            temperature: 0.3
+                            model: 'claude-3-5-sonnet-latest',
+                            max_tokens: 400,
+                            temperature: 0.85,
+                            messages: [{ role: 'user', content: promptTemplate }]
                         })
                     });
                     
-                    if (visionResponse.ok) {
-                        const visionData = await visionResponse.json();
-                        const analysis = visionData.choices[0].message.content.trim();
-                        visionMatch = analysis.toUpperCase().startsWith('YES');
-                        visionReason = analysis.substring(analysis.indexOf('-') + 1).trim();
-                        
-                        console.log(visionMatch ? '✅ MATCH!' : '❌ NO MATCH:', visionReason);
+                    if (promptResponse.ok) {
+                        const data = await promptResponse.json();
+                        imagePrompt = data.content[0].text.trim();
+                        console.log(`✅ Claude designed: "${imagePrompt.substring(0, 60)}..."`);
                     }
-                } catch (err) {
-                    console.warn('⚠️ Vision validation failed:', err.message);
-                    visionMatch = false;
                 }
+                
+                // Fallback to GPT-4
+                if (!imagePrompt && openaiKey) {
+                    const gptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${openaiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-4o',
+                            max_tokens: 300,
+                            temperature: 0.85,
+                            messages: [
+                                { role: 'system', content: 'You are a Gen Alpha educational designer.' },
+                                { role: 'user', content: promptTemplate }
+                            ]
+                        })
+                    });
+                    
+                    if (gptResponse.ok) {
+                        const data = await gptResponse.json();
+                        imagePrompt = data.choices[0].message.content.trim();
+                        console.log(`✅ GPT-4 designed: "${imagePrompt.substring(0, 60)}..."`);
+                    }
+                }
+                
+                if (!imagePrompt) {
+                    console.warn('⚠️ Failed to create infographic prompt');
+                    infographics.push({ fact, photo: null });
+                    continue;
+                }
+                
+                // Step 2: Generate the infographic with Replicate or DALL-E
+                let imageUrl = null;
+                
+                // Try Replicate first
+                if (replicateKey) {
+                    const prediction = await fetch('https://api.replicate.com/v1/predictions', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Token ${replicateKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            version: '5599ed30703defd1d160a25a63321b4dec97101d98b4674bcc56e41f62f35637',
+                            input: {
+                                prompt: imagePrompt,
+                                num_outputs: 1,
+                                aspect_ratio: '16:9',
+                                output_format: 'jpg',
+                                output_quality: 95
+                            }
+                        })
+                    });
+                    
+                    if (prediction.ok) {
+                        const predData = await prediction.json();
+                        
+                        // Poll for result
+                        for (let attempt = 0; attempt < 15; attempt++) {
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                            
+                            const statusResponse = await fetch(
+                                `https://api.replicate.com/v1/predictions/${predData.id}`,
+                                { headers: { 'Authorization': `Token ${replicateKey}` } }
+                            );
+                            
+                            if (statusResponse.ok) {
+                                const statusData = await statusResponse.json();
+                                
+                                if (statusData.status === 'succeeded' && statusData.output?.[0]) {
+                                    imageUrl = statusData.output[0];
+                                    console.log('✅ Replicate generated infographic!');
+                                    break;
+                                } else if (statusData.status === 'failed') {
+                                    console.warn('⚠️ Replicate failed');
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Fallback to DALL-E
+                if (!imageUrl && openaiKey) {
+                    console.log('🎨 Trying DALL-E...');
+                    const dalleResponse = await fetch('https://api.openai.com/v1/images/generations', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${openaiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: 'dall-e-3',
+                            prompt: imagePrompt,
+                            size: '1792x1024',
+                            quality: 'standard',
+                            n: 1
+                        })
+                    });
+                    
+                    if (dalleResponse.ok) {
+                        const data = await dalleResponse.json();
+                        imageUrl = data.data[0].url;
+                        console.log('✅ DALL-E generated infographic!');
+                    }
+                }
+                
+                if (imageUrl) {
+                    infographics.push({
+                        fact,
+                        photo: {
+                            id: `edu-infographic-${i}`,
+                            url: imageUrl,
+                            thumbnail: imageUrl,
+                            photographer: '🎨 Educational AI Infographic',
+                            photographer_url: null,
+                            description: imagePrompt,
+                            source: 'educational-infographic',
+                            aiGenerated: true,
+                            isEducationalInfographic: true
+                        }
+                    });
+                    console.log(`✅ Infographic ${i + 1} complete!`);
+                } else {
+                    console.warn(`⚠️ Failed to generate infographic ${i + 1}`);
+                    infographics.push({ fact, photo: null });
+                }
+                
+            } catch (error) {
+                console.error(`❌ Error on infographic ${i + 1}:`, error.message);
+                infographics.push({ fact, photo: null });
             }
-            
-            // ========================================
-            // STEP 4: USE PHOTO (SKIP AI GENERATION FOR NOW - TOO SLOW!)
-            // ========================================
-            // Always use the real photo we found, even if vision doesn't perfect match
-            // AI generation takes 8+ seconds per image and crashes the server!
-            
-            matchedFacts.push({
-                fact,
-                photo: {
-                    url: photoUrl,
-                    alt: photoAlt,
-                    photographer,
-                    searchQuery,
-                    visionValidated: visionMatch,
-                    visionReason: visionReason || (photoUrl ? 'Real photo from ' + (photographer || 'photographer') : 'No photo found'),
-                    aiGenerated: false
-                }
-            });
-            
-            console.log(`✅ Using ${visionMatch ? 'vision-validated' : 'real'} photo for: ${fact.substring(0, 40)}...`);
         }
         
-        console.log(`\n✅ Processed ${matchedFacts.length} facts with photos`);
-        res.json({ matched: matchedFacts });
+        const successCount = infographics.filter(i => i.photo).length;
+        console.log(`\n🎉 Generated ${successCount}/${facts.length} educational infographics!`);
+        
+        res.json({
+            matched: infographics,
+            source: 'educational-infographics'
+        });
         
     } catch (error) {
-        console.error('❌ Photo-fact matching error:', error);
+        console.error('❌ Error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Start server
+// Generate Geography in Real Life (NEW!)
+app.post('/.netlify/functions/generate-real-life-geography', async (req, res) => {
+    console.log('🌍 Generating real-life geography applications');
+    
+    try {
+        const { location, country, facts } = req.body;
+        
+        if (!location) {
+            return res.status(400).json({ error: 'Location required' });
+        }
+        
+        const fetch = (await import('node-fetch')).default;
+        const claudeKey = process.env.ANTHROPIC_API_KEY;
+        const openaiKey = process.env.OPENAI_API_KEY;
+        
+        if (!claudeKey && !openaiKey) {
+            return res.status(500).json({ error: 'No AI provider available' });
+        }
+        
+        // Create safe prompt
+        const factsContext = facts && facts.length > 0 
+            ? `\n\nFACTS ABOUT ${location.toUpperCase()}:\n${facts.map((f, i) => `${i + 1}. ${f}`).join('\n')}`
+            : '';
+        
+        const prompt = `You are an educational AI creating safe, engaging geography content for middle school students (ages 11-14).
+
+LOCATION: ${location}${country ? ', ' + country : ''}
+${factsContext}
+
+🎯 YOUR MISSION:
+Generate 3 real-life applications using the 5 Themes of Geography:
+1. Location (Where is it?)
+2. Place (What's it like there?)
+3. Human-Environment Interaction (How do people adapt?)
+4. Movement (How do people, goods, ideas move?)
+5. Region (What makes it unique?)
+
+For each theme:
+1. Write a 2-3 sentence explanation connecting the theme to ${location}
+2. Create a specific example of how this geography concept connects to a middle school student's daily life
+
+🛡️ SAFETY REQUIREMENTS (CRITICAL):
+- ✅ Age-appropriate language (11-14 year olds)
+- ✅ Educational and factual content only
+- ✅ Positive, inclusive, respectful tone
+- ✅ Focus on universal student experiences (school, hobbies, technology, sports, food)
+- ❌ NO personal information requests (addresses, phone numbers, real names)
+- ❌ NO location tracking or "share your location" suggestions
+- ❌ NO controversial topics (politics, religion, violence, discrimination)
+- ❌ NO unsafe activities or dangerous suggestions
+- ❌ NO assumptions about family structure, income, or living situations
+- ❌ NO comparisons that could be offensive or stereotyping
+
+💡 STUDENT CONNECTION EXAMPLES (SAFE):
+- "When you video chat with relatives in another country, that's Movement!"
+- "Checking the weather app before school is using Location data"
+- "Your school cafeteria choosing local vs imported food shows Human-Environment Interaction"
+- "Playing games with friends online demonstrates how technology connects different Places"
+- "Your school bus route is designed using Place characteristics (streets, neighborhoods)"
+
+📝 RESPONSE FORMAT (JSON):
+{
+  "themes": [
+    {
+      "icon": "📍",
+      "name": "Location",
+      "explanation": "2-3 sentences about how this theme applies to the location",
+      "studentApplication": "One specific example of how this connects to a middle school student's life"
+    },
+    // ... 2 more themes (pick from the 5)
+  ]
+}
+
+RESPOND WITH ONLY THE JSON OBJECT. Make it EDUCATIONAL and RELATABLE!`;
+        
+        let themes = null;
+        
+        // Try Claude first
+        if (claudeKey) {
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': claudeKey,
+                    'anthropic-version': '2023-06-01'
+                },
+                body: JSON.stringify({
+                    model: 'claude-3-5-sonnet-latest',
+                    max_tokens: 1500,
+                    temperature: 0.7,
+                    messages: [{ role: 'user', content: prompt }]
+                })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const content = data.content[0].text.trim();
+                const jsonMatch = content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    themes = parsed.themes;
+                    console.log('✅ Claude generated', themes?.length || 0, 'themes');
+                }
+            }
+        }
+        
+        // Fallback to GPT-4
+        if (!themes && openaiKey) {
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${openaiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-4o',
+                    max_tokens: 1200,
+                    temperature: 0.7,
+                    response_format: { type: 'json_object' },
+                    messages: [
+                        { 
+                            role: 'system', 
+                            content: 'You are a safe, educational AI for middle school geography. Always output valid JSON with the themes array.' 
+                        },
+                        { role: 'user', content: prompt }
+                    ]
+                })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const content = data.choices[0].message.content.trim();
+                const parsed = JSON.parse(content);
+                themes = parsed.themes;
+                console.log('✅ GPT-4 generated', themes?.length || 0, 'themes');
+            }
+        }
+        
+        if (!themes) {
+            return res.status(500).json({ error: 'Failed to generate content' });
+        }
+        
+        // 🛡️ SAFETY FILTER
+        const safeThemes = themes.filter(theme => {
+            if (!theme || !theme.explanation || !theme.studentApplication) {
+                return false;
+            }
+            
+            const combinedText = `${theme.explanation} ${theme.studentApplication}`.toLowerCase();
+            
+            // Blocked patterns
+            const blocked = [
+                /\b(address|phone\s*number|real\s*name|where\s*you\s*live|your\s*home)\b/i,
+                /\b(share\s*your\s*location|tell\s*me\s*where|post\s*your)\b/i,
+                /\b(politics|political|religion|religious|war|violence|terrorist)\b/i,
+                /\b(hate|racist|sexist|discriminat)\b/i,
+                /\b(drug|alcohol|weapon|gun)\b/i,
+                /\b(suicide|self[- ]harm|kill)\b/i,
+                /\b(sexy|sexual|porn|nude)\b/i,
+                /\b(password|credit\s*card|social\s*security)\b/i
+            ];
+            
+            for (const pattern of blocked) {
+                if (pattern.test(combinedText)) {
+                    console.warn(`⚠️ SAFETY FILTER: Blocked theme "${theme.name}"`);
+                    return false;
+                }
+            }
+            
+            if (theme.explanation.length < 50 || theme.explanation.length > 500) {
+                return false;
+            }
+            
+            return true;
+        }).slice(0, 3);
+        
+        console.log(`✅ Generated ${safeThemes.length} safe geography themes`);
+        
+        res.json({
+            themes: safeThemes,
+            location,
+            generated: new Date().toISOString()
+        });
+        
+    } catch (error) {
+        console.error('❌ Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log('\n╔════════════════════════════════════════════════════════════╗');
     console.log('║  🚀 LOCAL DEV SERVER RUNNING                              ║');
