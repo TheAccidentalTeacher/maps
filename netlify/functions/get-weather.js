@@ -95,11 +95,21 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Error fetching weather:', error);
+    console.error('❌ Weather function error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      apiKeyPresent: !!process.env.OPENWEATHER_API_KEY
+    });
+    
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Failed to fetch weather', message: error.message })
+      body: JSON.stringify({ 
+        error: 'Failed to fetch weather', 
+        message: error.message,
+        details: 'Check Netlify function logs for more info'
+      })
     };
   }
 };
