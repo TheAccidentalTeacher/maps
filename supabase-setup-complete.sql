@@ -263,17 +263,20 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Apply to tables with updated_at column
-CREATE TRIGGER IF NOT EXISTS update_accounts_updated_at
+DROP TRIGGER IF EXISTS update_accounts_updated_at ON accounts;
+CREATE TRIGGER update_accounts_updated_at
   BEFORE UPDATE ON accounts
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER IF NOT EXISTS update_profiles_updated_at
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
+CREATE TRIGGER update_profiles_updated_at
   BEFORE UPDATE ON profiles
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER IF NOT EXISTS update_game_progress_updated_at
+DROP TRIGGER IF EXISTS update_game_progress_updated_at ON game_progress;
+CREATE TRIGGER update_game_progress_updated_at
   BEFORE UPDATE ON game_progress
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
@@ -285,40 +288,47 @@ CREATE TRIGGER IF NOT EXISTS update_game_progress_updated_at
 -- ACCOUNTS TABLE
 ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "Users can view own account"
+DROP POLICY IF EXISTS "Users can view own account" ON accounts;
+CREATE POLICY "Users can view own account"
   ON accounts FOR SELECT
   USING (auth.uid() = auth_user_id);
 
-CREATE POLICY IF NOT EXISTS "Users can update own account"
+DROP POLICY IF EXISTS "Users can update own account" ON accounts;
+CREATE POLICY "Users can update own account"
   ON accounts FOR UPDATE
   USING (auth.uid() = auth_user_id);
 
-CREATE POLICY IF NOT EXISTS "Users can insert own account"
+DROP POLICY IF EXISTS "Users can insert own account" ON accounts;
+CREATE POLICY "Users can insert own account"
   ON accounts FOR INSERT
   WITH CHECK (auth.uid() = auth_user_id);
 
 -- PROFILES TABLE
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "Users can view own profiles"
+DROP POLICY IF EXISTS "Users can view own profiles" ON profiles;
+CREATE POLICY "Users can view own profiles"
   ON profiles FOR SELECT
   USING (account_id IN (
     SELECT id FROM accounts WHERE auth_user_id = auth.uid()
   ));
 
-CREATE POLICY IF NOT EXISTS "Users can create own profiles"
+DROP POLICY IF EXISTS "Users can create own profiles" ON profiles;
+CREATE POLICY "Users can create own profiles"
   ON profiles FOR INSERT
   WITH CHECK (account_id IN (
     SELECT id FROM accounts WHERE auth_user_id = auth.uid()
   ));
 
-CREATE POLICY IF NOT EXISTS "Users can update own profiles"
+DROP POLICY IF EXISTS "Users can update own profiles" ON profiles;
+CREATE POLICY "Users can update own profiles"
   ON profiles FOR UPDATE
   USING (account_id IN (
     SELECT id FROM accounts WHERE auth_user_id = auth.uid()
   ));
 
-CREATE POLICY IF NOT EXISTS "Users can delete own profiles"
+DROP POLICY IF EXISTS "Users can delete own profiles" ON profiles;
+CREATE POLICY "Users can delete own profiles"
   ON profiles FOR DELETE
   USING (account_id IN (
     SELECT id FROM accounts WHERE auth_user_id = auth.uid()
@@ -327,7 +337,8 @@ CREATE POLICY IF NOT EXISTS "Users can delete own profiles"
 -- GAME_PROGRESS TABLE
 ALTER TABLE game_progress ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "Users can view own game progress"
+DROP POLICY IF EXISTS "Users can view own game progress" ON game_progress;
+CREATE POLICY "Users can view own game progress"
   ON game_progress FOR SELECT
   USING (profile_id IN (
     SELECT p.id FROM profiles p
@@ -335,7 +346,8 @@ CREATE POLICY IF NOT EXISTS "Users can view own game progress"
     WHERE a.auth_user_id = auth.uid()
   ));
 
-CREATE POLICY IF NOT EXISTS "Users can insert own game progress"
+DROP POLICY IF EXISTS "Users can insert own game progress" ON game_progress;
+CREATE POLICY "Users can insert own game progress"
   ON game_progress FOR INSERT
   WITH CHECK (profile_id IN (
     SELECT p.id FROM profiles p
@@ -343,7 +355,8 @@ CREATE POLICY IF NOT EXISTS "Users can insert own game progress"
     WHERE a.auth_user_id = auth.uid()
   ));
 
-CREATE POLICY IF NOT EXISTS "Users can update own game progress"
+DROP POLICY IF EXISTS "Users can update own game progress" ON game_progress;
+CREATE POLICY "Users can update own game progress"
   ON game_progress FOR UPDATE
   USING (profile_id IN (
     SELECT p.id FROM profiles p
@@ -354,7 +367,8 @@ CREATE POLICY IF NOT EXISTS "Users can update own game progress"
 -- ACHIEVEMENTS TABLE
 ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "Users can view own achievements"
+DROP POLICY IF EXISTS "Users can view own achievements" ON achievements;
+CREATE POLICY "Users can view own achievements"
   ON achievements FOR SELECT
   USING (profile_id IN (
     SELECT p.id FROM profiles p
@@ -362,7 +376,8 @@ CREATE POLICY IF NOT EXISTS "Users can view own achievements"
     WHERE a.auth_user_id = auth.uid()
   ));
 
-CREATE POLICY IF NOT EXISTS "Users can insert own achievements"
+DROP POLICY IF EXISTS "Users can insert own achievements" ON achievements;
+CREATE POLICY "Users can insert own achievements"
   ON achievements FOR INSERT
   WITH CHECK (profile_id IN (
     SELECT p.id FROM profiles p
@@ -373,7 +388,8 @@ CREATE POLICY IF NOT EXISTS "Users can insert own achievements"
 -- ERROR_LOGS TABLE
 ALTER TABLE error_logs ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "Users can view own error logs"
+DROP POLICY IF EXISTS "Users can view own error logs" ON error_logs;
+CREATE POLICY "Users can view own error logs"
   ON error_logs FOR SELECT
   USING (
     account_id IN (
@@ -386,7 +402,8 @@ CREATE POLICY IF NOT EXISTS "Users can view own error logs"
     )
   );
 
-CREATE POLICY IF NOT EXISTS "Anyone can insert error logs"
+DROP POLICY IF EXISTS "Anyone can insert error logs" ON error_logs;
+CREATE POLICY "Anyone can insert error logs"
   ON error_logs FOR INSERT
   WITH CHECK (true);
 
