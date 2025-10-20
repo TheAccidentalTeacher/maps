@@ -31,12 +31,15 @@ exports.handler = async (event, context) => {
     const apiKey = process.env.OPENWEATHER_API_KEY;
     
     if (!apiKey) {
+      console.error('❌ OPENWEATHER_API_KEY not found in environment variables');
       return {
         statusCode: 500,
         headers,
         body: JSON.stringify({ error: 'OpenWeatherMap API key not configured' })
       };
     }
+    
+    console.log('✅ Weather API key found, fetching weather for:', lat, lon);
 
     // Get current weather
     const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
