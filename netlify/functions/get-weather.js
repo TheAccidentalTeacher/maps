@@ -52,24 +52,41 @@ exports.handler = async (event, context) => {
 
     const data = await response.json();
 
-    // Format weather data
+    // Format weather data to match frontend expectations
+    const tempF = Math.round(data.main.temp);
+    const tempC = Math.round((data.main.temp - 32) * 5/9);
+    const visibilityMiles = Math.round(data.visibility * 0.000621371); // meters to miles
+    
+    // Get wind direction as compass direction
+    const getWindDirection = (deg) => {
+      const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+      return directions[Math.round(deg / 22.5) % 16];
+    };
+    
     const weather = {
-      temp: Math.round(data.main.temp),
-      temp_celsius: Math.round((data.main.temp - 32) * 5/9),
+      temp: {
+        fahrenheit: tempF,
+        celsius: tempC
+      },
       feels_like: Math.round(data.main.feels_like),
       humidity: data.main.humidity,
       pressure: data.main.pressure,
       description: data.weather[0].description,
       icon: data.weather[0].icon,
-      wind_speed: Math.round(data.wind.speed),
-      wind_direction: data.wind.deg,
+      wind: {
+        speed: Math.round(data.wind.speed),
+        direction: getWindDirection(data.wind.deg),
+        degrees: data.wind.deg
+      },
       clouds: data.clouds.all,
-      visibility: data.visibility,
+      visibility: visibilityMiles,
       sunrise: data.sys.sunrise,
       sunset: data.sys.sunset,
       timezone: data.timezone,
       city: data.name
     };
+    
+    console.log('✅ Weather data formatted successfully:', weather.temp.fahrenheit + '°F');
 
     return {
       statusCode: 200,
