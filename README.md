@@ -22,10 +22,32 @@
 - **[ACTION_PLAN.md](./ACTION_PLAN.md)** - Development roadmap and timeline
 
 ### 🔧 Technical Documentation
+- **[CODE_ARCHITECTURE.md](./CODE_ARCHITECTURE.md)** - Complete code map with line numbers (NEW)
+- **[NETLIFY_FUNCTIONS_REFERENCE.md](./NETLIFY_FUNCTIONS_REFERENCE.md)** - API documentation for all 7 serverless functions (NEW)
+- **[CODE_DOCUMENTATION_AUDIT.md](./CODE_DOCUMENTATION_AUDIT.md)** - Documentation quality review (NEW)
 - **[CODE_REVIEW_SUMMARY.md](./CODE_REVIEW_SUMMARY.md)** - Architecture and code analysis
 - **[COORDINATE_FINDER_SPEC.md](./COORDINATE_FINDER_SPEC.md)** - Progressive reveal feature specification (technical)
 - **[COORDINATE_FINDER_IMPLEMENTATION.md](./COORDINATE_FINDER_IMPLEMENTATION.md)** - Developer implementation guide
 - **[COORDINATE_FINDER_EXPLAINED.md](./COORDINATE_FINDER_EXPLAINED.md)** - Plain English explanation (12th grade reading level)
+
+### 💰 SaaS Transformation
+
+#### 🚀 Implementation (START HERE!)
+- **[TODAY_CHECKLIST_DAY1.md](./TODAY_CHECKLIST_DAY1.md)** - Day 1: Supabase setup checklist ⭐ NEW ⭐
+- **[SUPABASE_CONNECTION_TEST.md](./SUPABASE_CONNECTION_TEST.md)** - Test your Supabase connection ⭐ NEW ⭐
+- **[SAAS_IMPLEMENTATION_WEEK_BY_WEEK.md](./SAAS_IMPLEMENTATION_WEEK_BY_WEEK.md)** - Week-by-week action plan (12 weeks) ⭐
+
+#### 📋 Planning Documents
+- **[PRODUCTION_SAFETY_QUICK_REFERENCE.md](./PRODUCTION_SAFETY_QUICK_REFERENCE.md)** - Never break production (3-min read) ⭐ NEW
+- **[SAFE_DEPLOYMENT_STRATEGY.md](./SAFE_DEPLOYMENT_STRATEGY.md)** - Complete deployment guide ⭐ NEW
+- **[DASHBOARD_QUICK_REFERENCE.md](./DASHBOARD_QUICK_REFERENCE.md)** - Quick summary for teachers ⭐ NEW
+- **[SAAS_TRANSFORMATION_ROADMAP.md](./SAAS_TRANSFORMATION_ROADMAP.md)** - Complete SaaS transformation guide ⭐ UPDATED
+- **[TEACHER_PARENT_DASHBOARD_SPEC.md](./TEACHER_PARENT_DASHBOARD_SPEC.md)** - Complete dashboard specification ⭐ NEW
+- **[FERPA_QUICK_START.md](./FERPA_QUICK_START.md)** - Essential FERPA compliance actions (5-min read) ⭐ NEW
+- **[FERPA_COMPLIANCE_GUIDE.md](./FERPA_COMPLIANCE_GUIDE.md)** - 100% FERPA compliance framework (complete) ⭐ NEW
+- **[SAAS_AUTH_ARCHITECTURE.md](./SAAS_AUTH_ARCHITECTURE.md)** - Authentication architecture (Supabase + Stripe)
+- **[SAAS_IMPLEMENTATION_READY.md](./SAAS_IMPLEMENTATION_READY.md)** - Step-by-step implementation (1,292 lines)
+- **[STUDENT_AUTH_PLAN.md](./STUDENT_AUTH_PLAN.md)** - Interim classroom authentication
 
 ### 🎮 Feature Documentation
 - **[ALASKA_EXPANSION_COMPLETE.md](./ALASKA_EXPANSION_COMPLETE.md)** - 5-round Alaska Adventure game
@@ -41,11 +63,14 @@
 - **[QUICK_FIXES.md](./QUICK_FIXES.md)** - Common problems and solutions
 - **[test_results.md](./test_results.md)** - Testing logs and results
 
-### �️ Archives
-- **[01_CODE_REVIEW_ARCHIVE.md](./01_CODE_REVIEW_ARCHIVE.md)** - Original code review documentation
-
-### �📈 Planning
+### 📈 Planning
 - **[IMPROVEMENT_PLAN.md](./IMPROVEMENT_PLAN.md)** - Future enhancements and features
+- **[ACTION_PLAN.md](./ACTION_PLAN.md)** - Development roadmap and timeline
+- **[IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md)** - Feature implementation order
+
+### 📂 Archives
+- **[01_CODE_REVIEW_ARCHIVE.md](./01_CODE_REVIEW_ARCHIVE.md)** - Original code review documentation
+- **[DOCUMENTATION_COMPLETE_SUMMARY.md](./DOCUMENTATION_COMPLETE_SUMMARY.md)** - October 2025 documentation audit results ⭐ NEW
 
 ---
 
@@ -109,11 +134,13 @@ Geographic Detective Academy is an interactive web-based geography learning appl
 
 **Start here if you're implementing new features or fixing bugs:**
 
-1. Read **[CODE_REVIEW_SUMMARY.md](./CODE_REVIEW_SUMMARY.md)** for architecture overview
-2. Review **[COORDINATE_FINDER_SPEC.md](./COORDINATE_FINDER_SPEC.md)** for technical specification
-3. Read **[COORDINATE_FINDER_EXPLAINED.md](./COORDINATE_FINDER_EXPLAINED.md)** for user experience context
-4. Follow **[COORDINATE_FINDER_IMPLEMENTATION.md](./COORDINATE_FINDER_IMPLEMENTATION.md)** for step-by-step coding
-5. Check **[BUGS_DETAILED.md](./BUGS_DETAILED.md)** for known issues
+1. Read **[CODE_ARCHITECTURE.md](./CODE_ARCHITECTURE.md)** for complete code map with line numbers ⭐ NEW
+2. Review **[NETLIFY_FUNCTIONS_REFERENCE.md](./NETLIFY_FUNCTIONS_REFERENCE.md)** for API documentation ⭐ NEW
+3. Read **[CODE_REVIEW_SUMMARY.md](./CODE_REVIEW_SUMMARY.md)** for architecture overview
+4. Review **[COORDINATE_FINDER_SPEC.md](./COORDINATE_FINDER_SPEC.md)** for technical specification
+5. Read **[COORDINATE_FINDER_EXPLAINED.md](./COORDINATE_FINDER_EXPLAINED.md)** for user experience context
+6. Follow **[COORDINATE_FINDER_IMPLEMENTATION.md](./COORDINATE_FINDER_IMPLEMENTATION.md)** for step-by-step coding
+7. Check **[BUGS_DETAILED.md](./BUGS_DETAILED.md)** for known issues
 
 **Development Workflow:**
 1. Test locally using `python -m http.server 8000`

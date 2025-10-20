@@ -2430,6 +2430,56 @@
             content: ' ✨';
         }
     </style>
+    
+    <!-- ============================================ -->
+    <!-- SUPABASE CONNECTION - Added October 20, 2025 -->
+    <!-- ============================================ -->
+    
+    <!-- Supabase Client Library (v2.x) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // ========================================
+        // SUPABASE INITIALIZATION
+        // ========================================
+        
+        // Your Supabase project configuration
+        const SUPABASE_URL = 'https://fuppbkhfqutzcromomkc.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cHBia2hmcXV0emNyb21vbWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5ODE4NDQsImV4cCI6MjA3NjU1Nzg0NH0.A1kARz6ujz1wMQy-T_4W2EN1wrroma6f230_-rKnNBo';
+        
+        // Create Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Log successful connection (you'll see this in browser console!)
+        console.log('✅ Supabase initialized successfully!');
+        console.log('📦 Supabase client:', supabase);
+        console.log('🌐 Project URL:', SUPABASE_URL);
+        console.log('🔗 Ready to connect to database!');
+        
+        // Test function to verify connection (run in console: testSupabaseConnection())
+        async function testSupabaseConnection() {
+            console.log('🧪 Testing Supabase connection...');
+            try {
+                const { data, error } = await supabase
+                    .from('test_connection')
+                    .select('*');
+                
+                if (error) {
+                    console.warn('⚠️ Query error (table might not exist yet):', error.message);
+                } else {
+                    console.log('✅ SUCCESS! Database connection working!');
+                    console.log('📊 Data received:', data);
+                }
+            } catch (err) {
+                console.error('❌ Connection test failed:', err);
+            }
+        }
+        
+        // Make test function available globally
+        window.testSupabaseConnection = testSupabaseConnection;
+    </script>
+    
+    <!-- End of Supabase setup -->
 </head>
 <body>
     <!-- Toast Notification Container -->
