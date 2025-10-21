@@ -2742,6 +2742,141 @@
             }, 1000);
         }
 
+        // ========================================
+        // TEACHER DASHBOARD FUNCTIONS
+        // ========================================
+        
+        // Store original teacher session
+        let originalTeacherSession = null;
+        let viewingAsStudent = false;
+        
+        async function loadTeacherDashboard() {
+            const accountType = localStorage.getItem('user_account_type');
+            
+            // Only show dashboard if user is a teacher
+            if (accountType !== 'teacher') {
+                return;
+            }
+            
+            console.log('👩‍🏫 Loading teacher dashboard...');
+            const dashboard = document.getElementById('teacher-dashboard');
+            dashboard.style.display = 'block';
+            
+            // Load all students
+            await loadAllStudents();
+        }
+        
+        async function loadAllStudents() {
+            console.log('📚 Loading all students...');
+            
+            try {
+                // Fetch all student accounts
+                const { data: students, error } = await supabase
+                    .from('accounts')
+                    .select('id, full_name, account_type, created_at, auth_user_id')
+                    .eq('account_type', 'student')
+                    .order('full_name');
+                
+                if (error) {
+                    console.error('❌ Error loading students:', error);
+                    return;
+                }
+                
+                console.log(`✅ Loaded ${students.length} students`);
+                
+                // Render student list
+                const studentList = document.getElementById('student-list');
+                studentList.innerHTML = students.map(student => `
+                    <div class="student-card" style="background: #FFE951; border: 3px solid #000; padding: 15px; box-shadow: 5px 5px 0 rgba(0,0,0,0.3); transition: all 0.2s;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #000;">
+                            🎓 ${student.full_name}
+                        </h3>
+                        <div style="margin: 10px 0; font-size: 14px; color: #333;">
+                            <div>📅 Joined: ${new Date(student.created_at).toLocaleDateString()}</div>
+                        </div>
+                        <button onclick="viewAsStudent('${student.auth_user_id}', '${student.full_name}')" 
+                            style="background: #6366F1; color: #FFE951; border: 3px solid #000; padding: 8px 16px; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); margin-top: 10px; width: 100%;">
+                            👁️ View As Student
+                        </button>
+                    </div>
+                `).join('');
+                
+            } catch (err) {
+                console.error('❌ Failed to load students:', err);
+            }
+        }
+        
+        function filterStudents() {
+            const searchInput = document.getElementById('student-search').value.toLowerCase();
+            const studentCards = document.querySelectorAll('.student-card');
+            
+            studentCards.forEach(card => {
+                const studentName = card.querySelector('h3').textContent.toLowerCase();
+                if (studentName.includes(searchInput)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        async function viewAsStudent(studentUserId, studentName) {
+            console.log(`👁️ Viewing as student: ${studentName} (${studentUserId})`);
+            
+            // Store original teacher session if not already stored
+            if (!viewingAsStudent) {
+                const { data: { session } } = await supabase.auth.getSession();
+                originalTeacherSession = session;
+                viewingAsStudent = true;
+            }
+            
+            // Store student info in sessionStorage (temporary, not persistent)
+            sessionStorage.setItem('viewing_student_id', studentUserId);
+            sessionStorage.setItem('viewing_student_name', studentName);
+            
+            // Update UI to show "Return to Teacher View" button
+            document.getElementById('return-to-teacher-container').style.display = 'block';
+            document.getElementById('current-student-name').textContent = `Viewing: ${studentName}`;
+            
+            // Update header title
+            const headerTitle = document.getElementById('header-title');
+            headerTitle.innerHTML = `🎓 ${studentName}'s Progress`;
+            
+            // Hide student list, show return button prominently
+            document.getElementById('student-list-container').style.display = 'none';
+            
+            // TODO: Load student's progress data
+            // This will be implemented when we build the progress tracking
+            showToast(`Now viewing ${studentName}'s account`, 'success');
+        }
+        
+        function returnToTeacherView() {
+            console.log('⬅️ Returning to teacher view');
+            
+            // Clear student viewing state
+            sessionStorage.removeItem('viewing_student_id');
+            sessionStorage.removeItem('viewing_student_name');
+            viewingAsStudent = false;
+            
+            // Update UI
+            document.getElementById('return-to-teacher-container').style.display = 'none';
+            document.getElementById('student-list-container').style.display = 'block';
+            
+            // Restore header
+            const userName = localStorage.getItem('user_full_name');
+            const firstName = userName.split(' ')[0];
+            const headerTitle = document.getElementById('header-title');
+            headerTitle.innerHTML = `👩‍🏫 Welcome, ${firstName}!`;
+            
+            showToast('Returned to teacher view', 'success');
+        }
+        
+        // Make functions globally available
+        window.loadTeacherDashboard = loadTeacherDashboard;
+        window.viewAsStudent = viewAsStudent;
+        window.returnToTeacherView = returnToTeacherView;
+        window.filterStudents = filterStudents;
+
         // Run auth check when page loads
         let currentUser = null;
         window.addEventListener('DOMContentLoaded', async () => {
@@ -2750,6 +2885,9 @@
                 // Will redirect to login
                 return;
             }
+            
+            // Load teacher dashboard if user is a teacher
+            await loadTeacherDashboard();
         });
     </script>
     
@@ -2796,6 +2934,36 @@
         <button id="logout-btn" onclick="logoutUser()">
             🚪 Logout
         </button>
+    </div>
+    
+    <!-- Teacher Dashboard (Only visible for teachers) -->
+    <div id="teacher-dashboard" style="display: none; background: #6366F1; border: 5px solid #000; padding: 20px; margin: 20px; box-shadow: 10px 10px 0 rgba(0,0,0,0.3);">
+        <h2 style="color: #FFE951; margin: 0 0 20px 0; font-size: 28px; text-shadow: 3px 3px 0 rgba(0,0,0,0.3);">
+            👩‍🏫 Teacher Dashboard
+        </h2>
+        
+        <!-- Return to Teacher View Button (hidden by default, shown when viewing as student) -->
+        <div id="return-to-teacher-container" style="display: none; margin-bottom: 20px;">
+            <button onclick="returnToTeacherView()" style="background: #FFE951; color: #000; border: 3px solid #000; padding: 12px 24px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 5px 5px 0 rgba(0,0,0,0.3); transition: all 0.2s;">
+                ⬅️ Return to Teacher View
+            </button>
+            <span id="current-student-name" style="color: #FFE951; margin-left: 20px; font-size: 18px; font-weight: bold;">
+                <!-- Current student name will be shown here -->
+            </span>
+        </div>
+        
+        <!-- Student List -->
+        <div id="student-list-container">
+            <div style="background: rgba(255,255,255,0.1); padding: 15px; border: 3px solid #000; margin-bottom: 20px;">
+                <input type="text" id="student-search" placeholder="🔍 Search students..." 
+                    onkeyup="filterStudents()"
+                    style="width: 100%; padding: 10px; font-size: 16px; border: 3px solid #000; box-shadow: inset 3px 3px 0 rgba(0,0,0,0.2);">
+            </div>
+            
+            <div id="student-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; max-height: 500px; overflow-y: auto;">
+                <!-- Students will be loaded here dynamically -->
+            </div>
+        </div>
     </div>
     
     <div id="game-modes">
