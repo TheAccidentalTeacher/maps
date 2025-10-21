@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin: Batch Create Students - Mrs. Somers</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .warning h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border: 2px solid #2196F3;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .progress.active {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 40px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+        }
+        
+        .success { color: #00ff00; }
+        .error { color: #ff4444; }
+        .info { color: #4fc3f7; }
+        .skip { color: #ffeb3b; }
+        
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .student-list {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .student-item {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Batch Create Students</h1>
+        <p class="subtitle">Administrator Tool - Mrs. Somers Only</p>
+        
+        <div class="warning">
+            <h3>⚠️ Important: Run This Once Only!</h3>
+            <p>This will create accounts for all 39 students from your Excel spreadsheet.</p>
+            <p>Each student will get:</p>
+            <ul>
+                <li>Email: [username]@mrsomers.student (e.g., kalayabo@mrsomers.student)</li>
+                <li>Password: Their password from the spreadsheet</li>
+                <li>Account automatically linked via database trigger</li>
+            </ul>
+        </div>
+        
+        <div class="info-box">
+            <h3>📊 Students to Create: 39</h3>
+            <p>From: Kalaya Boston to Hunter Stickwan</p>
+        </div>
+        
+        <button id="createBtn" onclick="createAllStudents()">
+            🚀 Create All 39 Students Now
+        </button>
+        
+        <div class="progress" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            
+            <div class="log" id="log"></div>
+            
+            <div class="summary" id="summary" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-number success" id="successCount">0</div>
+                    <div class="stat-label">Created</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number skip" id="skipCount">0</div>
+                    <div class="stat-label">Skipped</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number error" id="failCount">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration - USING SERVICE ROLE KEY FOR ADMIN OPERATIONS
+        const SUPABASE_URL = 'https://fuppbkhfqutzcromomkc.supabase.co';
+        const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cHBia2hmcXV0emNyb21vbWtjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDk4MTg0NCwiZXhwIjoyMDc2NTU3ODQ0fQ.aHwkJ2EReo0hQSmL8D45hSVN9ibm_KlanrfK0U8tgV8';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false
+            }
+        });
+
+        // Student data from your Excel spreadsheet
+        const students = [
+            {firstName: "Kalaya", lastName: "Boston", username: "kalayabo", password: "kinddoor79"},
+            {firstName: "Kisu", lastName: "Boston", username: "kisubo", password: "lowdesk32"},
+            {firstName: "Sayna", lastName: "Cummings", username: "saynacu", password: "slowbrass50"},
+            {firstName: "Helena", lastName: "Debler", username: "helenade", password: "quietchess79"},
+            {firstName: "Jack", lastName: "Dempsey", username: "jackde", password: "coldbun88"},
+            {firstName: "Norma", lastName: "Harris", username: "normaha", password: "nicearm91"},
+            {firstName: "Ashton", lastName: "Jackson", username: "ashtonja", password: "roundfish98"},
+            {firstName: "Gabriel", lastName: "Jangala", username: "gabrielja", password: "shorttiger61"},
+            {firstName: "Grace", lastName: "Kinzer", username: "graceki", password: "cleanmouse13"},
+            {firstName: "Easton", lastName: "Kvamme", username: "eastonkv", password: "messyleaf92"},
+            {firstName: "Alayna", lastName: "MacDonald", username: "alaynama", password: "redtoy18"},
+            {firstName: "Leslie", lastName: "Pete", username: "lesliepe", password: "orangebed97"},
+            {firstName: "Sawyer", lastName: "Roslansky", username: "sawyerro", password: "quickmass67"},
+            {firstName: "Skyler", lastName: "Sandson", username: "syklersa", password: "freelunch34"},
+            {firstName: "Oscar", lastName: "Winishut", username: "oscarwi", password: "greenclass23"},
+            {firstName: "River", lastName: "Bengtson", username: "riverbe", password: "graykite80"},
+            {firstName: "Alvaro", lastName: "Christoffersen", username: "alvaroch", password: "tallplot45"},
+            {firstName: "John", lastName: "Coulter", username: "johnco", password: "greendime66"},
+            {firstName: "Joslynn", lastName: "Douglas", username: "joslynndo", password: "lowmall16"},
+            {firstName: "Casey", lastName: "Fields", username: "caseyfi", password: "sadflock87"},
+            {firstName: "Adam", lastName: "Jackson", username: "adamja", password: "bigsock27"},
+            {firstName: "Tianna", lastName: "Kvamme", username: "tiannakv", password: "olivepaint36"},
+            {firstName: "Brooke", lastName: "Lambert", username: "brookela", password: "richhair51"},
+            {firstName: "Tovey", lastName: "Malone-Crain", username: "toveyma", password: "lowplot64"},
+            {firstName: "Justus", lastName: "McConkey", username: "justusmc", password: "graybook35"},
+            {firstName: "Wyatt", lastName: "McGinnis", username: "wyattmc", password: "roundbunny75"},
+            {firstName: "Abigail", lastName: "Meyer", username: "abigailme", password: "oddstar62"},
+            {firstName: "Maison", lastName: "Oosterman", username: "maisonoo", password: "reddeer93"},
+            {firstName: "Ryland", lastName: "Paul", username: "rylandpa", password: "funbun92"},
+            {firstName: "E. Jay", lastName: "Thompson", username: "ejayth", password: "Hodges35"},
+            {firstName: "Lucius", lastName: "Townsend", username: "luciusto", password: "proudhair96"},
+            {firstName: "Alayah", lastName: "Voyles", username: "alayahvo", password: "youngbunny90"},
+            {firstName: "Natalia", lastName: "White", username: "nataliawh", password: "redbun33"},
+            {firstName: "Hadassah", lastName: "Alexander", username: "hadassahal", password: "drycup40"},
+            {firstName: "Naomi", lastName: "Jackson", username: "naomija", password: "widekite15"},
+            {firstName: "Autumn", lastName: "Riley", username: "ariley", password: "hottooth90"},
+            {firstName: "Raylee", lastName: "Rock-Albert", username: "rayleero", password: "younghorse54"},
+            {firstName: "Eastyn", lastName: "Shipman", username: "eastynsh", password: "megaamber19"},
+            {firstName: "Hunter", lastName: "Stickwan", username: "hunterst", password: "orangekite70"}
+        ];
+
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        async function createAllStudents() {
+            const btn = document.getElementById('createBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const summary = document.getElementById('summary');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Creating students...';
+            progressContainer.classList.add('active');
+            
+            const results = {
+                success: [],
+                failed: [],
+                skipped: []
+            };
+            
+            addLog(`🚀 Starting batch creation of ${students.length} students...`, 'info');
+            
+            for (let i = 0; i < students.length; i++) {
+                const student = students[i];
+                const email = `${student.username}@mrsomers.student`;
+                const progress = Math.round(((i + 1) / students.length) * 100);
+                
+                progressFill.style.width = progress + '%';
+                progressFill.textContent = progress + '%';
+                
+                addLog(`[${i+1}/${students.length}] Creating: ${student.firstName} ${student.lastName}...`, 'info');
+                
+                try {
+                    // Use admin API to create user (bypasses email confirmation)
+                    const { data, error } = await supabase.auth.admin.createUser({
+                        email: email,
+                        password: student.password,
+                        email_confirm: true,
+                        user_metadata: {
+                            full_name: `${student.firstName} ${student.lastName}`,
+                            account_type: 'student',
+                            username: student.username,
+                            first_name: student.firstName,
+                            last_name: student.lastName
+                        }
+                    });
+                    
+                    if (error) {
+                        if (error.message.includes('already registered')) {
+                            addLog(`⏭️  SKIPPED: ${student.firstName} ${student.lastName} (already exists)`, 'skip');
+                            results.skipped.push(student);
+                        } else {
+                            addLog(`❌ FAILED: ${student.firstName} ${student.lastName} - ${error.message}`, 'error');
+                            results.failed.push({student, error: error.message});
+                        }
+                    } else {
+                        addLog(`✅ SUCCESS: ${student.firstName} ${student.lastName} created!`, 'success');
+                        results.success.push(student);
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    
+                } catch (err) {
+                    addLog(`❌ EXCEPTION: ${student.firstName} ${student.lastName} - ${err.message}`, 'error');
+                    results.failed.push({student, error: err.message});
+                }
+            }
+            
+            // Show summary
+            document.getElementById('successCount').textContent = results.success.length;
+            document.getElementById('skipCount').textContent = results.skipped.length;
+            document.getElementById('failCount').textContent = results.failed.length;
+            summary.style.display = 'grid';
+            
+            addLog('', 'info');
+            addLog('═'.repeat(60), 'info');
+            addLog('📊 BATCH CREATION COMPLETE!', 'info');
+            addLog('═'.repeat(60), 'info');
+            addLog(`✅ Successfully created: ${results.success.length}`, 'success');
+            addLog(`⏭️  Skipped (already exist): ${results.skipped.length}`, 'skip');
+            addLog(`❌ Failed: ${results.failed.length}`, 'error');
+            addLog('═'.repeat(60), 'info');
+            
+            if (results.success.length > 0) {
+                addLog('🎉 All students have been created and can now login!', 'success');
+            }
+            
+            btn.textContent = '✅ Complete!';
+        }
+    </script>
+</body>
+</html>

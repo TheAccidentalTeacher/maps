@@ -52,6 +52,25 @@
             gap: 8px;
         }
         
+        #logout-btn {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            margin-left: 15px;
+        }
+        
+        #logout-btn:hover {
+            background: rgba(255,107,107,0.3);
+            border-color: #ff6b6b;
+            transform: translateY(-2px);
+        }
+        
         #game-modes {
             background: #0f1329;
             padding: 12px 20px;
@@ -2440,15 +2459,22 @@
     
     <script>
         // ========================================
-        // SUPABASE INITIALIZATION
+        // SUPABASE INITIALIZATION - PROPER SETUP
         // ========================================
         
         // Your Supabase project configuration
         const SUPABASE_URL = 'https://fuppbkhfqutzcromomkc.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cHBia2hmcXV0emNyb21vbWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5ODE4NDQsImV4cCI6MjA3NjU1Nzg0NH0.A1kARz6ujz1wMQy-T_4W2EN1wrroma6f230_-rKnNBo';
         
-        // Create Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Create Supabase client with localStorage persistence
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storage: window.localStorage,
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: false
+            }
+        });
         
         // Log successful connection (you'll see this in browser console!)
         console.log('✅ Supabase initialized successfully!');
@@ -2477,6 +2503,254 @@
         
         // Make test function available globally
         window.testSupabaseConnection = testSupabaseConnection;
+        
+        // ========================================
+        // LOGOUT FUNCTION
+        // ========================================
+        async function logoutUser() {
+            console.log('🚪 Logging out...');
+            try {
+                // Clear localStorage
+                localStorage.removeItem('user_full_name');
+                localStorage.removeItem('user_account_type');
+                localStorage.removeItem('user_username');
+                localStorage.removeItem('user_email');
+                
+                // Sign out from Supabase
+                const { error } = await supabase.auth.signOut();
+                if (error) {
+                    console.error('❌ Logout error:', error);
+                    alert('Error logging out. Redirecting anyway...');
+                } else {
+                    console.log('✅ Logged out successfully!');
+                }
+                // Redirect to login page
+                window.location.href = 'login.html';
+            } catch (err) {
+                console.error('❌ Logout failed:', err);
+                // Redirect anyway
+                window.location.href = 'login.html';
+            }
+        }
+        
+        // Make logout function available globally
+        window.logoutUser = logoutUser;
+
+        // ========================================
+        // SESSION MANAGEMENT & AUTH CHECK
+        // ========================================
+        // PROPER IMPLEMENTATION: Always check Supabase session first, never trust localStorage alone
+        
+        async function checkAuthentication() {
+            console.log('🔐 === AUTHENTICATION CHECK START ===');
+            console.log('📅 Timestamp:', new Date().toISOString());
+            
+            try {
+                // ALWAYS check Supabase session first - this is the source of truth
+                console.log('📡 Calling supabase.auth.getSession()...');
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                console.log('📦 getSession() result:');
+                console.log('  - Error:', error);
+                console.log('  - Session exists:', !!session);
+                
+                if (error) {
+                    console.error('❌ Session error:', error);
+                    await forceSignOut();
+                    return null;
+                }
+                
+                if (!session) {
+                    console.log('❌ No session found - clearing stale localStorage data');
+                    await forceSignOut();
+                    return null;
+                }
+                
+                console.log('✅ Session object received:');
+                console.log('  - User email:', session.user?.email);
+                console.log('  - User ID:', session.user?.id);
+                console.log('  - Expires at:', session.expires_at);
+                console.log('  - Expires date:', new Date(session.expires_at * 1000));
+                console.log('  - Access token (first 20 chars):', session.access_token?.substring(0, 20) + '...');
+                
+                // Verify session is actually valid by trying to use it
+                console.log('🧪 Verifying session by fetching user...');
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
+                
+                console.log('👤 getUser() result:');
+                console.log('  - Error:', userError);
+                console.log('  - User exists:', !!user);
+                
+                if (userError || !user) {
+                    console.error('❌ Session exists but user fetch failed!');
+                    console.error('   Error details:', userError);
+                    console.log('🔧 Session is stale/invalid - forcing full signout');
+                    await forceSignOut();
+                    return null;
+                }
+                
+                console.log('✅ User verified:', user.email);
+                console.log('📅 Session expires:', new Date(session.expires_at * 1000));
+                
+                // Check if we have cached user data
+                let userName = localStorage.getItem('user_full_name');
+                let accountType = localStorage.getItem('user_account_type');
+                
+                console.log('💾 localStorage cache:');
+                console.log('  - user_full_name:', userName);
+                console.log('  - user_account_type:', accountType);
+                
+                // If no cached data OR it might be stale, fetch from database
+                if (!userName || !accountType) {
+                    console.log('📊 Fetching user data from database...');
+                    const { data: accountData, error: accountError } = await supabase
+                        .from('accounts')
+                        .select('full_name, account_type')
+                        .eq('auth_user_id', session.user.id)
+                        .single();
+                    
+                    console.log('🗃️ Database query result:');
+                    console.log('  - Error:', accountError);
+                    console.log('  - Data:', accountData);
+                    
+                    if (accountError) {
+                        console.error('❌ Account fetch error:', accountError);
+                        await forceSignOut();
+                        return null;
+                    }
+                    
+                    userName = accountData.full_name;
+                    accountType = accountData.account_type;
+                    
+                    // Cache in localStorage for UI performance
+                    localStorage.setItem('user_full_name', userName);
+                    localStorage.setItem('user_account_type', accountType);
+                    
+                    console.log('✅ Account data loaded and cached:', userName);
+                } else {
+                    console.log('✅ Using cached user data:', userName);
+                }
+                
+                // Display welcome message
+                displayWelcomeMessage(userName, accountType);
+                
+                console.log('🎉 === AUTHENTICATION CHECK COMPLETE - SUCCESS ===');
+                
+                return {
+                    session: session,
+                    userName: userName,
+                    accountType: accountType
+                };
+                
+            } catch (err) {
+                console.error('❌ === AUTHENTICATION CHECK FAILED ===');
+                console.error('Exception:', err);
+                console.error('Stack:', err.stack);
+                await forceSignOut();
+                return null;
+            }
+        }
+
+        async function forceSignOut() {
+            console.log('� === FORCE SIGN OUT TRIGGERED ===');
+            console.log('📅 Timestamp:', new Date().toISOString());
+            
+            try {
+                console.log('🔓 Calling supabase.auth.signOut()...');
+                // Sign out from Supabase (clears session from localStorage)
+                await supabase.auth.signOut();
+                console.log('✅ Supabase signOut() completed');
+            } catch (err) {
+                console.error('⚠️ Signout error (continuing anyway):', err);
+            }
+            
+            // Clear ALL storage
+            console.log('🧹 Clearing localStorage...');
+            localStorage.clear();
+            console.log('🧹 Clearing sessionStorage...');
+            sessionStorage.clear();
+            
+            console.log('✅ All sessions cleared');
+            console.log('🔄 Calling redirectToLogin()...');
+            
+            // Now redirect
+            redirectToLogin();
+        }
+
+        function redirectToLogin() {
+            console.log('🔄 No valid session - redirecting to login...');
+            
+            // Anti-strobing protection: Don't redirect if we just came from login
+            const lastRedirect = sessionStorage.getItem('last_redirect_time');
+            const now = Date.now();
+            
+            if (lastRedirect && (now - parseInt(lastRedirect)) < 3000) {
+                console.log('⚠️ STROBING DETECTED - preventing rapid redirect loop');
+                console.log('❌ Session persistence is broken - please close browser and restart');
+                
+                // Show error message instead of redirecting
+                document.body.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #1a1a2e; color: white; font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+                        <div>
+                            <div style="font-size: 80px; margin-bottom: 20px;">⚠️</div>
+                            <h1 style="color: #FFE951; margin-bottom: 20px;">Session Error Detected</h1>
+                            <p style="font-size: 18px; margin-bottom: 30px; max-width: 600px;">
+                                A redirect loop was detected. This usually means Supabase session storage isn't working properly.
+                            </p>
+                            <p style="font-size: 16px; color: #888; margin-bottom: 30px;">
+                                Please try:<br>
+                                1. Close ALL browser windows<br>
+                                2. Clear browser cache and cookies<br>
+                                3. Restart the browser<br>
+                                4. Try again
+                            </p>
+                            <button onclick="sessionStorage.clear(); localStorage.clear(); location.reload()" 
+                                    style="background: #6366F1; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; box-shadow: 8px 8px 0 #000;">
+                                🔄 Clear Everything & Reload
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Record redirect time
+            sessionStorage.setItem('last_redirect_time', now.toString());
+            
+            // Redirect immediately
+            window.location.replace('login.html');
+        }
+
+        function displayWelcomeMessage(userName, accountType) {
+            console.log(`👋 Welcome, ${userName}! (${accountType})`);
+            
+            // Update header to show user's name
+            const headerTitle = document.getElementById('header-title');
+            if (headerTitle) {
+                const accountEmoji = accountType === 'teacher' ? '👩‍🏫' : '🎓';
+                const firstName = userName.split(' ')[0]; // Get first name only
+                headerTitle.innerHTML = `${accountEmoji} Welcome, ${firstName}!`;
+            }
+            
+            // Show a toast notification
+            const accountEmoji = accountType === 'teacher' ? '👩‍🏫' : '🎓';
+            const welcomeText = `${accountEmoji} Welcome back, ${userName}!`;
+            
+            // Show toast after a brief delay
+            setTimeout(() => {
+                showToast(welcomeText, 'success');
+            }, 1000);
+        }
+
+        // Run auth check when page loads
+        let currentUser = null;
+        window.addEventListener('DOMContentLoaded', async () => {
+            currentUser = await checkAuthentication();
+            if (!currentUser) {
+                // Will redirect to login
+                return;
+            }
+        });
     </script>
     
     <!-- End of Supabase setup -->
@@ -2513,12 +2787,15 @@
     </div>
     
     <div id="header">
-        <h1>🕵️ GEOGRAPHIC DETECTIVE ACADEMY</h1>
+        <h1 id="header-title">🕵️ GEOGRAPHIC DETECTIVE ACADEMY</h1>
         <div class="xp-display">
             <span>⭐</span>
             <span id="total-xp">0</span>
             <span>XP</span>
         </div>
+        <button id="logout-btn" onclick="logoutUser()">
+            🚪 Logout
+        </button>
     </div>
     
     <div id="game-modes">

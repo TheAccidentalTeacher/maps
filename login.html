@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Geographic Detective Academy</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="real-life-facts.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #FFE951;
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* SPLIT SCREEN LAYOUT */
+        .split-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* LEFT SIDE - Real Life Facts Carousel */
+        .left-panel {
+            flex: 1;
+            background: #6366F1;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.03) 10px,
+                rgba(255, 255, 255, 0.03) 20px
+            );
+        }
+
+        .brand {
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand h1 {
+            font-size: 48px;
+            font-weight: 900;
+            color: #FFE951;
+            text-shadow: 4px 4px 0 #000;
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
+
+        .brand p {
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* CAROUSEL CARD - Neo-Brutalism Style */
+        .fact-card {
+            background: #fff;
+            border: 5px solid #000;
+            box-shadow: 12px 12px 0 #000;
+            padding: 40px;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .fact-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 16px 16px 0 #000;
+        }
+
+        .fact-emoji {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .fact-subject {
+            font-size: 14px;
+            font-weight: 900;
+            color: #6366F1;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .fact-text {
+            font-size: 20px;
+            color: #000;
+            line-height: 1.6;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .fact-skill {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+            padding: 10px 15px;
+            background: #FFE951;
+            border: 3px solid #000;
+            display: inline-block;
+        }
+
+        /* Carousel Navigation */
+        .carousel-nav {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .carousel-dot {
+            width: 16px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 3px solid #000;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .carousel-dot.active {
+            background: #FFE951;
+            width: 48px;
+        }
+
+        .carousel-dot:hover {
+            background: #fff;
+        }
+
+        /* RIGHT SIDE - Login Form */
+        .right-panel {
+            flex: 1;
+            background: #fff;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-left: 8px solid #000;
+        }
+
+        .login-container {
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .login-header {
+            margin-bottom: 40px;
+        }
+
+        .login-header h2 {
+            font-size: 42px;
+            font-weight: 900;
+            color: #000;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            font-size: 18px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* ERROR MESSAGE - Neo-Brutalism */
+        .error-message {
+            background: #FF6B6B;
+            border: 4px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            color: #fff;
+            padding: 16px 20px;
+            margin-bottom: 30px;
+            display: none;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* FORM GROUPS */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 800;
+            color: #000;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 4px solid #000;
+            background: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 6px 6px 0 #6366F1;
+            transform: translate(-2px, -2px);
+        }
+
+        input::placeholder {
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        /* LOGIN BUTTON - Neo-Brutalism Power! */
+        .btn-login {
+            width: 100%;
+            padding: 20px;
+            background: #6366F1;
+            border: 5px solid #000;
+            box-shadow: 8px 8px 0 #000;
+            color: #FFE951;
+            font-size: 20px;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.1s;
+            margin-top: 30px;
+        }
+
+        .btn-login:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0 #000;
+        }
+
+        .btn-login:active {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 #000;
+        }
+
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* LOADING SPINNER - Chunky! */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 4px solid rgba(255, 233, 81, 0.3);
+            border-top-color: #FFE951;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ACHIEVEMENT PREVIEW - Neo-Brutalism */
+        .achievement-box {
+            background: #FFE951;
+            border: 5px solid #000;
+            box-shadow: 8px 8px 0 #000;
+            padding: 25px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .achievement-box h3 {
+            font-size: 16px;
+            font-weight: 900;
+            color: #000;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .achievement-box p {
+            font-size: 14px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* LEGAL DISCLAIMER & FOOTER */
+        .terms-text {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+            margin-top: 25px;
+            line-height: 1.5;
+        }
+
+        .terms-text a {
+            color: #6366F1;
+            text-decoration: none;
+            font-weight: 700;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .terms-text a:hover {
+            border-bottom-color: #6366F1;
+        }
+
+        .footer-links {
+            background: #000;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+        }
+
+        .footer-links a {
+            color: #FFE951;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .footer-links a:hover {
+            border-bottom-color: #FFE951;
+        }
+
+        .footer-links .separator {
+            color: #666;
+        }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 968px) {
+            .split-container {
+                flex-direction: column;
+                overflow-y: auto;
+                padding-bottom: 80px; /* Space for footer */
+            }
+
+            .left-panel {
+                min-height: 50vh;
+                padding: 40px 30px;
+            }
+
+            .brand h1 {
+                font-size: 36px;
+            }
+
+            .fact-card {
+                padding: 30px;
+                box-shadow: 8px 8px 0 #000;
+            }
+
+            .fact-text {
+                font-size: 18px;
+            }
+
+            .right-panel {
+                border-left: none;
+                border-top: 8px solid #000;
+                padding: 40px 30px;
+                min-height: 50vh;
+            }
+
+            .login-header h2 {
+                font-size: 32px;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .footer-links .separator {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .brand h1 {
+                font-size: 28px;
+                text-shadow: 3px 3px 0 #000;
+            }
+
+            .fact-card {
+                padding: 25px;
+                box-shadow: 6px 6px 0 #000;
+            }
+
+            .fact-emoji {
+                font-size: 48px;
+            }
+
+            .fact-text {
+                font-size: 16px;
+            }
+
+            .login-header h2 {
+                font-size: 28px;
+            }
+
+            input {
+                padding: 16px 18px;
+                font-size: 16px;
+            }
+
+            .btn-login {
+                padding: 18px;
+                font-size: 18px;
+            }
+        }
+
+        /* FADE IN ANIMATION */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- SPLIT SCREEN LAYOUT -->
+    <div class="split-container">
+        
+        <!-- LEFT PANEL - Real Life Facts Carousel -->
+        <div class="left-panel fade-in">
+            <div class="brand">
+                <h1>🌍 Geographic<br>Detective<br>Academy</h1>
+                <p>Lock in and level up your brain �</p>
+            </div>
+
+            <!-- NEO-BRUTALISM FACT CARD -->
+            <div class="fact-card" id="factCard">
+                <span class="fact-emoji" id="factEmoji">📍</span>
+                <div class="fact-subject" id="factSubject">GEOGRAPHY IN REAL LIFE</div>
+                <div class="fact-text" id="factText">Loading awesome facts...</div>
+                <div class="fact-skill" id="factSkill">💡 Skill unlocked</div>
+            </div>
+
+            <!-- Carousel Navigation -->
+            <div class="carousel-nav" id="carouselNav"></div>
+        </div>
+
+        <!-- RIGHT PANEL - Login Form -->
+        <div class="right-panel fade-in">
+            <div class="login-container">
+                <div class="login-header">
+                    <h2>Welcome Back</h2>
+                    <p>Sign in to continue your journey</p>
+                </div>
+
+                <!-- ERROR MESSAGE -->
+                <div class="error-message" id="errorMessage"></div>
+
+                <!-- LOGIN FORM -->
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            placeholder="kalayabo"
+                            autocomplete="username"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="btn-login" id="loginBtn">
+                        <span id="btnText">Let's Go! 🚀</span>
+                    </button>
+                </form>
+
+                <!-- TERMS DISCLAIMER -->
+                <div class="terms-text">
+                    By signing in, you agree to our<br>
+                    <a href="terms-of-service.html" target="_blank">Terms of Service</a> and <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
+                </div>
+
+                <!-- ACHIEVEMENT PREVIEW -->
+                <div class="achievement-box">
+                    <h3>🏆 First Login Achievement</h3>
+                    <p>"New Detective" unlocked when you sign in!</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER WITH LEGAL LINKS -->
+    <div class="footer-links">
+        <a href="privacy-policy.html" target="_blank">🔒 Privacy Policy</a>
+        <span class="separator">•</span>
+        <a href="terms-of-service.html" target="_blank">📜 Terms of Service</a>
+        <span class="separator">•</span>
+        <a href="mailto:scosom@gmail.com">📧 Contact Mrs. Somers</a>
+    </div>
+
+    <script>
+        // ========================================
+        // SUPABASE CONFIGURATION - PROPER SETUP
+        // ========================================
+        const SUPABASE_URL = 'https://fuppbkhfqutzcromomkc.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cHBia2hmcXV0emNyb21vbWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5ODE4NDQsImV4cCI6MjA3NjU1Nzg0NH0.A1kARz6ujz1wMQy-T_4W2EN1wrroma6f230_-rKnNBo';
+        
+        // Create Supabase client with localStorage persistence
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storage: window.localStorage,
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: false
+            }
+        });
+
+        // ========================================
+        // REAL LIFE FACTS CAROUSEL - NEO-BRUTALISM
+        // ========================================
+        let currentFactIndex = 0;
+        let facts = [];
+
+        function initializeCarousel() {
+            facts = getFactCarousel(); // From real-life-facts.js
+            displayFact(0);
+            createCarouselDots();
+            
+            // Auto-rotate every 10 seconds
+            setInterval(() => {
+                currentFactIndex = (currentFactIndex + 1) % facts.length;
+                displayFact(currentFactIndex);
+            }, 10000);
+        }
+
+        function displayFact(index) {
+            const fact = facts[index];
+            
+            // Update fact card with smooth transition
+            document.getElementById('factEmoji').textContent = fact.emoji;
+            document.getElementById('factSubject').textContent = fact.subject.toUpperCase() + ' IN REAL LIFE';
+            document.getElementById('factText').textContent = fact.fact;
+            document.getElementById('factSkill').textContent = '💡 ' + fact.skill;
+            
+            // Update active dot
+            updateCarouselDots(index);
+        }
+
+        function createCarouselDots() {
+            const navContainer = document.getElementById('carouselNav');
+            navContainer.innerHTML = '';
+            
+            facts.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'carousel-dot';
+                if (index === 0) dot.classList.add('active');
+                
+                dot.onclick = () => {
+                    currentFactIndex = index;
+                    displayFact(index);
+                };
+                
+                navContainer.appendChild(dot);
+            });
+        }
+
+        function updateCarouselDots(activeIndex) {
+            const dots = document.querySelectorAll('.carousel-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === activeIndex);
+            });
+        }
+
+        // ========================================
+        // LOGIN FORM HANDLER
+        // ========================================
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const btnText = document.getElementById('btnText');
+        const errorMessage = document.getElementById('errorMessage');
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 5000);
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showError('⚠️ Yo, fill in both fields! No cap!');
+                return;
+            }
+
+            // Disable button and show loading
+            loginBtn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Logging in...';
+            errorMessage.classList.remove('show');
+
+            try {
+                // Students login with username@mrsomers.student, teachers with their email
+                const email = username.includes('@') ? username : `${username}@mrsomers.student`;
+                
+                console.log('Attempting login with:', email);
+                
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                console.log('✅ Login successful!', data);
+                console.log('🔑 Session:', data.session);
+                console.log('👤 User:', data.user);
+                
+                // CRITICAL: Verify session was actually stored before proceeding
+                const { data: { session: verifySession } } = await supabase.auth.getSession();
+                
+                if (!verifySession) {
+                    throw new Error('Session not persisted! Check localStorage permissions.');
+                }
+                
+                console.log('✅ Session verified in storage');
+
+                // Get user metadata from the accounts table
+                const { data: accountData, error: accountError } = await supabase
+                    .from('accounts')
+                    .select('full_name, account_type')
+                    .eq('auth_user_id', data.user.id)
+                    .single();
+
+                if (accountError) {
+                    console.error('⚠️ Could not fetch account data:', accountError);
+                } else {
+                    console.log('📊 Account data:', accountData);
+                    
+                    // Store user info in localStorage for quick access
+                    localStorage.setItem('user_full_name', accountData.full_name);
+                    localStorage.setItem('user_account_type', accountData.account_type);
+                    localStorage.setItem('user_email', data.user.email);
+                    localStorage.setItem('user_auth_id', data.user.id);
+                }
+
+                // Success! Show success message then redirect
+                btnText.textContent = '✅ LOCKED IN!';
+                
+                // Redirect immediately - session is confirmed persisted
+                console.log('🔄 Redirecting to main app...');
+                window.location.replace('index.html');
+
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                let errorMsg = '❌ Login failed. Check your username and password!';
+                
+                if (error.message.includes('Invalid login credentials')) {
+                    errorMsg = '❌ Wrong username or password. Try again!';
+                } else if (error.message.includes('Email not confirmed')) {
+                    errorMsg = '⚠️ Email not confirmed. Check your inbox!';
+                } else if (error.message.includes('Network')) {
+                    errorMsg = '� Connection issue. Check your internet!';
+                }
+                
+                showError(errorMsg);
+                
+                // Reset button
+                loginBtn.disabled = false;
+                btnText.textContent = "Let's Go! 🚀";
+            }
+        });
+
+        // ========================================
+        // INITIALIZE ON PAGE LOAD
+        // ========================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('🌍 Geographic Detective Academy - Login Page Loaded');
+            
+            // DISABLED - causing strobing redirect loop
+            // await checkExistingSession();
+            
+            // Initialize carousel
+            initializeCarousel();
+            
+            // Auto-focus username field after page loads
+            document.getElementById('username').focus();
+        });
+
+        // ========================================
+        // CHECK FOR EXISTING SESSION
+        // ========================================
+        // PROPER IMPLEMENTATION: Check if user is already logged in and redirect to app
+        
+        async function checkExistingSession() {
+            console.log('🔍 Checking for existing session...');
+            
+            try {
+                // Check Supabase session (source of truth)
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    console.error('❌ Session check error:', error);
+                    return;
+                }
+                
+                if (session) {
+                    console.log('✅ Active session found for:', session.user.email);
+                    console.log('� Session expires:', new Date(session.expires_at * 1000));
+                    console.log('🔄 Redirecting to main app...');
+                    
+                    // User is already logged in - redirect immediately
+                    // No need to show message or delay, localStorage ensures clean transition
+                    window.location.replace('index.html');
+                } else {
+                    console.log('ℹ️ No active session. Please log in.');
+                }
+            } catch (err) {
+                console.error('❌ Session check failed:', err);
+            }
+        }
+    </script>
+</body>
+</html>
