@@ -196,7 +196,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
 **Required Variables for Production:**
 
 ```
-SENDGRID_API_KEY=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
+SENDGRID_API_KEY=[Your SendGrid API key]
 SENDGRID_VERIFIED_SENDER=scosom@gmail.com
 ANTHROPIC_API_KEY=[Your Claude key]
 OPENAI_API_KEY=[Your OpenAI key]
