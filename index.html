@@ -2600,36 +2600,36 @@
                 console.log('  - user_full_name:', userName);
                 console.log('  - user_account_type:', accountType);
                 
-                // If no cached data OR it might be stale, fetch from database
-                if (!userName || !accountType) {
-                    console.log('📊 Fetching user data from database...');
-                    const { data: accountData, error: accountError } = await supabase
-                        .from('accounts')
-                        .select('full_name, account_type')
-                        .eq('auth_user_id', session.user.id)
-                        .single();
-                    
-                    console.log('🗃️ Database query result:');
-                    console.log('  - Error:', accountError);
-                    console.log('  - Data:', accountData);
-                    
-                    if (accountError) {
-                        console.error('❌ Account fetch error:', accountError);
-                        await forceSignOut();
-                        return null;
-                    }
-                    
-                    userName = accountData.full_name;
-                    accountType = accountData.account_type;
-                    
-                    // Cache in localStorage for UI performance
-                    localStorage.setItem('user_full_name', userName);
-                    localStorage.setItem('user_account_type', accountType);
-                    
-                    console.log('✅ Account data loaded and cached:', userName);
-                } else {
-                    console.log('✅ Using cached user data:', userName);
+                // ALWAYS fetch fresh account data from database to ensure correct account_type
+                // (prevents issues when switching between accounts)
+                console.log('📊 Fetching user data from database...');
+                const { data: accountData, error: accountError } = await supabase
+                    .from('accounts')
+                    .select('full_name, account_type')
+                    .eq('auth_user_id', session.user.id)
+                    .single();
+                
+                console.log('🗃️ Database query result:');
+                console.log('  - Error:', accountError);
+                console.log('  - Data:', accountData);
+                console.log('  - Full Name:', accountData?.full_name);
+                console.log('  - Account Type:', accountData?.account_type);
+                console.log('  - Email from session:', session.user.email);
+                
+                if (accountError) {
+                    console.error('❌ Account fetch error:', accountError);
+                    await forceSignOut();
+                    return null;
                 }
+                
+                userName = accountData.full_name;
+                accountType = accountData.account_type;
+                
+                // Cache in localStorage for UI performance
+                localStorage.setItem('user_full_name', userName);
+                localStorage.setItem('user_account_type', accountType);
+                
+                console.log('✅ Account data loaded and cached:', userName, '(' + accountType + ')');
                 
                 // Display welcome message
                 displayWelcomeMessage(userName, accountType);
@@ -2779,10 +2779,39 @@
                 
                 if (error) {
                     console.error('❌ Error loading students:', error);
+                    const studentList = document.getElementById('student-list');
+                    studentList.innerHTML = `
+                        <div style="background: #FF6B6B; border: 3px solid #000; padding: 20px; color: #000; grid-column: 1/-1;">
+                            <h3>❌ Error Loading Students</h3>
+                            <p><strong>Error:</strong> ${error.message}</p>
+                            <p><strong>Details:</strong> ${JSON.stringify(error, null, 2)}</p>
+                            <p>Check browser console for more details.</p>
+                        </div>
+                    `;
                     return;
                 }
                 
-                console.log(`✅ Loaded ${students.length} students`);
+                console.log(`✅ Loaded ${students ? students.length : 0} students`);
+                console.log('Students data:', students);
+                
+                // Check if no students found
+                if (!students || students.length === 0) {
+                    const studentList = document.getElementById('student-list');
+                    studentList.innerHTML = `
+                        <div style="background: #FFE951; border: 3px solid #000; padding: 20px; color: #000; grid-column: 1/-1;">
+                            <h3>⚠️ No Students Found</h3>
+                            <p>The accounts table appears to be empty.</p>
+                            <p><strong>Possible reasons:</strong></p>
+                            <ul style="text-align: left;">
+                                <li>Students exist in auth.users but not in accounts table</li>
+                                <li>The create_account_on_signup trigger didn't fire</li>
+                                <li>Need to manually link auth users to accounts table</li>
+                            </ul>
+                            <p><strong>Next step:</strong> Check Supabase dashboard to verify accounts table has data.</p>
+                        </div>
+                    `;
+                    return;
+                }
                 
                 // Render student list
                 const studentList = document.getElementById('student-list');
@@ -2850,6 +2879,32 @@
             showToast(`Now viewing ${studentName}'s account`, 'success');
         }
         
+        function toggleDashboard() {
+            const dashboard = document.getElementById('teacher-dashboard');
+            const studentListContainer = document.getElementById('student-list-container');
+            const returnContainer = document.getElementById('return-to-teacher-container');
+            const toggleBtn = document.getElementById('toggle-dashboard-btn');
+            
+            // Check if dashboard is currently minimized
+            const isMinimized = studentListContainer.style.display === 'none';
+            
+            if (isMinimized) {
+                // EXPAND: Show student list
+                studentListContainer.style.display = 'block';
+                if (viewingAsStudent) {
+                    returnContainer.style.display = 'block';
+                }
+                toggleBtn.innerHTML = '➖ Minimize';
+                dashboard.style.maxHeight = 'none';
+            } else {
+                // MINIMIZE: Hide student list but keep header visible
+                studentListContainer.style.display = 'none';
+                returnContainer.style.display = 'none';
+                toggleBtn.innerHTML = '➕ Expand';
+                dashboard.style.maxHeight = '120px';
+            }
+        }
+        
         function returnToTeacherView() {
             console.log('⬅️ Returning to teacher view');
             
@@ -2876,6 +2931,7 @@
         window.viewAsStudent = viewAsStudent;
         window.returnToTeacherView = returnToTeacherView;
         window.filterStudents = filterStudents;
+        window.toggleDashboard = toggleDashboard;
 
         // Run auth check when page loads
         let currentUser = null;
@@ -2886,8 +2942,21 @@
                 return;
             }
             
-            // Load teacher dashboard if user is a teacher
-            await loadTeacherDashboard();
+            // Initialize cloud sync for game progress
+            await initCloudSync();
+            
+            // Load teacher dashboard ONLY if user is a teacher
+            console.log('🔍 DASHBOARD CHECK:');
+            console.log('  - currentUser.accountType:', currentUser.accountType);
+            console.log('  - typeof currentUser.accountType:', typeof currentUser.accountType);
+            console.log('  - Is teacher?', currentUser.accountType === 'teacher');
+            
+            if (currentUser.accountType === 'teacher') {
+                console.log('✅ User IS a teacher - loading dashboard');
+                await loadTeacherDashboard();
+            } else {
+                console.log('❌ User is NOT a teacher - skipping dashboard (account type: ' + currentUser.accountType + ')');
+            }
         });
     </script>
     
@@ -2937,10 +3006,15 @@
     </div>
     
     <!-- Teacher Dashboard (Only visible for teachers) -->
-    <div id="teacher-dashboard" style="display: none; background: #6366F1; border: 5px solid #000; padding: 20px; margin: 20px; box-shadow: 10px 10px 0 rgba(0,0,0,0.3);">
-        <h2 style="color: #FFE951; margin: 0 0 20px 0; font-size: 28px; text-shadow: 3px 3px 0 rgba(0,0,0,0.3);">
-            👩‍🏫 Teacher Dashboard
-        </h2>
+    <div id="teacher-dashboard" style="display: none; background: #6366F1; border: 5px solid #000; padding: 20px; margin: 20px; box-shadow: 10px 10px 0 rgba(0,0,0,0.3); transition: all 0.3s ease;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #FFE951; margin: 0; font-size: 28px; text-shadow: 3px 3px 0 rgba(0,0,0,0.3);">
+                👩‍🏫 Teacher Dashboard
+            </h2>
+            <button id="toggle-dashboard-btn" onclick="toggleDashboard()" style="background: #FFE951; color: #000; border: 3px solid #000; padding: 8px 16px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 5px 5px 0 rgba(0,0,0,0.3); transition: all 0.2s;">
+                ➖ Minimize
+            </button>
+        </div>
         
         <!-- Return to Teacher View Button (hidden by default, shown when viewing as student) -->
         <div id="return-to-teacher-container" style="display: none; margin-bottom: 20px;">
@@ -4040,8 +4114,8 @@
                 
                 // Step 6: Populate AI Facts, Photos, and Weather (Phase 3)
                 // These will only work after deployment to Netlify
-                const locationName = geocodeData.city || geocodeData.town || geocodeData.village || geocodeData.state || geocodeData.country || 'location';
-                const countryName = countryData?.name || geocodeData.country || 'Unknown';
+                const locationName = geocodeData.city || geocodeData.town || geocodeData.village || geocodeData.state || geocodeData.country || geocodeData.ocean || geocodeData.oceanBasin || 'location';
+                const countryName = countryData?.name || geocodeData.country || (geocodeData.isWater ? geocodeData.oceanBasin : 'Unknown');
                 
                 // NEW FLOW: Fetch AI facts → Match photos to facts → Display together!
                 console.log('🧠 Fetching AI facts + matching photos...');
@@ -4049,7 +4123,7 @@
                 // Show Gen Alpha loading animation!
                 showGenAlphaLoading();
                 
-                fetchLocationFacts(locationName, countryName)
+                fetchLocationFacts(locationName, countryName, geocodeData)
                     .then(async facts => {
                         if (facts && facts.length > 0) {
                             console.log(`✅ Got ${facts.length} facts, now matching photos...`);
@@ -4128,17 +4202,71 @@
             
             const data = await response.json();
             
-            // Extract relevant information
-            return {
+            // Extract relevant information with enhanced ocean detection
+            const geocodeData = {
                 display_name: data.display_name,
                 country: data.address?.country,
                 countryCode: data.address?.country_code?.toUpperCase(),
                 city: data.address?.city || data.address?.town || data.address?.village || data.address?.municipality,
                 state: data.address?.state,
-                ocean: data.address?.ocean || data.address?.sea,
-                isWater: data.type === 'body_of_water' || data.class === 'natural' && data.type === 'water',
-                raw: data
+                ocean: data.address?.ocean || data.address?.sea || data.address?.water,
+                isWater: data.type === 'body_of_water' || (data.class === 'natural' && data.type === 'water') || data.class === 'boundary' && data.type === 'maritime',
+                raw: data,
+                lat: lat,
+                lng: lng
             };
+            
+            // Add enhanced ocean data if this is water
+            if (geocodeData.isWater || geocodeData.ocean) {
+                geocodeData.oceanBasin = identifyOceanBasin(lat, lng);
+                geocodeData.oceanRegion = determineOceanRegion(lat);
+                geocodeData.nearestCountry = data.address?.country || 'Open Ocean';
+            }
+            
+            return geocodeData;
+        }
+        
+        /**
+         * Determine ocean region based on latitude
+         * @param {number} lat - Latitude
+         * @returns {string} Ocean region classification
+         */
+        function determineOceanRegion(lat) {
+            if (lat > 66.5) return 'Arctic (Polar)';
+            if (lat < -60) return 'Antarctic (Polar)';
+            if (Math.abs(lat) < 23.5) return 'Tropical';
+            return 'Temperate';
+        }
+        
+        /**
+         * Identify which ocean basin based on coordinates
+         * @param {number} lat - Latitude
+         * @param {number} lng - Longitude
+         * @returns {string} Ocean basin name
+         */
+        function identifyOceanBasin(lat, lng) {
+            // Arctic Ocean
+            if (lat > 65) return 'Arctic Ocean';
+            
+            // Southern Ocean / Antarctic
+            if (lat < -60) return 'Southern Ocean';
+            
+            // Pacific Ocean (roughly -180 to -70 and 140 to 180)
+            if ((lng >= -180 && lng <= -70) || (lng >= 140 && lng <= 180)) {
+                return 'Pacific Ocean';
+            }
+            
+            // Atlantic Ocean (roughly -70 to 20)
+            if (lng > -70 && lng < 20) {
+                return 'Atlantic Ocean';
+            }
+            
+            // Indian Ocean (roughly 20 to 140)
+            if (lng >= 20 && lng < 140) {
+                return 'Indian Ocean';
+            }
+            
+            return 'Unknown Ocean';
         }
         
         // Get country data from REST Countries API (free, no key required)
@@ -4227,75 +4355,136 @@
         function populateQuickFacts(geocodeData, countryData) {
             console.log('🔍 populateQuickFacts called with:', { geocodeData, countryData });
             
-            // Country
-            const countryElement = document.getElementById('fact-country');
-            if (countryElement) {
-                const countryValue = geocodeData.country || 'Unknown';
-                console.log('🔍 Setting country to:', countryValue);
-                countryElement.textContent = countryValue;
-            } else {
-                console.error('❌ fact-country element not found!');
-            }
+            // Check if this is an ocean location
+            const isOcean = geocodeData.isWater || geocodeData.ocean;
             
-            // Capital
-            const capitalElement = document.getElementById('fact-capital');
-            if (capitalElement) {
-                const capitalValue = countryData?.capital || 'N/A';
-                console.log('🔍 Setting capital to:', capitalValue);
-                capitalElement.textContent = capitalValue;
-            } else {
-                console.error('❌ fact-capital element not found!');
-            }
-            
-            // Population
-            const populationElement = document.getElementById('fact-population');
-            if (populationElement) {
-                if (countryData?.population) {
-                    const popValue = countryData.population.toLocaleString();
-                    console.log('🔍 Setting population to:', popValue);
-                    populationElement.textContent = popValue;
-                } else {
-                    populationElement.textContent = 'N/A';
+            if (isOcean) {
+                // ========================================
+                // OCEAN-SPECIFIC QUICK FACTS
+                // ========================================
+                console.log('🌊 Populating ocean-specific quick facts');
+                
+                const oceanData = getOceanData(geocodeData.oceanBasin);
+                const regionData = getOceanRegionData(geocodeData.oceanRegion);
+                
+                // Ocean Name (instead of Country)
+                const countryElement = document.getElementById('fact-country');
+                if (countryElement) {
+                    countryElement.textContent = geocodeData.oceanBasin || geocodeData.ocean || 'Open Ocean';
                 }
-            } else {
-                console.error('❌ fact-population element not found!');
-            }
-            
-            // Area
-            const areaElement = document.getElementById('fact-area');
-            if (areaElement) {
-                if (countryData?.area) {
-                    const areaValue = `${countryData.area.toLocaleString()} km²`;
-                    console.log('🔍 Setting area to:', areaValue);
-                    areaElement.textContent = areaValue;
-                } else {
-                    areaElement.textContent = 'N/A';
+                
+                // Region Type (instead of Capital)
+                const capitalElement = document.getElementById('fact-capital');
+                if (capitalElement) {
+                    capitalElement.textContent = geocodeData.oceanRegion || 'Marine Waters';
                 }
+                
+                // Species Count (instead of Population)
+                const populationElement = document.getElementById('fact-population');
+                if (populationElement) {
+                    populationElement.textContent = regionData.species || '~10,000 species';
+                }
+                
+                // Ocean Area
+                const areaElement = document.getElementById('fact-area');
+                if (areaElement) {
+                    areaElement.textContent = oceanData.area || 'Unknown';
+                }
+                
+                // Marine Environment (instead of Continent)
+                const continentElement = document.getElementById('fact-continent');
+                if (continentElement) {
+                    continentElement.textContent = 'Marine Environment';
+                }
+                
+                // Timezone (calculated from longitude)
+                const timezoneElement = document.getElementById('fact-timezone');
+                if (timezoneElement) {
+                    timezoneElement.textContent = getOceanTimezone(geocodeData.lng);
+                }
+                
+                console.log('✅ Ocean quick facts populated:', {
+                    basin: geocodeData.oceanBasin,
+                    region: geocodeData.oceanRegion,
+                    species: regionData.species,
+                    area: oceanData.area
+                });
+                
             } else {
-                console.error('❌ fact-area element not found!');
+                // ========================================
+                // LAND-BASED QUICK FACTS (ORIGINAL)
+                // ========================================
+                
+                // Country
+                const countryElement = document.getElementById('fact-country');
+                if (countryElement) {
+                    const countryValue = geocodeData.country || 'Unknown';
+                    console.log('🔍 Setting country to:', countryValue);
+                    countryElement.textContent = countryValue;
+                } else {
+                    console.error('❌ fact-country element not found!');
+                }
+                
+                // Capital
+                const capitalElement = document.getElementById('fact-capital');
+                if (capitalElement) {
+                    const capitalValue = countryData?.capital || 'N/A';
+                    console.log('🔍 Setting capital to:', capitalValue);
+                    capitalElement.textContent = capitalValue;
+                } else {
+                    console.error('❌ fact-capital element not found!');
+                }
+                
+                // Population
+                const populationElement = document.getElementById('fact-population');
+                if (populationElement) {
+                    if (countryData?.population) {
+                        const popValue = countryData.population.toLocaleString();
+                        console.log('🔍 Setting population to:', popValue);
+                        populationElement.textContent = popValue;
+                    } else {
+                        populationElement.textContent = 'N/A';
+                    }
+                } else {
+                    console.error('❌ fact-population element not found!');
+                }
+                
+                // Area
+                const areaElement = document.getElementById('fact-area');
+                if (areaElement) {
+                    if (countryData?.area) {
+                        const areaValue = `${countryData.area.toLocaleString()} km²`;
+                        console.log('🔍 Setting area to:', areaValue);
+                        areaElement.textContent = areaValue;
+                    } else {
+                        areaElement.textContent = 'N/A';
+                    }
+                } else {
+                    console.error('❌ fact-area element not found!');
+                }
+                
+                // Continent
+                const continentElement = document.getElementById('fact-continent');
+                if (continentElement) {
+                    const continentValue = countryData?.continent || 'Unknown';
+                    console.log('🔍 Setting continent to:', continentValue);
+                    continentElement.textContent = continentValue;
+                } else {
+                    console.error('❌ fact-continent element not found!');
+                }
+                
+                // Timezone
+                const timezoneElement = document.getElementById('fact-timezone');
+                if (timezoneElement) {
+                    const timezoneValue = countryData?.timezone || 'Unknown';
+                    console.log('🔍 Setting timezone to:', timezoneValue);
+                    timezoneElement.textContent = timezoneValue;
+                } else {
+                    console.error('❌ fact-timezone element not found!');
+                }
+                
+                console.log('✅ populateQuickFacts complete');
             }
-            
-            // Continent
-            const continentElement = document.getElementById('fact-continent');
-            if (continentElement) {
-                const continentValue = countryData?.continent || 'Unknown';
-                console.log('🔍 Setting continent to:', continentValue);
-                continentElement.textContent = continentValue;
-            } else {
-                console.error('❌ fact-continent element not found!');
-            }
-            
-            // Timezone
-            const timezoneElement = document.getElementById('fact-timezone');
-            if (timezoneElement) {
-                const timezoneValue = countryData?.timezone || 'Unknown';
-                console.log('🔍 Setting timezone to:', timezoneValue);
-                timezoneElement.textContent = timezoneValue;
-            } else {
-                console.error('❌ fact-timezone element not found!');
-            }
-            
-            console.log('✅ populateQuickFacts complete');
         }
         
         // Populate Card 3: Comparison to Home
@@ -4535,6 +4724,10 @@
                 });
                 saveExploredLocations();
                 console.log('✅ Location added to collection!');
+                
+                // Award XP for exploring new location!
+                addXP(10, `Discovered: ${locationData.city || locationData.country || 'New Location'}`);
+                
                 return true;
             } else {
                 console.log('ℹ️ Location already in collection');
@@ -4686,11 +4879,32 @@
          * Fetch AI-generated fun facts from OpenAI via Netlify Function
          * @param {string} location - Location name
          * @param {string} country - Country name
+         * @param {object} geocodeData - Full geocoding data with ocean info
          * @returns {Promise<Array>} Array of fact strings
          */
-        async function fetchLocationFacts(location, country) {
+        async function fetchLocationFacts(location, country, geocodeData = {}) {
             try {
-                const params = new URLSearchParams({ location, country });
+                const params = new URLSearchParams({ 
+                    location, 
+                    country: country || ''
+                });
+                
+                // Add ocean-specific parameters if this is a water location
+                if (geocodeData.isWater || geocodeData.ocean) {
+                    params.append('isWater', 'true');
+                    if (geocodeData.ocean) params.append('ocean', geocodeData.ocean);
+                    if (geocodeData.oceanBasin) params.append('oceanBasin', geocodeData.oceanBasin);
+                    if (geocodeData.oceanRegion) params.append('oceanRegion', geocodeData.oceanRegion);
+                    if (geocodeData.lat) params.append('lat', geocodeData.lat);
+                    if (geocodeData.lng) params.append('lon', geocodeData.lng);
+                    
+                    console.log('🌊 Requesting ocean-specific facts:', {
+                        ocean: geocodeData.ocean,
+                        basin: geocodeData.oceanBasin,
+                        region: geocodeData.oceanRegion
+                    });
+                }
+                
                 const response = await fetch(`/.netlify/functions/get-ai-facts?${params}`);
                 
                 if (!response.ok) {
@@ -5653,6 +5867,10 @@
                 });
                 saveExploredLocations();
                 console.log('✅ Location added to collection!');
+                
+                // Award XP for exploring new location!
+                addXP(10, `Discovered: ${locationData.city || locationData.country || 'New Location'}`);
+                
                 return true;
             } else {
                 console.log('ℹ️ Location already in collection');
@@ -7468,17 +7686,158 @@
             }
         }
         
-        // Save state
+        // Save state to localStorage (legacy)
         window.saveState = function() {
             localStorage.setItem('geoDetectiveState', JSON.stringify(gameState));
         }
         
-        // Add XP with notification
+        // ============================================
+        // CLOUD SYNC FUNCTIONS
+        // ============================================
+        
+        // Save game progress to Supabase database
+        window.saveGameProgress = async function() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    console.log('⚠️ No user logged in - cannot save progress');
+                    return false;
+                }
+
+                // Get account ID from database
+                const { data: account } = await supabase
+                    .from('accounts')
+                    .select('id')
+                    .eq('auth_user_id', user.id)
+                    .single();
+
+                if (!account) {
+                    console.log('❌ No account found for user');
+                    return false;
+                }
+
+                // Prepare data for database
+                const progressData = {
+                    user_account_id: account.id,
+                    total_xp: gameState.totalXP || 0,
+                    locations_visited: gameState.locations || {},
+                    countries_unlocked: gameState.unlockedCountries || {},
+                    achievements: gameState.achievements || [],
+                    current_streak_days: gameState.currentStreak || 0,
+                    longest_streak_days: gameState.longestStreak || 0,
+                    last_played_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+
+                // Upsert (insert or update) to game_progress table
+                const { data, error } = await supabase
+                    .from('game_progress')
+                    .upsert(progressData, {
+                        onConflict: 'user_account_id'
+                    });
+
+                if (error) {
+                    console.error('❌ Error saving progress:', error);
+                    return false;
+                }
+
+                console.log('✅ Progress saved to cloud:', progressData.total_xp, 'XP');
+                return true;
+
+            } catch (err) {
+                console.error('❌ Failed to save progress:', err);
+                return false;
+            }
+        }
+        
+        // Load game progress from Supabase database
+        window.loadGameProgress = async function() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    console.log('⚠️ No user logged in - cannot load progress');
+                    return null;
+                }
+
+                // Get account ID
+                const { data: account } = await supabase
+                    .from('accounts')
+                    .select('id')
+                    .eq('auth_user_id', user.id)
+                    .single();
+
+                if (!account) {
+                    console.log('❌ No account found for user');
+                    return null;
+                }
+
+                // Load progress from database
+                const { data: progress, error } = await supabase
+                    .from('game_progress')
+                    .select('*')
+                    .eq('user_account_id', account.id)
+                    .single();
+
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        console.log('ℹ️ No saved progress found - starting fresh');
+                        return null;
+                    }
+                    console.error('❌ Error loading progress:', error);
+                    return null;
+                }
+
+                console.log('✅ Progress loaded from cloud:', progress.total_xp, 'XP');
+                return progress;
+
+            } catch (err) {
+                console.error('❌ Failed to load progress:', err);
+                return null;
+            }
+        }
+        
+        // Initialize cloud sync on login
+        window.initCloudSync = async function() {
+            console.log('☁️ Initializing cloud sync...');
+            
+            // Load from cloud
+            const cloudProgress = await loadGameProgress();
+            
+            if (cloudProgress) {
+                // Merge cloud data with local data (cloud wins for XP)
+                gameState.totalXP = Math.max(cloudProgress.total_xp || 0, gameState.totalXP || 0);
+                gameState.locations = cloudProgress.locations_visited || gameState.locations || {};
+                gameState.unlockedCountries = cloudProgress.countries_unlocked || gameState.unlockedCountries || {};
+                gameState.achievements = cloudProgress.achievements || gameState.achievements || [];
+                gameState.currentStreak = cloudProgress.current_streak_days || 0;
+                gameState.longestStreak = cloudProgress.longest_streak_days || 0;
+                
+                // Update displays
+                document.getElementById('total-xp').textContent = gameState.totalXP;
+                
+                console.log('✅ Cloud sync initialized with', gameState.totalXP, 'XP');
+            }
+            
+            // Auto-save every 30 seconds
+            setInterval(async () => {
+                await saveGameProgress();
+            }, 30000); // 30 seconds
+            
+            // Save on page unload
+            window.addEventListener('beforeunload', () => {
+                saveGameProgress();
+            });
+            
+            console.log('✅ Auto-save enabled (every 30s)');
+        }
+        
+        // Add XP with notification AND cloud save
         window.addXP = function(amount, reason) {
             gameState.totalXP += amount;
             document.getElementById('total-xp').textContent = gameState.totalXP;
             showNotification(`+${amount} XP! ${reason}`);
-            saveState();
+            saveState(); // Save to localStorage
+            saveGameProgress(); // Save to cloud
         }
         
         // Show notification
@@ -10189,6 +10548,9 @@
 
     <!-- Photo Modal JavaScript Functions -->
     <script src="photo-modal-functions.js"></script>
+    
+    <!-- Ocean Data & Helper Functions -->
+    <script src="ocean-data.js"></script>
 
 </body>
 </html>

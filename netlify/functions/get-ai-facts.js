@@ -25,7 +25,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { location, country, lat, lon } = event.queryStringParameters;
+    const { location, country, lat, lon, isWater, ocean, oceanBasin, oceanRegion } = event.queryStringParameters;
     
     if (!location) {
       return {
@@ -34,6 +34,11 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({ error: 'Missing location parameter' })
       };
     }
+
+    // Detect if this is an ocean location
+    const isOceanLocation = isWater === 'true' || ocean || location.toLowerCase().includes('ocean') || location.toLowerCase().includes('sea');
+    
+    console.log('🌊 Ocean detection:', { isOceanLocation, isWater, ocean, oceanBasin, oceanRegion, location });
 
     // Try Claude first (PREFERRED for educational content)
     const claudeKey = process.env.ANTHROPIC_API_KEY;
@@ -64,7 +69,47 @@ STYLE GUIDELINES:
 - Include surprising or little-known facts
 - Keep sentences short and punchy`;
 
-    const userPrompt = `Generate exactly 5 fun, educational facts about ${location}${country ? ' in ' + country : ''}.
+    // Generate ocean-specific or land-specific prompt
+    let userPrompt;
+    
+    if (isOceanLocation) {
+      // OCEAN-SPECIFIC PROMPT
+      const oceanName = oceanBasin || ocean || location;
+      const region = oceanRegion || 'these waters';
+      const nearCountry = country ? ` near ${country}` : '';
+      const coordinates = lat && lon ? ` at ${parseFloat(lat).toFixed(1)}°, ${parseFloat(lon).toFixed(1)}°` : '';
+      
+      userPrompt = `Generate exactly 5 fascinating, educational facts about ${oceanName}${nearCountry}${coordinates}.
+
+Focus on OCEAN-SPECIFIC topics (use at least 4 different ones):
+- 🐋 Marine Life (specific species that live in THIS ocean region - be specific!)
+- 🌊 Ocean Floor Features (trenches, ridges, seamounts, underwater volcanoes, continental shelf)
+- 🌀 Ocean Currents & Circulation (how water moves here, temperature patterns)
+- 🌡️ Physical Properties (temperature, salinity, depth, pressure)
+- 🚢 Human Activity (shipping lanes, fishing, research stations, underwater cables)
+- 🏝️ Geographic Features (nearby islands, coastlines, connection to other oceans)
+- 🌍 Climate Impact (how this ocean affects global weather, storms, El Niño)
+- 🐠 Ecosystems (coral reefs, kelp forests, deep sea vents, polar ecosystems)
+
+Regional context: ${region}
+${nearCountry ? `Nearest land: ${country}` : 'Open ocean location'}
+
+Requirements:
+- Be SPECIFIC to THIS ocean region (not generic ocean facts!)
+- Mention actual species names, not just "fish" or "whales"
+- Include real measurements (depths, temperatures, distances)
+- Make it personal: "In these waters..." or "This part of the ocean..."
+- Each fact = 1-2 sentences max
+- Start with an emoji that matches the topic
+- Make them memorable and shareable
+- Be 100% accurate
+- Return ONLY a JSON array of 5 strings, nothing else
+
+Example format:
+["🐋 Humpback whales migrate 5,000 miles through this region of the Pacific each year, singing songs that can be heard 20 miles away!", "🌊 The Mariana Trench here is Earth's deepest point at 35,876 feet - you could fit Mount Everest inside with a mile to spare!"]`;
+    } else {
+      // LAND-BASED PROMPT (existing)
+      userPrompt = `Generate exactly 5 fun, educational facts about ${location}${country ? ' in ' + country : ''}.
 
 Mix these topics (use at least 3 different ones):
 - 🌍 Geography (landforms, climate, location)
