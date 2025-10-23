@@ -4213,17 +4213,30 @@
                 city: data.address?.city || data.address?.town || data.address?.village || data.address?.municipality,
                 state: data.address?.state,
                 ocean: data.address?.ocean || data.address?.sea || data.address?.water,
-                isWater: data.type === 'body_of_water' || (data.class === 'natural' && data.type === 'water') || data.class === 'boundary' && data.type === 'maritime',
+                isWater: data.type === 'body_of_water' || (data.class === 'natural' && data.type === 'water') || (data.class === 'boundary' && data.type === 'maritime'),
                 raw: data,
                 lat: lat,
                 lng: lng
             };
+            
+            // ENHANCED: If no country data AND no city, assume it's ocean
+            const hasLandData = geocodeData.country || geocodeData.city || geocodeData.state;
+            if (!hasLandData) {
+                console.log('🌊 No land data found - treating as ocean');
+                geocodeData.isWater = true;
+            }
             
             // Add enhanced ocean data if this is water
             if (geocodeData.isWater || geocodeData.ocean) {
                 geocodeData.oceanBasin = identifyOceanBasin(lat, lng);
                 geocodeData.oceanRegion = determineOceanRegion(lat);
                 geocodeData.nearestCountry = data.address?.country || 'Open Ocean';
+                console.log('🌊 Ocean detected:', {
+                    basin: geocodeData.oceanBasin,
+                    region: geocodeData.oceanRegion,
+                    lat: lat,
+                    lng: lng
+                });
             }
             
             return geocodeData;
@@ -4370,6 +4383,17 @@
                 const oceanData = getOceanData(geocodeData.oceanBasin);
                 const regionData = getOceanRegionData(geocodeData.oceanRegion);
                 
+                // Update labels for ocean context
+                const factLabels = document.querySelectorAll('.fact-label');
+                if (factLabels.length >= 6) {
+                    factLabels[0].textContent = '🌊 Ocean:';
+                    factLabels[1].textContent = '🌡️ Region:';
+                    factLabels[2].textContent = '🐠 Species:';
+                    factLabels[3].textContent = '📏 Area:';
+                    factLabels[4].textContent = '🌐 Environment:';
+                    factLabels[5].textContent = '🕐 Timezone:';
+                }
+                
                 // Ocean Name (instead of Country)
                 const countryElement = document.getElementById('fact-country');
                 if (countryElement) {
@@ -4417,6 +4441,17 @@
                 // ========================================
                 // LAND-BASED QUICK FACTS (ORIGINAL)
                 // ========================================
+                
+                // Reset labels for land context
+                const factLabels = document.querySelectorAll('.fact-label');
+                if (factLabels.length >= 6) {
+                    factLabels[0].textContent = 'Country:';
+                    factLabels[1].textContent = 'Capital:';
+                    factLabels[2].textContent = 'Population:';
+                    factLabels[3].textContent = 'Area:';
+                    factLabels[4].textContent = 'Continent:';
+                    factLabels[5].textContent = 'Timezone:';
+                }
                 
                 // Country
                 const countryElement = document.getElementById('fact-country');
