@@ -4117,8 +4117,15 @@
                 
                 // Step 6: Populate AI Facts, Photos, and Weather (Phase 3)
                 // These will only work after deployment to Netlify
-                const locationName = geocodeData.city || geocodeData.town || geocodeData.village || geocodeData.state || geocodeData.country || geocodeData.ocean || geocodeData.oceanBasin || 'location';
-                const countryName = countryData?.name || geocodeData.country || (geocodeData.isWater ? geocodeData.oceanBasin : 'Unknown');
+                
+                // For oceans, prioritize ocean basin name
+                const locationName = (geocodeData.isWater || geocodeData.ocean) 
+                    ? (geocodeData.oceanBasin || geocodeData.ocean || 'Open Ocean')
+                    : (geocodeData.city || geocodeData.town || geocodeData.village || geocodeData.state || geocodeData.country || 'location');
+                
+                const countryName = (geocodeData.isWater || geocodeData.ocean)
+                    ? geocodeData.oceanBasin  // For oceans, use basin as "country" 
+                    : (countryData?.name || geocodeData.country || 'Unknown');
                 
                 // NEW FLOW: Fetch AI facts → Match photos to facts → Display together!
                 console.log('🧠 Fetching AI facts + matching photos...');
@@ -4334,14 +4341,18 @@
             // Location name - Prefer English names
             const nameElement = document.getElementById('location-name');
             if (nameElement) {
-                // Priority: Use countryData for English name, then fall back to geocode data
-                let name = geocodeData.city || geocodeData.town || geocodeData.village || 
+                let name;
+                
+                // For oceans, prioritize ocean basin name
+                if (geocodeData.isWater || geocodeData.ocean) {
+                    name = geocodeData.oceanBasin || geocodeData.ocean || 'Open Ocean';
+                } else {
+                    // For land, use the usual hierarchy
+                    name = geocodeData.city || geocodeData.town || geocodeData.village || 
                            geocodeData.state || geocodeData.region ||
                            (countryData?.name) || geocodeData.country || 'Unknown Location';
-                
-                if (geocodeData.isWater && geocodeData.ocean) {
-                    name = geocodeData.ocean;
                 }
+                
                 nameElement.textContent = name;
             }
             
