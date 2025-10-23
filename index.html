@@ -4820,6 +4820,43 @@
         // ========================================
         
         /**
+         * Fetch with timeout and retry logic
+         * Prevents hanging on slow school networks! 🏫
+         * @param {string} url - URL to fetch
+         * @param {object} options - Fetch options
+         * @param {number} timeout - Timeout in milliseconds (default 30s)
+         * @param {number} retries - Number of retries (default 2)
+         * @returns {Promise<Response>}
+         */
+        async function fetchWithTimeout(url, options = {}, timeout = 30000, retries = 2) {
+            for (let attempt = 0; attempt <= retries; attempt++) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), timeout);
+                    
+                    const response = await fetch(url, {
+                        ...options,
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    return response;
+                } catch (error) {
+                    if (attempt === retries) {
+                        // Last attempt failed - throw error
+                        if (error.name === 'AbortError') {
+                            throw new Error(`Request timeout after ${timeout/1000}s - network may be slow`);
+                        }
+                        throw error;
+                    }
+                    // Wait 1 second before retrying
+                    console.warn(`⚠️ Attempt ${attempt + 1} failed, retrying...`);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+        }
+        
+        /**
          * Fetch photos from Unsplash/Pexels via Netlify Function
          * @param {string} location - Location name
          * @param {string} query - Search query
@@ -4835,7 +4872,7 @@
         async function fetchLocationPhotos(location, country) {
             try {
                 const params = new URLSearchParams({ location, country });
-                const response = await fetch(`/.netlify/functions/get-photos?${params}`);
+                const response = await fetchWithTimeout(`/.netlify/functions/get-photos?${params}`, {}, 30000, 2);
                 
                 if (!response.ok) {
                     console.warn('Photos API returned error:', response.status);
@@ -4860,7 +4897,7 @@
         async function fetchLocationWeather(lat, lon) {
             try {
                 const params = new URLSearchParams({ lat: lat.toString(), lon: lon.toString() });
-                const response = await fetch(`/.netlify/functions/get-weather?${params}`);
+                const response = await fetchWithTimeout(`/.netlify/functions/get-weather?${params}`, {}, 15000, 2);
                 
                 if (!response.ok) {
                     console.warn('Weather API returned error:', response.status);
@@ -4905,7 +4942,7 @@
                     });
                 }
                 
-                const response = await fetch(`/.netlify/functions/get-ai-facts?${params}`);
+                const response = await fetchWithTimeout(`/.netlify/functions/get-ai-facts?${params}`, {}, 45000, 2);
                 
                 if (!response.ok) {
                     console.warn('AI Facts API returned error:', response.status);
@@ -4931,11 +4968,11 @@
             try {
                 console.log('🎯 Matching photos to', facts.length, 'facts...');
                 
-                const response = await fetch('/.netlify/functions/match-photos-to-facts', {
+                const response = await fetchWithTimeout('/.netlify/functions/match-photos-to-facts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ facts, location, country })
-                });
+                }, 60000, 2);
                 
                 if (!response.ok) {
                     console.warn('Photo matching API returned error:', response.status);
@@ -5317,7 +5354,7 @@
                 console.log('🌍 Generating real-life geography applications...');
                 
                 // Call AI to generate practical applications
-                const response = await fetch('/.netlify/functions/generate-real-life-geography', {
+                const response = await fetchWithTimeout('/.netlify/functions/generate-real-life-geography', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -5325,7 +5362,7 @@
                         country,
                         facts: facts || []
                     })
-                });
+                }, 45000, 2);
                 
                 if (!response.ok) {
                     throw new Error('Failed to generate content');
