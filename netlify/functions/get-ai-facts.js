@@ -251,6 +251,7 @@ Example format:
         usage
       })
     };
+  } // End of try block
 
   } catch (error) {
     console.error('❌ Error generating AI facts:', error);
