@@ -1,5 +1,6 @@
 // Netlify Function: Get AI-Generated Fun Facts from Claude 3.5 Sonnet
 // Endpoint: /.netlify/functions/get-ai-facts?location=Paris&country=France
+// Last updated: 2025-10-22 - Ocean support added
 // 
 // EDUCATIONAL SAFETY GUARDRAILS:
 // - Uses Claude 3.5 Sonnet (best for educational accuracy)
