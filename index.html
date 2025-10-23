@@ -4942,7 +4942,7 @@
                     });
                 }
                 
-                const response = await fetchWithTimeout(`/.netlify/functions/get-ai-facts?${params}`, {}, 45000, 2);
+                const response = await fetchWithTimeout(`/.netlify/functions/get-ai-facts?${params}`, {}, 90000, 1);
                 
                 if (!response.ok) {
                     console.warn('AI Facts API returned error:', response.status);
@@ -4972,7 +4972,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ facts, location, country })
-                }, 60000, 2);
+                }, 90000, 1);
                 
                 if (!response.ok) {
                     console.warn('Photo matching API returned error:', response.status);
@@ -5362,7 +5362,7 @@
                         country,
                         facts: facts || []
                     })
-                }, 45000, 2);
+                }, 90000, 1);
                 
                 if (!response.ok) {
                     throw new Error('Failed to generate content');
