@@ -1,6 +1,5 @@
 // Netlify Function: Get AI-Generated Fun Facts from Claude 3.5 Sonnet
 // Endpoint: /.netlify/functions/get-ai-facts?location=Paris&country=France
-// Last updated: 2025-10-22 - Ocean support added
 // 
 // EDUCATIONAL SAFETY GUARDRAILS:
 // - Uses Claude 3.5 Sonnet (best for educational accuracy)
@@ -256,12 +255,24 @@ Example format:
 
   } catch (error) {
     console.error('❌ Error generating AI facts:', error);
+    
+    // EMERGENCY FALLBACK: Static educational facts
+    console.log('🚨 Using static fallback facts due to API failure');
+    const fallbackFacts = [
+      `${location} is a fascinating place with rich geography and culture that students love to explore!`,
+      `This location offers amazing opportunities to learn about world geography and cultural diversity.`,
+      `Students often find this area particularly interesting for its unique geographical features.`,
+      `This region provides excellent examples for studying climate, culture, and human geography.`,
+      `Many educators use this location as a perfect case study for understanding our world better.`
+    ];
+    
     return {
-      statusCode: 500,
+      statusCode: 200,
       headers,
-      body: JSON.stringify({ 
-        error: 'Failed to generate AI facts', 
-        message: error.message 
+      body: JSON.stringify({
+        facts: fallbackFacts,
+        source: 'static_fallback',
+        usage: { total_tokens: 0, cost: 0 }
       })
     };
   }

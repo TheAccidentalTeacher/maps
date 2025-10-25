@@ -1,0 +1,44 @@
+{
+  "pacific": [
+    "The Pacific Ocean is the largest ocean on Earth, covering more than 63 million square miles — that's about 30% of the planet's surface.",
+    "The deepest point on Earth, the Mariana Trench, is in the Pacific Ocean and reaches about 11,034 meters (36,201 feet).",
+    "The Pacific hosts the Ring of Fire — a zone with many underwater volcanoes and frequent earthquakes that shape the ocean floor.",
+    "The Great Pacific Garbage Patch is a large concentration of marine debris, mostly plastics, trapped by ocean currents in the North Pacific Gyre.",
+    "Marine life in the Pacific ranges from tiny plankton to blue whales — the largest animals ever to live on Earth."
+  ],
+  "atlantic": [
+    "The Atlantic Ocean is the second-largest ocean and is known for its strong current system including the Gulf Stream, which affects climate in Europe.",
+    "The Mid-Atlantic Ridge runs down the center of the Atlantic Ocean and is an underwater mountain range formed by tectonic plates pulling apart.",
+    "The Sargasso Sea in the North Atlantic is unique for its floating seaweed mats that provide important habitat for marine life.",
+    "The Atlantic connects the Arctic and Southern Oceans and has been a major route for human exploration and trade for centuries.",
+    "Many important marine species live here, including Atlantic cod, humpback whales, and leatherback turtles."
+  ],
+  "indian": [
+    "The Indian Ocean is the warmest of the major oceans and is critical for global monsoon systems that affect rainfall in many countries.",
+    "It has important currents and features like the Somali Current and numerous deep-sea trenches off Indonesia.",
+    "The Indian Ocean is bordered by Africa, Asia, and Australia, and it's a key route for international shipping.",
+    "Coral reefs in the Indian Ocean, such as those near the Maldives and Seychelles, support huge biodiversity.",
+    "Many species like whale sharks and dugongs are found in Indian Ocean waters."
+  ],
+  "arctic": [
+    "The Arctic Ocean is the smallest and shallowest of the world's oceans and is mostly covered by sea ice for much of the year.",
+    "Polar bears, seals, and walruses rely on Arctic sea ice for hunting and breeding — changes to ice affect their survival.",
+    "The Arctic plays a key role in Earth's climate by reflecting sunlight and regulating temperature through ice and ocean interactions.",
+    "Despite being cold, the Arctic has unique ecosystems, like ice-edge communities where plankton blooms fuel food chains.",
+    "Scientists study Arctic waters to learn about climate change, ocean circulation, and how ecosystems respond to warming."
+  ],
+  "southern": [
+    "The Southern Ocean encircles Antarctica and is powerful — it helps drive global ocean currents through the Antarctic Circumpolar Current.",
+    "This ocean connects the Atlantic, Pacific, and Indian Oceans and plays a major role in Earth's climate and carbon storage.",
+    "It is home to huge populations of krill, which are a vital food source for whales, seals, and seabirds.",
+    "Sea ice around Antarctica expands and contracts seasonally, strongly affecting local ecosystems and global sea levels.",
+    "Research in the Southern Ocean helps scientists understand how the oceans absorb heat and carbon dioxide."
+  ],
+  "generic_ocean": [
+    "Oceans cover about 71% of Earth's surface and are crucial for weather, climate, and life on our planet.",
+    "Ocean currents act like conveyor belts, moving heat, salt, and nutrients around the world and shaping climates.",
+    "Many animals live in specific ocean zones — from sunlit surface waters to dark deep-sea habitats with unique creatures.",
+    "Oceans supply much of the oxygen we breathe because marine plants like phytoplankton produce oxygen through photosynthesis.",
+    "Protecting oceans is important: pollution, overfishing, and warming harm marine ecosystems and coastal communities."
+  ]
+}

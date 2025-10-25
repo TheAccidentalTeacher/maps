@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ocean Explorer — Mini Game</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; background:#0b2239; color:#e6f7ff; margin:0; padding:20px }
+    .card { background:#07263a; border-radius:10px; padding:20px; max-width:900px; margin:24px auto }
+    button { background:#ffd66b; border:none; padding:12px 18px; border-radius:8px; cursor:pointer }
+    .facts { margin-top:16px }
+    li{margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Ocean Explorer</h1>
+    <p>Welcome to the Ocean Explorer mini-game. This lightweight page provides curated ocean facts and small interactive tools without using AI by default. If you'd like richer AI-generated content, there's a button to request it (rate-limited).</p>
+
+    <label for="oceanSelect">Choose an ocean:</label>
+    <select id="oceanSelect">
+      <option value="generic_ocean">Generic Ocean</option>
+      <option value="pacific">Pacific</option>
+      <option value="atlantic">Atlantic</option>
+      <option value="indian">Indian</option>
+      <option value="arctic">Arctic</option>
+      <option value="southern">Southern</option>
+    </select>
+
+    <div style="margin-top:12px">
+      <button id="showFacts">Show Facts</button>
+      <button id="requestAi" style="margin-left:12px">Request AI Deep Dive (uses API)</button>
+    </div>
+
+    <div class="facts" id="factsContainer"></div>
+
+    <p style="margin-top:24px; font-size:0.9em; color:#b9dff1">Note: The AI button will call the site AI backend and is rate-limited — use it sparingly or only when testing.</p>
+    <p><a href="/">Back to Maps</a></p>
+  </div>
+
+  <script>
+    async function showLocalFacts(key) {
+      try {
+        const resp = await fetch('/data/ocean-facts.json');
+        if (!resp.ok) throw new Error('local facts not found');
+        const all = await resp.json();
+        const facts = all[key] || all['generic_ocean'] || [];
+        const container = document.getElementById('factsContainer');
+        container.innerHTML = '<h3>Facts about ' + key.replace('_',' ') + '</h3>' + (facts.length ? ('<ol>' + facts.map(f=>'<li>'+f+'</li>').join('') + '</ol>') : '<p>No facts available.</p>');
+      } catch (e) {
+        document.getElementById('factsContainer').textContent = 'Failed to load local facts.';
+      }
+    }
+
+    document.getElementById('showFacts').addEventListener('click', ()=>{
+      const key = document.getElementById('oceanSelect').value;
+      showLocalFacts(key);
+    });
+
+    // AI button: calls the same Netlify function but requires confirmation to reduce accidental requests
+    document.getElementById('requestAi').addEventListener('click', async ()=>{
+      if (!confirm('Request an AI Deep Dive for this ocean? This may consume API requests. Proceed?')) return;
+      const key = document.getElementById('oceanSelect').value;
+      const response = await fetch('/.netlify/functions/get-ai-facts?location=' + encodeURIComponent(key) + '&isWater=true');
+      if (!response.ok) {
+        alert('AI request failed: ' + response.status);
+        return;
+      }
+      const data = await response.json();
+      const facts = data.facts || [];
+      const container = document.getElementById('factsContainer');
+      container.innerHTML = '<h3>AI Deep Dive: ' + key.replace('_',' ') + '</h3>' + (facts.length ? ('<ol>' + facts.map(f=>'<li>'+f+'</li>').join('') + '</ol>') : '<p>No facts returned.</p>');
+    });
+  </script>
+</body>
+</html>

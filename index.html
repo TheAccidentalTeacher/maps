@@ -3048,6 +3048,7 @@
         <button class="mode-btn" onclick="switchMode('missions')">🏆 MISSIONS</button>
         <button class="mode-btn" onclick="switchMode('create')">🗺️ CREATE</button>
         <button class="mode-btn" onclick="switchMode('alaska')">🏔️ ALASKA</button>
+        <button class="mode-btn" onclick="window.location.href='/ocean-explorer-v3.html'">🌊 OCEAN</button>
     </div>
     
     <div id="container">
@@ -4090,6 +4091,9 @@
                 const geocodeData = await reverseGeocode(lat, lng);
                 console.log('🔍 geocodeData:', geocodeData);
                 
+                // Store globally for Ocean Explorer link
+                window.currentGeocodeData = geocodeData;
+                
                 // Step 2: Get country details if we found a country
                 let countryData = null;
                 if (geocodeData.country) {
@@ -4111,6 +4115,17 @@
                 populateLocationHeader(geocodeData, countryData, lat, lng);
                 populateQuickFacts(geocodeData, countryData);
                 populateComparison(distance, bearing, geocodeData);
+                
+                // Show/hide Ocean Explorer button based on location type
+                const oceanBtn = document.getElementById('ocean-explorer-btn');
+                if (oceanBtn) {
+                    if (geocodeData.isWater || geocodeData.ocean || geocodeData.oceanBasin) {
+                        oceanBtn.style.display = 'block';
+                        console.log('🌊 Showing Ocean Explorer button');
+                    } else {
+                        oceanBtn.style.display = 'none';
+                    }
+                }
                 
                 // Step 5: Populate nearby places (Phase 2)
                 populateNearbyPlaces(lat, lng);
@@ -4757,13 +4772,19 @@
         
         // Add location to collection
         function addToCollection(locationData) {
-            // Check if already collected (within 1km)
+            // Determine minimum distance based on location type
+            // Oceans need MUCH larger regions to prevent spam-clicking
+            const minDistance = (locationData.isWater || locationData.oceanBasin) 
+                ? 100  // 100km minimum for ocean regions (prevents spam)
+                : 1;   // 1km minimum for land locations
+            
+            // Check if already collected (within minimum distance)
             const isDuplicate = exploredLocations.some(loc => {
                 const distance = calculateDistance(
                     loc.lat, loc.lng,
                     locationData.lat, locationData.lng
                 );
-                return distance < 1; // Less than 1km apart
+                return distance < minDistance;
             });
             
             if (!isDuplicate) {
@@ -4779,7 +4800,7 @@
                 
                 return true;
             } else {
-                console.log('ℹ️ Location already in collection');
+                console.log(`ℹ️ Location already explored (within ${minDistance}km)`);
                 return false;
             }
         }
@@ -4969,35 +4990,61 @@
          * @returns {Promise<Array>} Array of fact strings
          */
         async function fetchLocationFacts(location, country, geocodeData = {}) {
+            // If this is an ocean/water location, return local curated facts to avoid
+            // excessive external AI/API calls. This prevents hitting rate limits when
+            // many users click ocean tiles. A link to the Ocean Explorer game is shown
+            // in the UI for deeper AI-driven experiences.
             try {
-                const params = new URLSearchParams({ 
-                    location, 
+                if (geocodeData && (geocodeData.isWater || geocodeData.ocean)) {
+                    try {
+                        console.log('🌊 Using local fallback facts for ocean location:', geocodeData.ocean || location);
+                        const resp = await fetch('/data/ocean-facts.json');
+                        if (!resp.ok) {
+                            console.warn('Local ocean facts not available:', resp.status);
+                            return [];
+                        }
+                        const allFacts = await resp.json();
+                        const rawKey = (geocodeData.ocean || geocodeData.oceanBasin || geocodeData.oceanRegion || 'generic_ocean').toString().toLowerCase();
+
+                        // Exact match
+                        if (allFacts[rawKey]) return allFacts[rawKey];
+
+                        // Fuzzy match: find a key that's contained in rawKey or vice-versa
+                        for (const k of Object.keys(allFacts)) {
+                            if (!k) continue;
+                            if (rawKey.includes(k) || k.includes(rawKey)) return allFacts[k];
+                        }
+
+                        // Fallback to generic ocean facts
+                        return allFacts['generic_ocean'] || [];
+                    } catch (err) {
+                        console.warn('Failed to load local ocean facts, falling back to AI call:', err);
+                        // If local JSON fails for some reason, fall through to AI call below
+                    }
+                }
+
+                // Not an ocean (or local fallback failed): proceed to call AI function
+                const params = new URLSearchParams({
+                    location,
                     country: country || ''
                 });
-                
-                // Add ocean-specific parameters if this is a water location
-                if (geocodeData.isWater || geocodeData.ocean) {
-                    params.append('isWater', 'true');
+
+                // Add any ocean params just in case (AI can handle but we avoid calling it for oceans by default)
+                if (geocodeData && (geocodeData.ocean || geocodeData.oceanBasin || geocodeData.oceanRegion)) {
                     if (geocodeData.ocean) params.append('ocean', geocodeData.ocean);
                     if (geocodeData.oceanBasin) params.append('oceanBasin', geocodeData.oceanBasin);
                     if (geocodeData.oceanRegion) params.append('oceanRegion', geocodeData.oceanRegion);
                     if (geocodeData.lat) params.append('lat', geocodeData.lat);
                     if (geocodeData.lng) params.append('lon', geocodeData.lng);
-                    
-                    console.log('🌊 Requesting ocean-specific facts:', {
-                        ocean: geocodeData.ocean,
-                        basin: geocodeData.oceanBasin,
-                        region: geocodeData.oceanRegion
-                    });
                 }
-                
+
                 const response = await fetchWithTimeout(`/.netlify/functions/get-ai-facts?${params}`, {}, 90000, 1);
-                
+
                 if (!response.ok) {
                     console.warn('AI Facts API returned error:', response.status);
                     return [];
                 }
-                
+
                 const data = await response.json();
                 return data.facts || [];
             } catch (error) {
@@ -5317,6 +5364,20 @@
                 html += `<li class="fact-item">✨ ${escapeHtml(fact)}</li>`;
             });
             html += '</ul>';
+            
+            // Add Ocean Explorer link if this is an ocean location
+            if (window.currentGeocodeData && (window.currentGeocodeData.isWater || window.currentGeocodeData.ocean)) {
+                html += `
+                    <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #0077be 0%, #00d9ff 100%); border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0, 119, 190, 0.3); cursor: pointer;" onclick="window.location.href='/ocean-explorer-v3.html'">
+                        <div style="color: white; text-decoration: none; font-weight: bold; font-size: 18px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                            🌊 DIVE INTO OCEAN EXPLORER! 🐠
+                        </div>
+                        <div style="font-size: 13px; margin-top: 8px; color: rgba(255,255,255,0.95);">
+                            Discover 30 species, collect real photos, and explore the deep!
+                        </div>
+                    </div>
+                `;
+            }
             
             contentElement.innerHTML = html;
             console.log('✅ Loaded', facts.length, 'AI facts');
@@ -10586,6 +10647,11 @@
         <div class="sidebar-footer">
             <button class="btn view-collection-btn" onclick="viewExploredLocations()">
                 🗂️ View My Collection
+            </button>
+            
+            <!-- Ocean Explorer Button (only shows for ocean locations) -->
+            <button id="ocean-explorer-btn" class="btn ocean-explorer-btn" onclick="window.location.href='/ocean-explorer-v3.html'" style="display: none; margin-top: 10px; background: linear-gradient(135deg, #0077be 0%, #00d9ff 100%); color: white; border: none;">
+                🌊 DIVE INTO OCEAN EXPLORER! 🐠
             </button>
         </div>
     </div> <!-- End location-explorer-sidebar -->

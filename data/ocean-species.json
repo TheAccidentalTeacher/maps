@@ -1,0 +1,406 @@
+{
+  "zones": {
+    "sunlight": {
+      "name": "Sunlight Zone",
+      "depth": "0-200m",
+      "description": "Where sunlight reaches, most ocean life thrives here",
+      "color": "#00d9ff"
+    },
+    "twilight": {
+      "name": "Twilight Zone",
+      "depth": "200-1000m",
+      "description": "Dim light zone where bioluminescence begins",
+      "color": "#0066cc"
+    },
+    "midnight": {
+      "name": "Midnight Zone",
+      "depth": "1000-4000m",
+      "description": "Pitch black waters with bizarre creatures",
+      "color": "#001a33"
+    }
+  },
+  "species": [
+    {
+      "id": 1,
+      "name": "Bottlenose Dolphin",
+      "zone": "sunlight",
+      "depth": "0-50m",
+      "rarity": "common",
+      "fact": "Can recognize themselves in mirrors and have unique whistles like names",
+      "diet": "Fish and squid",
+      "size": "2-4 meters"
+    },
+    {
+      "id": 2,
+      "name": "Green Sea Turtle",
+      "zone": "sunlight",
+      "depth": "0-100m",
+      "rarity": "common",
+      "fact": "Can hold their breath for up to 5 hours when resting",
+      "diet": "Seagrass and algae",
+      "size": "1-1.5 meters"
+    },
+    {
+      "id": 3,
+      "name": "Clownfish",
+      "zone": "sunlight",
+      "depth": "0-30m",
+      "rarity": "common",
+      "fact": "Live in sea anemones that would sting other fish - they're immune!",
+      "diet": "Algae and plankton",
+      "size": "10-18 cm"
+    },
+    {
+      "id": 4,
+      "name": "Great White Shark",
+      "zone": "sunlight",
+      "depth": "0-250m",
+      "rarity": "rare",
+      "fact": "Can detect a single drop of blood in 25 million drops of ocean water",
+      "diet": "Seals, fish, dolphins",
+      "size": "4-6 meters"
+    },
+    {
+      "id": 5,
+      "name": "Manta Ray",
+      "zone": "sunlight",
+      "depth": "0-120m",
+      "rarity": "uncommon",
+      "fact": "Has the largest brain-to-body ratio of any fish",
+      "diet": "Plankton and small fish",
+      "size": "5-7 meter wingspan"
+    },
+    {
+      "id": 6,
+      "name": "Blue Tang",
+      "zone": "sunlight",
+      "depth": "2-40m",
+      "rarity": "common",
+      "fact": "Can change from blue to purple at night for camouflage",
+      "diet": "Algae and plankton",
+      "size": "25-30 cm"
+    },
+    {
+      "id": 7,
+      "name": "Octopus",
+      "zone": "sunlight",
+      "depth": "0-200m",
+      "rarity": "uncommon",
+      "fact": "Has 3 hearts, 9 brains, and blue blood",
+      "diet": "Crabs, shrimp, fish",
+      "size": "30-90 cm"
+    },
+    {
+      "id": 8,
+      "name": "Sea Otter",
+      "zone": "sunlight",
+      "depth": "0-40m",
+      "rarity": "uncommon",
+      "fact": "Has the densest fur of any animal - up to 1 million hairs per square inch!",
+      "diet": "Sea urchins, crabs, clams",
+      "size": "1-1.5 meters"
+    },
+    {
+      "id": 9,
+      "name": "Bluefin Tuna",
+      "zone": "sunlight",
+      "depth": "0-200m",
+      "rarity": "rare",
+      "fact": "Can swim up to 43 mph - faster than most boats!",
+      "diet": "Fish, squid, crustaceans",
+      "size": "2-3 meters"
+    },
+    {
+      "id": 10,
+      "name": "Seahorse",
+      "zone": "sunlight",
+      "depth": "0-100m",
+      "rarity": "uncommon",
+      "fact": "Males get pregnant and give birth - only animal where this happens!",
+      "diet": "Plankton and small shrimp",
+      "size": "2-35 cm"
+    },
+    {
+      "id": 11,
+      "name": "Moon Jellyfish",
+      "zone": "twilight",
+      "depth": "0-300m",
+      "rarity": "common",
+      "fact": "95% water with no brain, heart, or bones",
+      "diet": "Plankton and small fish",
+      "size": "25-40 cm diameter"
+    },
+    {
+      "id": 12,
+      "name": "Lanternfish",
+      "zone": "twilight",
+      "depth": "200-1000m",
+      "rarity": "common",
+      "fact": "Make up 65% of all deep-sea fish - over 250 species!",
+      "diet": "Plankton and small fish",
+      "size": "2-30 cm"
+    },
+    {
+      "id": 13,
+      "name": "Giant Squid",
+      "zone": "twilight",
+      "depth": "300-1000m",
+      "rarity": "epic",
+      "fact": "Has eyes the size of basketballs - largest of any animal!",
+      "diet": "Fish and other squid",
+      "size": "10-13 meters"
+    },
+    {
+      "id": 14,
+      "name": "Vampire Squid",
+      "zone": "twilight",
+      "depth": "600-900m",
+      "rarity": "rare",
+      "fact": "Not actually a vampire - eats marine snow (dead stuff floating down)",
+      "diet": "Marine snow and detritus",
+      "size": "15-30 cm"
+    },
+    {
+      "id": 15,
+      "name": "Hatchetfish",
+      "zone": "twilight",
+      "depth": "200-600m",
+      "rarity": "uncommon",
+      "fact": "Super thin body looks like a hatchet from the side",
+      "diet": "Small crustaceans",
+      "size": "2-6 cm"
+    },
+    {
+      "id": 16,
+      "name": "Barreleye Fish",
+      "zone": "twilight",
+      "depth": "400-800m",
+      "rarity": "rare",
+      "fact": "Has a transparent head so you can see its brain!",
+      "diet": "Jellyfish and small fish",
+      "size": "15 cm"
+    },
+    {
+      "id": 17,
+      "name": "Bigfin Squid",
+      "zone": "twilight",
+      "depth": "400-900m",
+      "rarity": "rare",
+      "fact": "Has ridiculously long tentacles - up to 8 meters!",
+      "diet": "Small fish and crustaceans",
+      "size": "Body 20cm, arms 8m"
+    },
+    {
+      "id": 18,
+      "name": "Dragonfish",
+      "zone": "twilight",
+      "depth": "200-2000m",
+      "rarity": "uncommon",
+      "fact": "Produces red bioluminescence that most fish can't see",
+      "diet": "Small fish and crustaceans",
+      "size": "15-50 cm"
+    },
+    {
+      "id": 19,
+      "name": "Viperfish",
+      "zone": "twilight",
+      "depth": "200-1500m",
+      "rarity": "uncommon",
+      "fact": "Teeth so long they can't close their mouth all the way",
+      "diet": "Small fish and shrimp",
+      "size": "30-60 cm"
+    },
+    {
+      "id": 20,
+      "name": "Goblin Shark",
+      "zone": "twilight",
+      "depth": "270-1300m",
+      "rarity": "epic",
+      "fact": "Can shoot its jaw forward to catch prey - looks terrifying!",
+      "diet": "Fish, squid, crustaceans",
+      "size": "3-4 meters"
+    },
+    {
+      "id": 21,
+      "name": "Anglerfish",
+      "zone": "midnight",
+      "depth": "1000-3000m",
+      "rarity": "rare",
+      "fact": "Uses glowing lure on its head to attract prey in the darkness",
+      "diet": "Small fish and shrimp",
+      "size": "20-100 cm"
+    },
+    {
+      "id": 22,
+      "name": "Gulper Eel",
+      "zone": "midnight",
+      "depth": "500-3000m",
+      "rarity": "rare",
+      "fact": "Mouth opens so wide it can swallow prey larger than itself!",
+      "diet": "Fish, squid, crustaceans",
+      "size": "Up to 1 meter"
+    },
+    {
+      "id": 23,
+      "name": "Giant Isopod",
+      "zone": "midnight",
+      "depth": "170-2500m",
+      "rarity": "uncommon",
+      "fact": "Like a giant roly-poly bug - can grow 16 inches long!",
+      "diet": "Dead whales and fish",
+      "size": "20-40 cm"
+    },
+    {
+      "id": 24,
+      "name": "Frilled Shark",
+      "zone": "midnight",
+      "depth": "500-1500m",
+      "rarity": "epic",
+      "fact": "Called a 'living fossil' - unchanged for 80 million years",
+      "diet": "Squid and fish",
+      "size": "1.5-2 meters"
+    },
+    {
+      "id": 25,
+      "name": "Blobfish",
+      "zone": "midnight",
+      "depth": "600-1200m",
+      "rarity": "uncommon",
+      "fact": "Looks normal underwater but gooey when brought to surface!",
+      "diet": "Crustaceans and mollusks",
+      "size": "30 cm"
+    },
+    {
+      "id": 26,
+      "name": "Dumbo Octopus",
+      "zone": "midnight",
+      "depth": "3000-4000m",
+      "rarity": "rare",
+      "fact": "Cutest deep-sea creature - ear-like fins flap to swim",
+      "diet": "Worms, crustaceans, mollusks",
+      "size": "20-30 cm"
+    },
+    {
+      "id": 27,
+      "name": "Fangtooth Fish",
+      "zone": "midnight",
+      "depth": "200-5000m",
+      "rarity": "uncommon",
+      "fact": "Has largest teeth relative to body size of any fish",
+      "diet": "Fish and crustaceans",
+      "size": "15-18 cm"
+    },
+    {
+      "id": 28,
+      "name": "Colossal Squid",
+      "zone": "midnight",
+      "depth": "1000-2200m",
+      "rarity": "legendary",
+      "fact": "Even bigger than giant squid - can weigh up to 1,500 pounds!",
+      "diet": "Large fish",
+      "size": "12-14 meters"
+    },
+    {
+      "id": 29,
+      "name": "Cookiecutter Shark",
+      "zone": "midnight",
+      "depth": "1000-3700m",
+      "rarity": "rare",
+      "fact": "Bites perfect circular chunks out of whales and submarines!",
+      "diet": "Tissue from large animals",
+      "size": "40-56 cm"
+    },
+    {
+      "id": 30,
+      "name": "Deep Sea Dragonfish",
+      "zone": "midnight",
+      "depth": "1500-5000m",
+      "rarity": "rare",
+      "fact": "Female is 40cm, male is only 5cm - huge size difference!",
+      "diet": "Small fish and crustaceans",
+      "size": "5-40 cm"
+    }
+  ],
+  "achievements": [
+    {
+      "id": "first_dive",
+      "name": "First Dive",
+      "description": "Reach 100m depth",
+      "icon": "🐠",
+      "requirement": 100,
+      "type": "depth"
+    },
+    {
+      "id": "twilight_zone",
+      "name": "Into the Twilight",
+      "description": "Unlock Twilight Zone (200m)",
+      "icon": "🌊",
+      "requirement": 200,
+      "type": "depth"
+    },
+    {
+      "id": "midnight_zone",
+      "name": "Midnight Explorer",
+      "description": "Unlock Midnight Zone (1000m)",
+      "icon": "🌑",
+      "requirement": 1000,
+      "type": "depth"
+    },
+    {
+      "id": "species_5",
+      "name": "Novice Explorer",
+      "description": "Discover 5 different species",
+      "icon": "🔍",
+      "requirement": 5,
+      "type": "species"
+    },
+    {
+      "id": "species_10",
+      "name": "Marine Biologist",
+      "description": "Discover 10 different species",
+      "icon": "📚",
+      "requirement": 10,
+      "type": "species"
+    },
+    {
+      "id": "species_20",
+      "name": "Ocean Master",
+      "description": "Discover 20 different species",
+      "icon": "🏆",
+      "requirement": 20,
+      "type": "species"
+    },
+    {
+      "id": "species_all",
+      "name": "Complete Collection",
+      "description": "Discover all 30 species!",
+      "icon": "👑",
+      "requirement": 30,
+      "type": "species"
+    },
+    {
+      "id": "shark_finder",
+      "name": "Shark Spotter",
+      "description": "Find a Great White Shark",
+      "icon": "🦈",
+      "requirement": 4,
+      "type": "specific_species"
+    },
+    {
+      "id": "squid_hunter",
+      "name": "Squid Hunter",
+      "description": "Find the Giant Squid",
+      "icon": "🦑",
+      "requirement": 13,
+      "type": "specific_species"
+    },
+    {
+      "id": "legendary",
+      "name": "Legendary Discovery",
+      "description": "Find the Colossal Squid!",
+      "icon": "⭐",
+      "requirement": 28,
+      "type": "specific_species"
+    }
+  ]
+}

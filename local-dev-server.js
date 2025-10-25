@@ -1806,11 +1806,312 @@ RESPOND WITH ONLY THE JSON OBJECT. Make it EDUCATIONAL and RELATABLE!`;
     }
 });
 
-app.listen(PORT, () => {
+// ==========================================
+// GET SPECIES PHOTOS (Kid-Safe Ocean Species)
+// ==========================================
+app.post('/.netlify/functions/get-species-photos', async (req, res) => {
+    console.log('🐟 Species photo request:', req.body);
+    
+    try {
+        const { speciesName } = req.body;
+        
+        if (!speciesName) {
+            return res.status(400).json({ error: 'Missing speciesName' });
+        }
+
+        const fetch = (await import('node-fetch')).default;
+        const unsplashKey = process.env.UNSPLASH_ACCESS_KEY;
+        const pexelsKey = process.env.PEXELS_API_KEY;
+        
+        if (!unsplashKey && !pexelsKey) {
+            console.log('❌ No photo APIs available');
+            return res.json({ photo: null, source: 'none' });
+        }
+
+        // Add educational context for better filtering
+        const educationalQuery = `${speciesName} ocean marine life educational`;
+        let photo = null;
+
+        // TIER 1: Unsplash (naturally curated, high quality)
+        if (unsplashKey) {
+            console.log(`🔍 TIER 1: Unsplash search for "${educationalQuery}"`);
+            const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(educationalQuery)}&per_page=5&orientation=landscape&content_filter=high`;
+            
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Client-ID ${unsplashKey}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.results && data.results.length > 0) {
+                        const result = data.results[0];
+                        console.log(`✅ TIER 1 SUCCESS: Found photo for ${speciesName}`);
+                        photo = {
+                            id: result.id,
+                            url: result.urls.regular,
+                            thumbnail: result.urls.small,
+                            photographer: result.user.name,
+                            photographer_url: result.user.links.html,
+                            description: result.description || result.alt_description || '',
+                            source: 'unsplash'
+                        };
+                    } else {
+                        console.log('❌ TIER 1: No results');
+                    }
+                }
+            } catch (error) {
+                console.error('Unsplash error:', error.message);
+            }
+        }
+
+        // TIER 2: Pexels (also curated, safe content)
+        if (!photo && pexelsKey) {
+            console.log(`🔍 TIER 2: Pexels search for "${speciesName}"`);
+            const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(speciesName + ' ocean')}&per_page=5&orientation=landscape`;
+            
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Authorization': pexelsKey }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.photos && data.photos.length > 0) {
+                        const result = data.photos[0];
+                        console.log(`✅ TIER 2 SUCCESS: Found photo for ${speciesName}`);
+                        photo = {
+                            id: result.id,
+                            url: result.src.large,
+                            thumbnail: result.src.medium,
+                            photographer: result.photographer,
+                            photographer_url: result.photographer_url,
+                            description: `${speciesName} photograph`,
+                            source: 'pexels'
+                        };
+                    } else {
+                        console.log('❌ TIER 2: No results');
+                    }
+                }
+            } catch (error) {
+                console.error('Pexels error:', error.message);
+            }
+        }
+
+        // TIER 3: Simplified species name
+        if (!photo && unsplashKey) {
+            const simplifiedName = speciesName.replace(/Deep Sea |Giant |Colossal |Great White /gi, '').trim();
+            if (simplifiedName !== speciesName) {
+                console.log(`🔍 TIER 3: Trying simplified name "${simplifiedName}"`);
+                const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(simplifiedName + ' ocean')}&per_page=3&orientation=landscape&content_filter=high`;
+                
+                try {
+                    const response = await fetch(url, {
+                        headers: { 'Authorization': `Client-ID ${unsplashKey}` }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.results && data.results.length > 0) {
+                            const result = data.results[0];
+                            console.log(`✅ TIER 3 SUCCESS: Found photo for ${simplifiedName}`);
+                            photo = {
+                                id: result.id,
+                                url: result.urls.regular,
+                                thumbnail: result.urls.small,
+                                photographer: result.user.name,
+                                photographer_url: result.user.links.html,
+                                description: result.description || result.alt_description || '',
+                                source: 'unsplash'
+                            };
+                        }
+                    }
+                } catch (error) {
+                    console.error('Tier 3 error:', error.message);
+                }
+            }
+        }
+
+        res.json({ 
+            species: speciesName,
+            photo: photo,
+            cached: false 
+        });
+
+    } catch (error) {
+        console.error('❌ Species photo error:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch species photo',
+            details: error.message 
+        });
+    }
+});
+
+// ==========================================
+// GET SPECIES AI FACTS (Claude/OpenAI)
+// ==========================================
+app.post('/.netlify/functions/get-species-ai-facts', async (req, res) => {
+    console.log('🧠 Species AI facts request:', req.body);
+    
+    try {
+        const { speciesName, speciesData } = req.body;
+        
+        if (!speciesName) {
+            return res.status(400).json({ error: 'Missing speciesName' });
+        }
+
+        const fetch = (await import('node-fetch')).default;
+        const claudeKey = process.env.ANTHROPIC_API_KEY;
+        const openaiKey = process.env.OPENAI_API_KEY;
+        
+        if (!claudeKey && !openaiKey) {
+            console.log('❌ No AI APIs available');
+            return res.json({ error: 'No AI service available', facts: null });
+        }
+
+        // Build the AI prompt
+        const baseInfo = speciesData ? `
+Known info about ${speciesName}:
+- Zone: ${speciesData.zone}
+- Depth Range: ${speciesData.depth}
+- Diet: ${speciesData.diet}
+- Size: ${speciesData.size}
+- Rarity: ${speciesData.rarity}
+` : '';
+
+        const prompt = `You are an ocean educator teaching kids (ages 8-14) about marine life.
+
+${baseInfo}
+
+Generate educational facts about the ${speciesName}. Make it engaging and kid-friendly!
+
+Provide EXACTLY this JSON format (no markdown, no extra text):
+{
+  "fun_fact": "A super interesting fact that will blow their minds (1-2 sentences)",
+  "habitat": "Where they live and what their environment is like (1-2 sentences)",
+  "diet": "What they eat and how they hunt/gather food (1-2 sentences)",
+  "conservation_status": "Are they endangered? What threats do they face? (1-2 sentences)",
+  "interesting_behavior": "A cool behavior or adaptation that makes them unique (1-2 sentences)"
+}
+
+Keep each fact under 150 characters. Use simple language. Be accurate but exciting!`;
+
+        let aiFacts = null;
+
+        // TRY CLAUDE FIRST (preferred)
+        if (claudeKey) {
+            console.log(`🧠 Asking Claude about ${speciesName}...`);
+            
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': claudeKey,
+                        'anthropic-version': '2023-06-01'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-3-5-sonnet-20241022',
+                        max_tokens: 1024,
+                        messages: [{
+                            role: 'user',
+                            content: prompt
+                        }]
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const content = data.content[0].text;
+                    console.log('✅ Claude response received');
+                    
+                    // Parse JSON from response
+                    const jsonMatch = content.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        aiFacts = JSON.parse(jsonMatch[0]);
+                        console.log('✅ Successfully parsed Claude facts');
+                    }
+                } else {
+                    console.log('❌ Claude API error:', response.status);
+                }
+            } catch (error) {
+                console.error('Claude error:', error.message);
+            }
+        }
+
+        // FALLBACK TO OPENAI
+        if (!aiFacts && openaiKey) {
+            console.log(`🧠 Asking OpenAI about ${speciesName}...`);
+            
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${openaiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [{
+                            role: 'system',
+                            content: 'You are an ocean educator. Always respond with valid JSON only, no markdown.'
+                        }, {
+                            role: 'user',
+                            content: prompt
+                        }],
+                        temperature: 0.7,
+                        max_tokens: 800
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const content = data.choices[0].message.content;
+                    console.log('✅ OpenAI response received');
+                    
+                    // Parse JSON from response
+                    const jsonMatch = content.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        aiFacts = JSON.parse(jsonMatch[0]);
+                        console.log('✅ Successfully parsed OpenAI facts');
+                    }
+                } else {
+                    console.log('❌ OpenAI API error:', response.status);
+                }
+            } catch (error) {
+                console.error('OpenAI error:', error.message);
+            }
+        }
+
+        if (!aiFacts) {
+            return res.json({ 
+                error: 'Failed to generate AI facts',
+                facts: null 
+            });
+        }
+
+        res.json({ 
+            species: speciesName,
+            facts: aiFacts,
+            source: claudeKey && aiFacts ? 'claude' : 'openai'
+        });
+
+    } catch (error) {
+        console.error('❌ Species AI facts error:', error);
+        res.status(500).json({ 
+            error: 'Failed to get species AI facts',
+            details: error.message 
+        });
+    }
+});
+
+// Listen on 0.0.0.0 to accept connections from all network interfaces
+app.listen(PORT, '0.0.0.0', () => {
     console.log('\n╔════════════════════════════════════════════════════════════╗');
     console.log('║  🚀 LOCAL DEV SERVER RUNNING                              ║');
     console.log('╚════════════════════════════════════════════════════════════╝\n');
     console.log('📍 Main App:    http://localhost:8888');
+    console.log('📍 Or try:      http://127.0.0.1:8888');
     console.log('🏥 Health Check: http://localhost:8888/health\n');
     console.log('🔑 API Keys Configured:');
     console.log('  Unsplash:      ', process.env.UNSPLASH_ACCESS_KEY ? '✅' : '❌');
@@ -1821,4 +2122,5 @@ app.listen(PORT, () => {
     console.log('\n🧠 AI Provider:', process.env.ANTHROPIC_API_KEY ? 'Claude 3.5 Sonnet' : process.env.OPENAI_API_KEY ? 'GPT-4o-mini' : 'None');
     console.log('💡 Click anywhere on the map to test Location Explorer!');
     console.log('📝 Watch this console for API request logs\n');
+    console.log('✅ Server is now listening on all network interfaces (0.0.0.0:8888)');
 });

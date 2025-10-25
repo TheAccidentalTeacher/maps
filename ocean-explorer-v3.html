@@ -1,0 +1,2722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Explorer - Deep Dive Discovery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animated water background */
+        .water-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            animation: waterFlow 8s ease-in-out infinite;
+        }
+
+        @keyframes waterFlow {
+            0%, 100% { filter: brightness(1) hue-rotate(0deg); }
+            50% { filter: brightness(1.15) hue-rotate(5deg); }
+        }
+
+        /* Header */
+        .header {
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 100%);
+            padding: 15px 220px 15px 180px; /* Space for back button on left, reset on right */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #00ffff;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            background: linear-gradient(90deg, #00ffff, #00ff88, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 10px #00ffff); }
+            50% { filter: drop-shadow(0 0 20px #00ffff); }
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 10px 20px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(0, 255, 255, 0.5);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #00ffff;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        /* Left Panel - Ocean View */
+        .ocean-view {
+            flex: 2;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #oceanCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            transition: transform 0.1s;
+        }
+
+        #oceanCanvas:active {
+            transform: scale(0.98);
+        }
+
+        /* Animated particles */
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp 3s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-300px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Floating points indicator */
+        .floating-text {
+            position: absolute;
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700;
+            pointer-events: none;
+            animation: floatUpText 1.5s ease-out forwards;
+            z-index: 100;
+        }
+
+        @keyframes floatUpText {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-150px) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* 🎉 EPIC 67 CELEBRATION! 🎉 */
+        .celebration-67 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(255, 0, 255, 0.2) 50%, rgba(0, 255, 255, 0.3) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: celebration67Fade 1.5s ease-in-out;
+            pointer-events: none;
+            backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease;
+        }
+
+        .celebration-67-content {
+            text-align: center;
+            animation: celebration67Zoom 1.5s ease-out;
+        }
+
+        .celebration-67-number {
+            font-size: 250px;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ffd700, #ff00ff, #00ffff, #ffd700);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: celebration67Rainbow 1s ease-in-out infinite, celebration67Pulse 0.5s ease-in-out 3;
+            text-shadow: 0 0 80px rgba(255, 215, 0, 0.8);
+            filter: drop-shadow(0 0 40px #ffd700) drop-shadow(0 0 80px #ff00ff);
+        }
+
+        .celebration-67-text {
+            font-size: 42px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700, 0 0 40px #ff00ff, 0 0 60px #00ffff;
+            margin-top: 20px;
+            animation: celebration67TextGlow 0.5s ease-in-out infinite;
+        }
+
+        @keyframes celebration67Fade {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes celebration67Zoom {
+            0% { 
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            50% { 
+                transform: scale(1.2) rotate(10deg);
+            }
+            100% { 
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes celebration67Rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes celebration67Pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes celebration67TextGlow {
+            0%, 100% { 
+                text-shadow: 0 0 20px #ffd700, 0 0 40px #ff00ff, 0 0 60px #00ffff;
+            }
+            50% { 
+                text-shadow: 0 0 30px #ffd700, 0 0 60px #ff00ff, 0 0 90px #00ffff;
+            }
+        }
+
+        /* Depth Meter */
+        .depth-meter {
+            position: absolute;
+            right: 30px;
+            top: 30px;
+            width: 80px;
+            height: 500px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 50, 100, 0.8) 100%);
+            border: 3px solid #00ffff;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .depth-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(180deg, #ff0066 0%, #9d00ff 50%, #00ffff 100%);
+            transition: height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        }
+
+        .depth-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 10px #000;
+            z-index: 10;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        /* Click Prompt */
+        .click-prompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            animation: pulse 2s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        .click-prompt h2 {
+            font-size: 48px;
+            color: #00ffff;
+            text-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff;
+            margin-bottom: 15px;
+        }
+
+        .click-prompt p {
+            font-size: 24px;
+            color: #fff;
+            text-shadow: 0 0 10px #000;
+        }
+
+        /* EPIC DIVE BUTTON */
+        .dive-button-wrapper {
+            position: relative;
+            display: inline-block;
+            animation: buttonPulse 2s ease-in-out infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dive-button-wrapper:hover {
+            animation: buttonPulseHover 0.6s ease-in-out infinite;
+            transform: scale(1.05);
+        }
+
+        .dive-button-wrapper:active {
+            transform: scale(0.95);
+            animation: none;
+        }
+
+        .dive-button-base {
+            display: block;
+            transition: all 0.2s ease;
+        }
+
+        .dive-button-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dive-arrow {
+            animation: arrowBounce 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+        }
+
+        .dive-text {
+            animation: textGlow 2s ease-in-out infinite;
+        }
+
+        .dive-button-hint {
+            animation: fadeInOut 3s ease-in-out infinite;
+        }
+
+        @keyframes buttonPulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.6));
+            }
+            50% {
+                transform: scale(1.08);
+                filter: drop-shadow(0 0 35px rgba(0, 255, 255, 0.9));
+            }
+        }
+
+        @keyframes buttonPulseHover {
+            0%, 100% {
+                transform: scale(1.05);
+            }
+            50% {
+                transform: scale(1.12);
+            }
+        }
+
+        @keyframes arrowBounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(8px);
+            }
+        }
+
+        @keyframes textGlow {
+            0%, 100% {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            }
+            50% {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(0, 255, 255, 0.8);
+            }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Hide dive button after first click */
+        #diveButtonContainer.hidden {
+            animation: fadeOutButton 0.8s ease forwards;
+        }
+
+        @keyframes fadeOutButton {
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(50px);
+                pointer-events: none;
+            }
+        }
+
+        /* Info Panel */
+        .info-panel {
+            flex: 1;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 20, 40, 0.95) 100%);
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 3px solid #00ffff;
+            box-shadow: -4px 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .panel-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .panel-section h3 {
+            color: #00ffff;
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: relative;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid #00ffff;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #9d00ff, #ff0066);
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 2px 4px #000;
+        }
+
+        /* Species Grid */
+        .species-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .species-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ffff;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            min-height: 140px;  /* Taller cards */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .species-card-photo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.7;  /* More visible (was 0.3) */
+            z-index: 0;
+            transition: opacity 0.3s;
+            filter: brightness(0.8);
+        }
+
+        .species-card:hover .species-card-photo {
+            opacity: 0.9;  /* Even more visible on hover */
+            filter: brightness(1);
+        }
+
+        .species-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .species-card:hover {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+            border-color: #ffd700;
+        }
+
+        .species-card.locked {
+            opacity: 0.3;
+            filter: grayscale(1);
+        }
+
+        .species-card.discovered {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            animation: discover 0.5s ease-out;
+        }
+
+        @keyframes discover {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .species-icon {
+            font-size: 50px;  /* Bigger emoji (was 40px) */
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .species-name {
+            font-size: 13px;  /* Slightly bigger text (was 12px) */
+            color: #fff;
+            margin-top: 8px;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.9), 0 2px 4px rgba(0, 0, 0, 0.8);  /* Better readability over photos */
+            background: rgba(0, 0, 0, 0.6);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        /* Achievements */
+        .achievement {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .achievement.unlocked {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .achievement.locked {
+            opacity: 0.4;
+        }
+
+        .achievement-icon {
+            font-size: 36px;
+            filter: drop-shadow(0 0 5px #ffd700);
+        }
+
+        .achievement-info h4 {
+            font-size: 16px;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .achievement-info p {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        /* Discovery Notification */
+        .discovery-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 100, 150, 0.95) 100%);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #00ffff;
+            box-shadow: 0 0 100px rgba(0, 255, 255, 0.8), inset 0 0 50px rgba(0, 255, 255, 0.2);
+            text-align: center;
+            z-index: 1000;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            max-width: 600px;
+        }
+
+        .discovery-photo {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .discovery-photo img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-credit {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            font-size: 11px;
+            color: #aaa;
+            text-align: right;
+        }
+
+        .photo-credit a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+
+        .photo-credit a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .discovery-icon {
+            font-size: 100px;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .discovery-name {
+            font-size: 32px;
+            color: #ffd700;
+            margin: 20px 0;
+            text-shadow: 0 0 20px #ffd700;
+        }
+
+        .discovery-fact {
+            font-size: 16px;
+            color: #fff;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .ai-facts-section {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(75, 0, 130, 0.2));
+            border: 2px solid #9370db;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .ai-label {
+            font-size: 14px;
+            color: #9370db;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .ai-fact {
+            font-size: 13px;
+            color: #e0e0e0;
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .ai-fact strong {
+            color: #9370db;
+        }
+
+        .discovery-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #00ffff;
+        }
+
+        .discovery-stat {
+            text-align: center;
+        }
+
+        .discovery-stat-label {
+            font-size: 12px;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .discovery-stat-value {
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        /* Zone Unlock Overlay */
+        .zone-unlock-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .zone-unlock-content {
+            text-align: center;
+            animation: zoomIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.5) rotate(-180deg);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .zone-unlock-content h1 {
+            font-size: 80px;
+            color: #00ffff;
+            text-shadow: 0 0 50px #00ffff, 0 0 100px #00ffff;
+            margin-bottom: 30px;
+            animation: glow 1s ease-in-out infinite;
+        }
+
+        .zone-unlock-content h2 {
+            font-size: 56px;
+            background: linear-gradient(90deg, #ffd700, #ff00ff, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+        }
+
+        .zone-unlock-content p {
+            font-size: 24px;
+            color: #fff;
+            max-width: 600px;
+        }
+
+        /* Back Button */
+        .back-link {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+            z-index: 1000; /* Higher z-index to stay on top */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .back-link:hover {
+            background: rgba(0, 217, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        /* Scrollbar */
+        .info-panel::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .info-panel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .info-panel::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00ffff, #9d00ff);
+            border-radius: 5px;
+        }
+
+        .info-panel::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #9d00ff, #ff0066);
+        }
+    </style>
+</head>
+<body>
+    <!-- 🎵 Sound Effects -->
+    <audio id="celebration67Sound" preload="auto">
+        <source src="assets/sounds/celebration67.ogg" type="audio/ogg">
+        <source src="assets/sounds/celebration67.mp3" type="audio/mpeg">
+    </audio>
+    
+    <div class="water-background" id="waterBg"></div>
+    
+    <a href="/" class="back-link">← Back to Map</a>
+
+    <div class="header">
+        <h1>🌊 OCEAN EXPLORER</h1>
+        <div class="header-stats">
+            <div class="stat">
+                <div class="stat-label">DEPTH</div>
+                <div class="stat-value" id="depthDisplay">0ft</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">SPECIES</div>
+                <div class="stat-value" id="speciesDisplay">0/30</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">POINTS</div>
+                <div class="stat-value" id="pointsDisplay">0</div>
+            </div>
+        </div>
+        <button onclick="confirmReset()" style="position: fixed; right: 15px; top: 15px; background: #ff4444; color: white; padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3); transition: all 0.3s ease; z-index: 1000;">⚠️ Reset</button>
+    </div>
+
+    <div class="game-container">
+        <!-- Ocean View -->
+        <div class="ocean-view">
+            <canvas id="oceanCanvas"></canvas>
+            
+            <div class="depth-meter">
+                <div class="depth-fill" id="depthFill"></div>
+                <div class="depth-text" id="depthMeterText">0ft</div>
+            </div>
+
+            <div class="click-prompt" id="clickPrompt">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <p style="font-size: 18px; color: #00ffff; margin-bottom: 15px; text-shadow: 0 0 10px #00ffff;">Discover amazing marine life!</p>
+                </div>
+            </div>
+
+            <!-- EPIC DIVE BUTTON (STAYS FOREVER!) -->
+            <div id="diveButtonContainer" style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 100;">
+                <div style="text-align: center;">
+                    <div class="dive-button-wrapper">
+                        <img src="assets/buttons/PNG/Blue/Default/button_round_depth_gradient.png" 
+                             alt="Dive Button" 
+                             class="dive-button-base"
+                             style="width: 180px; height: 180px; cursor: pointer; filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.6));">
+                        <div class="dive-button-content">
+                            <img src="assets/buttons/PNG/Blue/Default/arrow_decorative_s.png" 
+                                 alt="Dive" 
+                                 class="dive-arrow"
+                                 style="width: 80px; height: 80px; margin-bottom: 5px;">
+                            <div class="dive-text" style="font-size: 24px; font-weight: bold; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">DIVE!</div>
+                        </div>
+                    </div>
+                    <div id="nextDiscoveryHint" class="dive-button-hint" style="margin-top: 15px; font-size: 14px; color: #00ffff; opacity: 0.8;">Click anywhere or press the button!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="info-panel">
+            <!-- Current Zone -->
+            <div class="panel-section">
+                <h3>📍 CURRENT ZONE</h3>
+                <div id="currentZone">
+                    <h4 style="color: #00ffff; font-size: 20px;">Sunlight Zone</h4>
+                    <p style="color: #aaa; font-size: 14px;">0-660ft: Where sunlight reaches</p>
+                </div>
+            </div>
+
+            <!-- Dive Progress -->
+            <div class="panel-section">
+                <h3>🎯 DIVE PROGRESS</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    <div class="progress-text" id="progressText">0 / 13000ft</div>
+                </div>
+            </div>
+
+            <!-- Species Collection -->
+            <div class="panel-section">
+                <h3>🐟 SPECIES COLLECTION</h3>
+                <div class="species-grid" id="speciesGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Achievements -->
+            <div class="panel-section">
+                <h3>🏆 ACHIEVEMENTS</h3>
+                <div id="achievementsList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // ========================================
+        // SUPABASE INITIALIZATION
+        // ========================================
+        const SUPABASE_URL = 'https://fuppbkhfqutzcromomkc.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cHBia2hmcXV0emNyb21vbWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5ODE4NDQsImV4cCI6MjA3NjU1Nzg0NH0.A1kARz6ujz1wMQy-T_4W2EN1wrroma6f230_-rKnNBo';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storage: window.localStorage,
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: false
+            }
+        });
+        
+        console.log('✅ Supabase connected for Ocean Explorer!');
+
+        // Game State
+        const gameState = {
+            depth: 0,
+            maxDepth: 0,
+            points: 0,
+            discoveredSpecies: new Set(),
+            unlockedAchievements: new Set(),
+            currentZone: 'sunlight',
+            speciesData: null,
+            clickCount: 0,
+            bubbles: [],
+            fish: [],
+            seaweed: [],
+            rocks: [],
+            submarineY: 0,
+            targetSubmarineY: 0,
+            scrollOffset: 0, // For parallax scrolling effect
+            environmentObjects: [], // Objects that scroll past
+            speciesPhotos: {}, // Real photos for discovered species
+            speciesAIFacts: {}, // AI-generated facts for discovered species
+            lastClickTime: 0 // Track last click for cooldown system
+        };
+
+        // Sprite storage
+        const sprites = {
+            fish: {
+                sunlight: [],
+                twilight: [],
+                midnight: []
+            },
+            bubbles: [],
+            seaweed: [],
+            rocks: [],
+            loaded: false
+        };
+
+        // Emoji mapping for species (since JSON doesn't have emoji field)
+        const speciesEmoji = {
+            "Bottlenose Dolphin": "🐬",
+            "Green Sea Turtle": "🐢",
+            "Clownfish": "🐠",
+            "Great White Shark": "🦈",
+            "Manta Ray": "🦈",
+            "Sea Otter": "🦦",
+            "Octopus": "🐙",
+            "Jellyfish": "🪼",
+            "Hammerhead Shark": "🦈",
+            "Humpback Whale": "🐋",
+            "Lanternfish": "🐟",
+            "Giant Squid": "🦑",
+            "Vampire Squid": "🦑",
+            "Gulper Eel": "🐟",
+            "Viperfish": "🐟",
+            "Hatchetfish": "🐟",
+            "Dragonfish": "🐟",
+            "Anglerfish": "🐟",
+            "Fangtooth": "🐟",
+            "Barreleye Fish": "🐟",
+            "Megamouth Shark": "🦈",
+            "Giant Isopod": "🦐",
+            "Sea Pig": "🐷",
+            "Dumbo Octopus": "🐙",
+            "Frilled Shark": "🦈",
+            "Goblin Shark": "🦈",
+            "Colossal Squid": "🦑",
+            "Deep Sea Dragonfish": "🐉",
+            "Telescope Octopus": "🐙",
+            "Sea Spider": "🕷️"
+        };
+
+        // Bubble class for animated background
+        class Bubble {
+            constructor(canvas) {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.radius = Math.random() * 8 + 3;
+                this.speed = Math.random() * 0.5 + 0.3;
+                this.opacity = Math.random() * 0.5 + 0.3;
+                this.wobble = Math.random() * 2;
+                this.wobbleSpeed = Math.random() * 0.02 + 0.01;
+                
+                // Pick a random bubble sprite
+                if (sprites.loaded && sprites.bubbles.length > 0) {
+                    this.spriteIndex = Math.floor(Math.random() * sprites.bubbles.length);
+                    this.sprite = sprites.bubbles[this.spriteIndex];
+                } else {
+                    this.sprite = null;
+                }
+            }
+
+            update(canvas) {
+                this.y -= this.speed;
+                this.x += Math.sin(this.y * this.wobbleSpeed) * this.wobble;
+                
+                if (this.y < -50) {
+                    this.y = canvas.height + 50;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                
+                if (this.sprite) {
+                    // Draw sprite
+                    const size = this.radius * 3;
+                    ctx.drawImage(
+                        this.sprite,
+                        this.x - size / 2,
+                        this.y - size / 2,
+                        size,
+                        size
+                    );
+                } else {
+                    // Fallback to gradient circle
+                    const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                    gradient.addColorStop(0.5, 'rgba(0, 255, 255, 0.4)');
+                    gradient.addColorStop(1, 'rgba(0, 255, 255, 0)');
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            }
+        }
+
+        // Fish class for ambient life
+        class Fish {
+            constructor(canvas, zone) {
+                this.x = Math.random() < 0.5 ? -50 : canvas.width + 50;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 40 + 30; // Slightly larger for sprites
+                this.speed = Math.random() * 0.5 + 0.3; // Slowed down from 0.8+0.5
+                this.direction = this.x < 0 ? 1 : -1;
+                this.wiggle = 0;
+                this.zone = zone;
+                
+                // Pick a random sprite for this zone
+                if (sprites.loaded && sprites.fish[zone] && sprites.fish[zone].length > 0) {
+                    this.spriteIndex = Math.floor(Math.random() * sprites.fish[zone].length);
+                    this.sprite = sprites.fish[zone][this.spriteIndex];
+                } else {
+                    this.sprite = null;
+                    this.color = this.getColorForZone(zone);
+                }
+            }
+
+            getColorForZone(zone) {
+                const colors = {
+                    'sunlight': ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731'],
+                    'twilight': ['#a55eea', '#5f27cd', '#00d2d3', '#01a3a4'],
+                    'midnight': ['#8854d0', '#4b7bec', '#0abde3', '#00d2d3']
+                };
+                const zoneColors = colors[zone] || colors['sunlight'];
+                return zoneColors[Math.floor(Math.random() * zoneColors.length)];
+            }
+            
+            updateSprite(zone) {
+                // Update sprite when zone changes
+                this.zone = zone;
+                if (sprites.loaded && sprites.fish[zone] && sprites.fish[zone].length > 0) {
+                    this.spriteIndex = Math.floor(Math.random() * sprites.fish[zone].length);
+                    this.sprite = sprites.fish[zone][this.spriteIndex];
+                } else {
+                    this.color = this.getColorForZone(zone);
+                }
+            }
+
+            update(canvas) {
+                this.x += this.speed * this.direction;
+                this.wiggle += 0.05;
+                
+                if ((this.direction > 0 && this.x > canvas.width + 100) ||
+                    (this.direction < 0 && this.x < -100)) {
+                    this.x = this.direction > 0 ? -50 : canvas.width + 50;
+                    this.y = Math.random() * canvas.height;
+                }
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                if (this.direction < 0) {
+                    ctx.scale(-1, 1);
+                }
+                
+                if (this.sprite) {
+                    // Draw sprite with wiggle animation
+                    ctx.globalAlpha = 0.8;
+                    ctx.drawImage(
+                        this.sprite,
+                        -this.size / 2,
+                        -this.size / 2 + Math.sin(this.wiggle) * 3,
+                        this.size,
+                        this.size * 0.6
+                    );
+                } else {
+                    // Fallback to drawn fish
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = 0.7;
+                    ctx.beginPath();
+                    ctx.ellipse(0, Math.sin(this.wiggle) * 3, this.size, this.size * 0.6, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(this.size * 0.7, 0);
+                    ctx.lineTo(this.size * 1.3, Math.sin(this.wiggle * 2) * 10 - 10);
+                    ctx.lineTo(this.size * 1.3, Math.sin(this.wiggle * 2) * 10 + 10);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#ffffff';
+                    ctx.globalAlpha = 1;
+                    ctx.beginPath();
+                    ctx.arc(-this.size * 0.4, -this.size * 0.2, this.size * 0.15, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#000000';
+                    ctx.beginPath();
+                    ctx.arc(-this.size * 0.4, -this.size * 0.2, this.size * 0.08, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            }
+        }
+
+        // Load game data
+        async function loadGameData() {
+            try {
+                const response = await fetch('/data/ocean-species.json');
+                gameState.speciesData = await response.json();
+                
+                // Load sprites before initializing
+                await loadSprites();
+                
+                // Load discoveries from Supabase (if user is logged in)
+                await loadDiscoveriesFromDatabase();
+                
+                initializeGame();
+            } catch (error) {
+                console.error('Error loading game data:', error);
+            }
+        }
+
+        // Load all previous discoveries from Supabase
+        async function loadDiscoveriesFromDatabase() {
+            try {
+                // Get current user
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (!user) {
+                    console.log('⚠️ No user logged in - skipping database load');
+                    return;
+                }
+
+                console.log(`📥 Loading discoveries from database for user ${user.id}...`);
+
+                const { data: discoveries, error } = await supabase
+                    .from('ocean_species_discoveries')
+                    .select('*')
+                    .eq('user_account_id', user.id);
+
+                if (error) {
+                    console.error('❌ Error loading from database:', error);
+                    return;
+                }
+
+                if (discoveries && discoveries.length > 0) {
+                    console.log(`✅ Loaded ${discoveries.length} discoveries from database!`);
+                    
+                    // Restore photos and AI facts to gameState
+                    discoveries.forEach(discovery => {
+                        // Add to discovered species
+                        gameState.discoveredSpecies.add(discovery.species_id);
+                        
+                        // Restore photo data
+                        if (discovery.photo_url) {
+                            gameState.speciesPhotos[discovery.species_id] = {
+                                url: discovery.photo_url,
+                                thumbnail: discovery.photo_thumbnail,
+                                photographer: discovery.photo_photographer,
+                                photographer_url: discovery.photo_photographer_url,
+                                source: discovery.photo_source
+                            };
+                        }
+                        
+                        // Restore AI facts
+                        if (discovery.ai_fun_fact) {
+                            gameState.speciesAIFacts[discovery.species_id] = {
+                                fun_fact: discovery.ai_fun_fact,
+                                habitat: discovery.ai_habitat,
+                                diet: discovery.ai_diet,
+                                conservation_status: discovery.ai_conservation_status,
+                                interesting_behavior: discovery.ai_interesting_behavior
+                            };
+                        }
+                    });
+                    
+                    console.log(`📦 Restored ${Object.keys(gameState.speciesPhotos).length} photos and ${Object.keys(gameState.speciesAIFacts).length} AI fact sets`);
+                } else {
+                    console.log('📭 No previous discoveries found in database');
+                }
+            } catch (error) {
+                console.error('❌ Database load error:', error);
+            }
+        }
+
+        // Load all sprite images
+        async function loadSprites() {
+            console.log('🎨 Loading sprite assets...');
+            
+            // Helper function to load an image
+            function loadImage(src) {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        console.log('✅ Loaded:', src);
+                        resolve(img);
+                    };
+                    img.onerror = () => {
+                        console.warn('⚠️ Failed to load:', src);
+                        resolve(null); // Don't reject, just return null
+                    };
+                    img.src = src;
+                });
+            }
+            
+            try {
+                // Load fish sprites for each zone
+                sprites.fish.sunlight = await Promise.all([
+                    loadImage('/assets/sprites/fish/PNG/Default/fish_blue.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/fish_green.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/fish_orange.png')
+                ]);
+                
+                sprites.fish.twilight = await Promise.all([
+                    loadImage('/assets/sprites/fish/PNG/Default/fish_pink.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/fish_red.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/fish_grey.png')
+                ]);
+                
+                sprites.fish.midnight = await Promise.all([
+                    loadImage('/assets/sprites/fish/PNG/Default/fish_blue_skeleton.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/fish_green_skeleton.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/fish_orange_skeleton.png')
+                ]);
+                
+                // Load bubble sprites
+                sprites.bubbles = await Promise.all([
+                    loadImage('/assets/sprites/fish/PNG/Default/bubble_a.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/bubble_b.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/bubble_c.png')
+                ]);
+                
+                // Load seaweed sprites
+                sprites.seaweed = await Promise.all([
+                    loadImage('/assets/sprites/fish/PNG/Default/seaweed_green_a.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/seaweed_green_b.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/seaweed_orange_a.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/seaweed_pink_a.png')
+                ]);
+                
+                // Load rock sprites
+                sprites.rocks = await Promise.all([
+                    loadImage('/assets/sprites/fish/PNG/Default/rock_a.png'),
+                    loadImage('/assets/sprites/fish/PNG/Default/rock_b.png')
+                ]);
+                
+                // Filter out any nulls (failed loads)
+                sprites.fish.sunlight = sprites.fish.sunlight.filter(img => img);
+                sprites.fish.twilight = sprites.fish.twilight.filter(img => img);
+                sprites.fish.midnight = sprites.fish.midnight.filter(img => img);
+                sprites.bubbles = sprites.bubbles.filter(img => img);
+                sprites.seaweed = sprites.seaweed.filter(img => img);
+                sprites.rocks = sprites.rocks.filter(img => img);
+                
+                sprites.loaded = true;
+                console.log('✅ All sprites loaded!');
+                
+            } catch (error) {
+                console.error('❌ Error loading sprites:', error);
+                sprites.loaded = false;
+            }
+        }
+
+        // Initialize game
+        function initializeGame() {
+            if (!gameState.speciesData) {
+                console.error('Species data not loaded');
+                return;
+            }
+            
+            loadSaveData();
+            setupCanvas();
+            renderSpeciesGrid();
+            renderAchievements();
+            updateUI();
+            updateWaterBackground();
+            
+            // Hide click prompt if already diving
+            if (gameState.depth > 0) {
+                document.getElementById('clickPrompt').style.display = 'none';
+            }
+
+            // Start animation loop
+            animate();
+        }
+
+        // Canvas setup
+        let canvas, ctx;
+        function setupCanvas() {
+            canvas = document.getElementById('oceanCanvas');
+            ctx = canvas.getContext('2d');
+            
+            function resizeCanvas() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                
+                // Reinitialize particles
+                gameState.bubbles = [];
+                for (let i = 0; i < 30; i++) {
+                    gameState.bubbles.push(new Bubble(canvas));
+                }
+                
+                gameState.fish = [];
+                for (let i = 0; i < 8; i++) { // Increased from 5 to 8
+                    gameState.fish.push(new Fish(canvas, gameState.currentZone));
+                }
+                
+                // Initialize ocean floor decorations
+                initializeOceanFloor();
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Click to dive
+            canvas.addEventListener('click', (e) => {
+                dive(e);
+            });
+
+            // EPIC DIVE BUTTON click handler
+            const diveButton = document.querySelector('.dive-button-wrapper');
+            if (diveButton) {
+                diveButton.addEventListener('click', (e) => {
+                    // Create fake event for dive function
+                    const fakeEvent = {
+                        clientX: canvas.offsetWidth / 2,
+                        clientY: canvas.offsetHeight / 2
+                    };
+                    dive(fakeEvent);
+                });
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            drawOcean();
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize ocean floor decorations
+        function initializeOceanFloor() {
+            gameState.seaweed = [];
+            gameState.rocks = [];
+            gameState.environmentObjects = []; // For parallax scrolling
+            
+            if (!sprites.loaded) return;
+            
+            // Initialize scrolling environment objects
+            spawnEnvironmentObjects(10); // Start with 10 objects
+        }
+        
+        // Spawn new environment objects for parallax effect
+        function spawnEnvironmentObjects(count) {
+            if (!sprites.loaded) return;
+            
+            for (let i = 0; i < count; i++) {
+                const type = Math.random() < 0.5 ? 'seaweed' : 'rock';
+                
+                if (type === 'seaweed' && gameState.currentZone !== 'midnight' && sprites.seaweed.length > 0) {
+                    gameState.environmentObjects.push({
+                        type: 'seaweed',
+                        x: Math.random() * canvas.width,
+                        y: canvas.height + Math.random() * 200, // More spread out spawn
+                        sprite: sprites.seaweed[Math.floor(Math.random() * sprites.seaweed.length)],
+                        scale: Math.random() * 0.5 + 0.5,
+                        swayOffset: Math.random() * Math.PI * 2,
+                        swaySpeed: Math.random() * 0.02 + 0.01,
+                        baseRotation: (Math.random() - 0.5) * 60, // Random -30 to +30 degree tilt
+                        scrollSpeed: Math.random() * 0.5 + 0.4 // Slower, more varied (0.4-0.9)
+                    });
+                } else if (sprites.rocks.length > 0) {
+                    gameState.environmentObjects.push({
+                        type: 'rock',
+                        x: Math.random() * canvas.width,
+                        y: canvas.height + Math.random() * 200, // More spread out spawn
+                        sprite: sprites.rocks[Math.floor(Math.random() * sprites.rocks.length)],
+                        scale: Math.random() * 0.7 + 0.5,
+                        scrollSpeed: Math.random() * 0.6 + 0.5 // Slower, more varied (0.5-1.1)
+                    });
+                }
+            }
+        }
+
+        // Draw ocean background with animations
+        function drawOcean() {
+            const zoneColors = {
+                'sunlight': { top: '#0077be', mid: '#005a8c', bottom: '#004e73' },
+                'twilight': { top: '#004e73', mid: '#00334d', bottom: '#001a33' },
+                'midnight': { top: '#001a33', mid: '#000d1a', bottom: '#000000' }
+            };
+            
+            const colors = zoneColors[gameState.currentZone];
+            
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, colors.top);
+            gradient.addColorStop(0.5, colors.mid);
+            gradient.addColorStop(1, colors.bottom);
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw light rays (only in sunlight zone)
+            if (gameState.currentZone === 'sunlight') {
+                drawLightRays();
+            }
+            
+            // Draw ocean floor decorations (behind bubbles and fish)
+            drawOceanFloor();
+            
+            // Update and draw bubbles
+            gameState.bubbles.forEach(bubble => {
+                bubble.update(canvas);
+                bubble.draw(ctx);
+            });
+            
+            // Update and draw fish
+            gameState.fish.forEach(fish => {
+                fish.update(canvas);
+                fish.draw(ctx);
+            });
+            
+            // Draw submarine
+            drawSubmarine();
+        }
+
+        // Draw ocean floor decorations
+        function drawOceanFloor() {
+            const time = Date.now() * 0.001;
+            
+            // Update parallax scrolling - objects move upward
+            gameState.environmentObjects.forEach(obj => {
+                obj.y -= obj.scrollSpeed; // Move upward
+            });
+            
+            // Remove objects that scrolled off top of screen
+            gameState.environmentObjects = gameState.environmentObjects.filter(obj => obj.y > -200);
+            
+            // Spawn new objects at bottom with randomized timing
+            if (gameState.environmentObjects.length < 12) {
+                // Random spawn count (1-3) for more organic appearance
+                const spawnCount = Math.floor(Math.random() * 3) + 1;
+                spawnEnvironmentObjects(spawnCount);
+            }
+            
+            // Draw all environment objects
+            gameState.environmentObjects.forEach(obj => {
+                ctx.save();
+                
+                if (obj.type === 'seaweed') {
+                    // Swaying seaweed with random base rotation
+                    ctx.translate(obj.x, obj.y);
+                    // Combine base rotation (orientation) with sway animation
+                    const sway = Math.sin(time * obj.swaySpeed + obj.swayOffset) * 5;
+                    ctx.rotate((obj.baseRotation + sway) * Math.PI / 180);
+                    ctx.globalAlpha = 0.7;
+                    const size = 60 * obj.scale;
+                    ctx.drawImage(
+                        obj.sprite,
+                        -size / 2,
+                        -size,
+                        size,
+                        size * 1.5
+                    );
+                } else if (obj.type === 'rock') {
+                    // Static rocks
+                    ctx.globalAlpha = 0.6;
+                    const size = 50 * obj.scale;
+                    ctx.drawImage(
+                        obj.sprite,
+                        obj.x - size / 2,
+                        obj.y - size / 2,
+                        size,
+                        size
+                    );
+                }
+                
+                ctx.restore();
+            });
+        }
+
+        // Draw animated light rays
+        function drawLightRays() {
+            const time = Date.now() * 0.001;
+            ctx.save();
+            ctx.globalAlpha = 0.1;
+            
+            for (let i = 0; i < 5; i++) {
+                const gradient = ctx.createLinearGradient(
+                    canvas.width * (0.2 + i * 0.15),
+                    0,
+                    canvas.width * (0.3 + i * 0.15),
+                    canvas.height
+                );
+                gradient.addColorStop(0, 'rgba(255, 255, 200, 0.3)');
+                gradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.moveTo(canvas.width * (0.2 + i * 0.15), 0);
+                ctx.lineTo(canvas.width * (0.25 + i * 0.15 + Math.sin(time + i) * 0.02), canvas.height);
+                ctx.lineTo(canvas.width * (0.3 + i * 0.15 + Math.sin(time + i) * 0.02), canvas.height);
+                ctx.lineTo(canvas.width * (0.3 + i * 0.15), 0);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
+
+        // Draw submarine with better graphics
+        function drawSubmarine() {
+            const x = canvas.width / 2;
+            
+            // Smooth scrolling animation - submarine slowly drifts down as you dive deeper
+            // This creates the illusion of descending without the bounce-back
+            const depthProgress = Math.min(gameState.depth / 4000, 1);
+            const scrollY = depthProgress * 200; // Gradually moves down over full depth range
+            
+            const y = canvas.height / 2 + Math.sin(Date.now() * 0.0008) * 3; // Gentle bob
+            const size = 70;
+            
+            ctx.save();
+            
+            // Translate to submarine position and rotate 45 degrees to look like diving
+            ctx.translate(x, y);
+            ctx.rotate(-Math.PI / 4); // Rotate 45° clockwise (nose down-left)
+            
+            // Now draw everything at (0, 0) since we translated to the sub's position
+            
+            // Headlight beam (brighter and more defined)
+            ctx.globalAlpha = 0.4;
+            const beamGradient = ctx.createRadialGradient(-size * 0.9, 0, 5, -size * 2.5, 0, size * 2.5);
+            beamGradient.addColorStop(0, 'rgba(255, 255, 150, 0.7)');
+            beamGradient.addColorStop(0.5, 'rgba(255, 255, 150, 0.3)');
+            beamGradient.addColorStop(1, 'rgba(255, 255, 150, 0)');
+            ctx.fillStyle = beamGradient;
+            ctx.beginPath();
+            ctx.arc(-size * 0.9, 0, size * 2.5, -Math.PI / 5, Math.PI / 5);
+            ctx.lineTo(-size * 0.9, 0);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            
+            // Main submarine body - sleek modern design
+            const bodyGradient = ctx.createLinearGradient(-size, -size * 0.4, size, size * 0.4);
+            bodyGradient.addColorStop(0, '#2c3e50');
+            bodyGradient.addColorStop(0.3, '#34495e');
+            bodyGradient.addColorStop(0.7, '#2c3e50');
+            bodyGradient.addColorStop(1, '#1a252f');
+            
+            // Main hull - torpedo shape
+            ctx.fillStyle = bodyGradient;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, size * 0.95, size * 0.35, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Hull outline for definition
+            ctx.strokeStyle = '#1a252f';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Metallic shine on top
+            const shineGradient = ctx.createLinearGradient(0, -size * 0.35, 0, -size * 0.15);
+            shineGradient.addColorStop(0, 'rgba(120, 144, 156, 0.6)');
+            shineGradient.addColorStop(1, 'rgba(120, 144, 156, 0)');
+            ctx.fillStyle = shineGradient;
+            ctx.beginPath();
+            ctx.ellipse(0, -size * 0.15, size * 0.7, size * 0.15, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Conning tower (periscope housing)
+            ctx.fillStyle = '#2c3e50';
+            ctx.beginPath();
+            ctx.roundRect(-size * 0.2, -size * 0.65, size * 0.4, size * 0.35, 5);
+            ctx.fill();
+            ctx.strokeStyle = '#1a252f';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Tower cap
+            ctx.fillStyle = '#34495e';
+            ctx.beginPath();
+            ctx.ellipse(0, -size * 0.65, size * 0.2, size * 0.08, 0, Math.PI, 0);
+            ctx.fill();
+            
+            // Periscope
+            ctx.strokeStyle = '#95a5a6';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, -size * 0.65);
+            ctx.lineTo(0, -size * 0.85);
+            ctx.stroke();
+            
+            // Front windows (3 portholes)
+            for (let i = 0; i < 3; i++) {
+                const windowX = -size * 0.6 + i * size * 0.25;
+                const windowY = -size * 0.05;
+                
+                // Window frame
+                ctx.fillStyle = '#1a252f';
+                ctx.beginPath();
+                ctx.arc(windowX, windowY, size * 0.12, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Window glass
+                const windowGradient = ctx.createRadialGradient(windowX, windowY, 0, windowX, windowY, size * 0.1);
+                windowGradient.addColorStop(0, 'rgba(0, 255, 255, 0.8)');
+                windowGradient.addColorStop(0.6, 'rgba(0, 180, 180, 0.6)');
+                windowGradient.addColorStop(1, 'rgba(0, 100, 100, 0.8)');
+                ctx.fillStyle = windowGradient;
+                ctx.beginPath();
+                ctx.arc(windowX, windowY, size * 0.09, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Window glare
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.beginPath();
+                ctx.arc(windowX - size * 0.03, windowY - size * 0.03, size * 0.03, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Tail fins
+            ctx.fillStyle = '#2c3e50';
+            // Top fin
+            ctx.beginPath();
+            ctx.moveTo(size * 0.7, -size * 0.1);
+            ctx.lineTo(size * 1.1, -size * 0.4);
+            ctx.lineTo(size * 1.1, -size * 0.1);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#1a252f';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Bottom fin
+            ctx.beginPath();
+            ctx.moveTo(size * 0.7, size * 0.1);
+            ctx.lineTo(size * 1.1, size * 0.4);
+            ctx.lineTo(size * 1.1, size * 0.1);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // Propeller (spinning)
+            const propAngle = Date.now() * 0.015;
+            const propX = size * 1.05;
+            
+            // Propeller blades
+            ctx.strokeStyle = '#95a5a6';
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            
+            for (let i = 0; i < 3; i++) {
+                const angle = propAngle + (i * Math.PI * 2 / 3);
+                ctx.beginPath();
+                ctx.moveTo(propX, 0);
+                ctx.lineTo(
+                    propX + Math.cos(angle) * size * 0.25,
+                    0 + Math.sin(angle) * size * 0.25
+                );
+                ctx.stroke();
+            }
+            
+            // Propeller hub
+            ctx.fillStyle = '#7f8c8d';
+            ctx.beginPath();
+            ctx.arc(propX, 0, size * 0.08, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Headlight
+            ctx.fillStyle = '#fff8dc';
+            ctx.beginPath();
+            ctx.arc(-size * 0.9, 0, size * 0.08, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Headlight glow
+            const headlightGlow = ctx.createRadialGradient(-size * 0.9, 0, 0, -size * 0.9, 0, size * 0.15);
+            headlightGlow.addColorStop(0, 'rgba(255, 255, 200, 0.8)');
+            headlightGlow.addColorStop(1, 'rgba(255, 255, 200, 0)');
+            ctx.fillStyle = headlightGlow;
+            ctx.beginPath();
+            ctx.arc(-size * 0.9, 0, size * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        // Update water background color
+        function updateWaterBackground() {
+            const bg = document.getElementById('waterBg');
+            const zoneGradients = {
+                'sunlight': 'linear-gradient(180deg, #0077be 0%, #004e73 100%)',
+                'twilight': 'linear-gradient(180deg, #004e73 0%, #001a33 100%)',
+                'midnight': 'linear-gradient(180deg, #001a33 0%, #000000 100%)'
+            };
+            bg.style.background = zoneGradients[gameState.currentZone];
+        }
+
+        // Dive function with cooldown to prevent spam-clicking
+        function dive(e) {
+            // Check cooldown (300ms = 0.3 seconds between clicks)
+            const now = Date.now();
+            if (gameState.lastClickTime && (now - gameState.lastClickTime) < 300) {
+                console.log('🚫 Cooldown active - wait before next dive!');
+                // Show visual feedback that click was too fast
+                canvas.style.border = '3px solid #ff4444';
+                setTimeout(() => {
+                    canvas.style.border = 'none';
+                }, 100);
+                return; // Exit early, don't process the dive
+            }
+            
+            // Update last click time
+            gameState.lastClickTime = now;
+            
+            gameState.clickCount++;
+            
+            // 🎉 EPIC 67 CELEBRATION! 🎉
+            if (gameState.clickCount % 67 === 0) {
+                show67Celebration();
+            }
+            
+            // Hide initial prompt after first click (but keep the button!)
+            if (gameState.clickCount === 1) {
+                document.getElementById('clickPrompt').style.display = 'none';
+            }
+            
+            // Increase depth (FEET - AMERICA!)
+            gameState.depth += 30;
+            if (gameState.depth > gameState.maxDepth) {
+                gameState.maxDepth = gameState.depth;
+            }
+            
+            // Award points
+            gameState.points += 1;
+            
+            // NO MORE BOUNCE ANIMATION - submarine position is now based on depth progress
+            // The submarine gradually moves down as depth increases (see drawSubmarine function)
+            
+            // Check for zone changes
+            updateZone();
+            
+            // Check for species discovery
+            checkSpeciesDiscovery();
+            
+            // Check achievements
+            checkAchievements();
+            
+            // Update UI
+            updateUI();
+            
+            // Save game
+            saveGame();
+            
+            // Visual feedback
+            createClickEffects(e);
+        }
+
+        // Create visual effects on click
+        function createClickEffects(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Screen shake
+            canvas.style.transform = 'scale(0.99)';
+            setTimeout(() => {
+                canvas.style.transform = 'scale(1)';
+            }, 100);
+            
+            // Create particles
+            for (let i = 0; i < 10; i++) {
+                createParticle(e.clientX, e.clientY);
+            }
+            
+            // Show +30ft text
+            showFloatingText('+30ft', e.clientX, e.clientY);
+        }
+
+        // 🎉 EPIC 67 CELEBRATION! 🎉
+        function show67Celebration() {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration-67';
+            celebration.innerHTML = `
+                <div class="celebration-67-content">
+                    <div class="celebration-67-number">67!</div>
+                    <div class="celebration-67-text">LEGENDARY COMBO!</div>
+                </div>
+            `;
+            document.body.appendChild(celebration);
+            
+            // 🎵 Play epic celebration sound!
+            const sound = document.getElementById('celebration67Sound');
+            if (sound) {
+                sound.currentTime = 0; // Reset to start
+                sound.volume = 0.7; // 70% volume
+                sound.play().catch(err => console.log('Sound play failed:', err));
+            }
+            
+            console.log('🎉🎉🎉 67 CLICKS! LEGENDARY! 🎉🎉🎉');
+            
+            // Remove after 1.5 seconds
+            setTimeout(() => {
+                celebration.style.opacity = '0';
+                setTimeout(() => {
+                    celebration.remove();
+                }, 300);
+            }, 1500);
+        }
+
+        // Create floating particle
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 3000);
+        }
+
+        // Show floating text
+        function showFloatingText(text, x, y) {
+            const floater = document.createElement('div');
+            floater.className = 'floating-text';
+            floater.textContent = text;
+            floater.style.left = x + 'px';
+            floater.style.top = y + 'px';
+            document.body.appendChild(floater);
+            
+            setTimeout(() => {
+                floater.remove();
+            }, 1500);
+        }
+
+        // Update zone based on depth (IN FEET - USA! USA!)
+        function updateZone() {
+            let newZone = gameState.currentZone;
+            
+            if (gameState.depth >= 3300) { // ~1000m
+                newZone = 'midnight';
+            } else if (gameState.depth >= 660) { // ~200m
+                newZone = 'twilight';
+            } else {
+                newZone = 'sunlight';
+            }
+            
+            if (newZone !== gameState.currentZone) {
+                gameState.currentZone = newZone;
+                showZoneUnlock(newZone);
+                updateWaterBackground();
+                
+                // Update fish sprites for new zone
+                gameState.fish.forEach(fish => {
+                    fish.updateSprite(newZone);
+                });
+                
+                // Reinitialize ocean floor for new zone
+                initializeOceanFloor();
+            }
+            
+            // Update zone display
+            const zoneInfo = gameState.speciesData.zones[newZone];
+            document.getElementById('currentZone').innerHTML = `
+                <h4 style="color: ${zoneInfo.color}; font-size: 20px;">${zoneInfo.name}</h4>
+                <p style="color: #aaa; font-size: 14px;">${zoneInfo.depth}: ${zoneInfo.description}</p>
+            `;
+        }
+
+        // Check for species discovery - PREDICTABLE LINEAR PROGRESSION
+        // Every 100m = 1 new species (10 clicks = 100m)
+        function checkSpeciesDiscovery() {
+            if (!gameState.speciesData || !gameState.speciesData.species) return;
+            
+            // Sort species by their minimum depth (already done in loadGameData, but ensure it)
+            const sortedSpecies = [...gameState.speciesData.species].sort((a, b) => {
+                const depthA = parseInt(a.depth.split('-')[0]);
+                const depthB = parseInt(b.depth.split('-')[0]);
+                return depthA - depthB;
+            });
+            
+            // Calculate which species index we should be at based on depth
+            // Every 1500 feet = next species (requires ~50 clicks per discovery)
+            const speciesIndex = Math.floor(gameState.depth / 1500);
+            
+            // Check if we should discover the species at this index
+            if (speciesIndex < sortedSpecies.length) {
+                const species = sortedSpecies[speciesIndex];
+                
+                // Only discover if we haven't already
+                if (!gameState.discoveredSpecies.has(species.id)) {
+                    console.log(`🎯 Depth ${gameState.depth}ft → Discovering species #${speciesIndex + 1}: ${species.name}`);
+                    discoverSpecies(species);
+                }
+            }
+        }
+
+        // Discover a species
+        async function discoverSpecies(species) {
+            console.log(`🎣 DISCOVERING: ${species.name} (ID: ${species.id})`);
+            gameState.discoveredSpecies.add(species.id);
+            gameState.points += 10;
+            
+            // Fetch real photo AND AI facts for this species (in parallel!)
+            const [photo, aiFacts] = await Promise.all([
+                fetchSpeciesPhoto(species),
+                fetchSpeciesAIFacts(species)
+            ]);
+            
+            console.log(`📸 Photo result for ${species.name}:`, photo ? 'GOT PHOTO' : 'NO PHOTO');
+            console.log(`🧠 AI Facts result for ${species.name}:`, aiFacts ? 'GOT FACTS' : 'NO FACTS');
+            
+            // Make sure photo is in gameState before rendering
+            if (photo && !gameState.speciesPhotos[species.id]) {
+                if (!gameState.speciesPhotos) {
+                    gameState.speciesPhotos = {};
+                }
+                gameState.speciesPhotos[species.id] = photo;
+                console.log(`✅ Added photo to gameState for ${species.name}`);
+            }
+            
+            // Save to Supabase database (student's personal catalog!)
+            await saveSpeciesToDatabase(species, photo, aiFacts);
+            
+            showDiscoveryNotification(species, aiFacts);
+            
+            // NOW render with photo ready!
+            console.log(`🎨 Rendering grid. Photo in gameState?`, !!gameState.speciesPhotos[species.id]);
+            renderSpeciesGrid();
+            updateUI();
+            saveGame();
+        }
+
+        // Fetch a real photo for discovered species
+        async function fetchSpeciesPhoto(species) {
+            // Check if we already have a photo cached
+            if (gameState.speciesPhotos && gameState.speciesPhotos[species.id]) {
+                console.log(`📸 Using cached photo for ${species.name}`);
+                return gameState.speciesPhotos[species.id]; // Return the cached photo!
+            }
+
+            try {
+                console.log(`🔍 Fetching photo for ${species.name}...`);
+                const response = await fetch('/.netlify/functions/get-species-photos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ speciesName: species.name })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.photo) {
+                        // Initialize photos cache if needed
+                        if (!gameState.speciesPhotos) {
+                            gameState.speciesPhotos = {};
+                        }
+                        
+                        gameState.speciesPhotos[species.id] = data.photo;
+                        console.log(`✅ Got photo for ${species.name} from ${data.photo.source}`);
+                        saveGame(); // Save the photo data
+                    } else {
+                        console.log(`❌ No photo found for ${species.name}`);
+                    }
+                }
+            } catch (error) {
+                console.error(`Error fetching photo for ${species.name}:`, error);
+            }
+            
+            return gameState.speciesPhotos?.[species.id] || null;
+        }
+
+        // Fetch AI-generated facts about species
+        async function fetchSpeciesAIFacts(species) {
+            // Check if we already have AI facts cached
+            if (gameState.speciesAIFacts && gameState.speciesAIFacts[species.id]) {
+                console.log(`🧠 Using cached AI facts for ${species.name}`);
+                return gameState.speciesAIFacts[species.id];
+            }
+
+            try {
+                console.log(`🧠 Fetching AI facts for ${species.name}...`);
+                const response = await fetch('/.netlify/functions/get-species-ai-facts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        speciesName: species.name,
+                        speciesData: {
+                            zone: species.zone,
+                            depth: species.depth,
+                            diet: species.diet,
+                            size: species.size,
+                            rarity: species.rarity
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.facts) {
+                        console.log(`✅ Got AI facts for ${species.name} from ${data.source}`);
+                        
+                        // Cache the facts
+                        if (!gameState.speciesAIFacts) {
+                            gameState.speciesAIFacts = {};
+                        }
+                        gameState.speciesAIFacts[species.id] = data.facts;
+                        saveGame(); // Save to localStorage
+                        
+                        return data.facts;
+                    } else {
+                        console.log(`❌ No AI facts for ${species.name}`);
+                    }
+                }
+            } catch (error) {
+                console.error(`Error fetching AI facts for ${species.name}:`, error);
+            }
+            
+            return null;
+        }
+
+        // Save species discovery to Supabase database
+        async function saveSpeciesToDatabase(species, photo, aiFacts) {
+            try {
+                // Get current user
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                
+                if (authError) {
+                    console.error('❌ Auth error:', authError);
+                    return;
+                }
+                
+                if (!user) {
+                    console.log('⚠️ No user logged in - skipping database save');
+                    return;
+                }
+
+                console.log(`💾 Saving ${species.name} to database for user ${user.id}...`);
+                console.log(`📸 Photo data:`, photo);
+                console.log(`🧠 AI Facts data:`, aiFacts);
+
+                const discoveryData = {
+                    user_account_id: user.id,
+                    species_id: species.id,
+                    species_name: species.name,
+                    
+                    // Photo data
+                    photo_url: photo?.url || null,
+                    photo_thumbnail: photo?.thumbnail || null,
+                    photo_photographer: photo?.photographer || null,
+                    photo_photographer_url: photo?.photographer_url || null,
+                    photo_source: photo?.source || null,
+                    
+                    // AI-generated facts
+                    ai_fun_fact: aiFacts?.fun_fact || null,
+                    ai_habitat: aiFacts?.habitat || null,
+                    ai_diet: aiFacts?.diet || null,
+                    ai_conservation_status: aiFacts?.conservation_status || null,
+                    ai_interesting_behavior: aiFacts?.interesting_behavior || null,
+                    
+                    // Discovery metadata
+                    discovered_at_depth: gameState.depth,
+                    discovered_at_zone: gameState.currentZone,
+                    discovery_timestamp: new Date().toISOString()
+                };
+
+                console.log(`📦 Discovery data to save:`, discoveryData);
+
+                const { data, error } = await supabase
+                    .from('ocean_species_discoveries')
+                    .upsert(discoveryData, { 
+                        onConflict: 'user_account_id,species_id',
+                        ignoreDuplicates: false 
+                    });
+
+                if (error) {
+                    console.error('❌ Error saving to database:', error);
+                    console.error('❌ Error details:', JSON.stringify(error, null, 2));
+                } else {
+                    console.log('✅ Saved to database successfully!');
+                    console.log('✅ Saved data:', data);
+                }
+            } catch (error) {
+                console.error('❌ Unexpected error in saveSpeciesToDatabase:', error);
+            }
+        }
+
+        // Show discovery notification
+        function showDiscoveryNotification(species, aiFacts = null) {
+            const notification = document.createElement('div');
+            notification.className = 'discovery-notification';
+            
+            // Check if we have a photo for this species
+            const photo = gameState.speciesPhotos && gameState.speciesPhotos[species.id];
+            const photoHTML = photo ? `
+                <div class="discovery-photo">
+                    <img src="${photo.thumbnail}" alt="${species.name}" />
+                    <div class="photo-credit">Photo: ${photo.photographer}</div>
+                </div>
+            ` : '';
+            
+            // AI Facts section (if available)
+            const aiFactsHTML = aiFacts ? `
+                <div class="ai-facts-section">
+                    <div class="ai-label">🧠 AI Deep Dive</div>
+                    ${aiFacts.fun_fact ? `<div class="ai-fact"><strong>Fun Fact:</strong> ${aiFacts.fun_fact}</div>` : ''}
+                    ${aiFacts.interesting_behavior ? `<div class="ai-fact"><strong>Behavior:</strong> ${aiFacts.interesting_behavior}</div>` : ''}
+                </div>
+            ` : '';
+
+            notification.innerHTML = `
+                ${photoHTML}
+                <div class="discovery-icon">${speciesEmoji[species.name] || '🐟'}</div>
+                <div class="discovery-name">${species.name}</div>
+                <div class="discovery-fact">${species.fact}</div>
+                ${aiFactsHTML}
+                <div class="discovery-stats">
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Zone</div>
+                        <div class="discovery-stat-value">${species.zone}</div>
+                    </div>
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Depth</div>
+                        <div class="discovery-stat-value">${species.depth}</div>
+                    </div>
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Rarity</div>
+                        <div class="discovery-stat-value">${species.rarity}</div>
+                    </div>
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Size</div>
+                        <div class="discovery-stat-value">${species.size}</div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'fadeIn 0.5s reverse';
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 6000); // Longer display time for AI facts
+        }
+
+        // Show zone unlock animation
+        function showZoneUnlock(zoneName) {
+            const zoneInfo = gameState.speciesData.zones[zoneName];
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'zone-unlock-overlay';
+            overlay.style.display = 'flex';
+            overlay.innerHTML = `
+                <div class="zone-unlock-content">
+                    <h1>🔓</h1>
+                    <h2>${zoneInfo.name} Unlocked!</h2>
+                    <p>${zoneInfo.description}</p>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            
+            setTimeout(() => {
+                overlay.style.animation = 'fadeIn 0.5s reverse';
+                setTimeout(() => {
+                    overlay.remove();
+                }, 500);
+            }, 3000);
+        }
+
+        // Check achievements
+        function checkAchievements() {
+            gameState.speciesData.achievements.forEach(achievement => {
+                if (!gameState.unlockedAchievements.has(achievement.id)) {
+                    let unlocked = false;
+                    
+                    switch (achievement.type) {
+                        case 'depth':
+                            unlocked = gameState.depth >= achievement.requirement;
+                            break;
+                        case 'species':
+                            unlocked = gameState.discoveredSpecies.size >= achievement.requirement;
+                            break;
+                        case 'points':
+                            unlocked = gameState.points >= achievement.requirement;
+                            break;
+                        case 'specific':
+                            unlocked = gameState.discoveredSpecies.has(achievement.requirement);
+                            break;
+                    }
+                    
+                    if (unlocked) {
+                        gameState.unlockedAchievements.add(achievement.id);
+                        gameState.points += 50;
+                        showAchievementUnlock(achievement);
+                    }
+                }
+            });
+            
+            renderAchievements();
+        }
+
+        // Show achievement unlock notification
+        function showAchievementUnlock(achievement) {
+            const notification = document.createElement('div');
+            notification.className = 'discovery-notification';
+            notification.innerHTML = `
+                <div class="discovery-icon">${achievement.icon}</div>
+                <div class="discovery-name">Achievement Unlocked!</div>
+                <div class="discovery-fact">${achievement.name}</div>
+                <div class="discovery-stats">
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Bonus</div>
+                        <div class="discovery-stat-value">+50 Points</div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'fadeIn 0.5s reverse';
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 3000);
+        }
+
+        // Render species grid
+        function renderSpeciesGrid() {
+            const grid = document.getElementById('speciesGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            
+            if (!gameState.speciesData || !gameState.speciesData.species) {
+                console.warn('Species data not loaded yet');
+                return;
+            }
+            
+            gameState.speciesData.species.forEach(species => {
+                const card = document.createElement('div');
+                card.className = 'species-card';
+                
+                if (gameState.discoveredSpecies.has(species.id)) {
+                    card.classList.add('discovered');
+                    
+                    // Check if we have a photo
+                    const photo = gameState.speciesPhotos && gameState.speciesPhotos[species.id];
+                    
+                    if (photo) {
+                        // Show photo instead of emoji
+                        card.innerHTML = `
+                            <div class="species-card-photo" style="background-image: url('${photo.thumbnail}');"></div>
+                            <div class="species-name">${species.name}</div>
+                        `;
+                    } else {
+                        // Show emoji if no photo yet
+                        card.innerHTML = `
+                            <div class="species-icon">${speciesEmoji[species.name] || '🐟'}</div>
+                            <div class="species-name">${species.name}</div>
+                        `;
+                    }
+                    card.title = species.fact;
+                    
+                    // Click to see full info with photo
+                    card.addEventListener('click', () => {
+                        showSpeciesDetail(species);
+                    });
+                } else {
+                    card.classList.add('locked');
+                    card.innerHTML = `
+                        <div class="species-icon">❓</div>
+                        <div class="species-name">???</div>
+                    `;
+                }
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Show detailed species info modal (with photo!)
+        function showSpeciesDetail(species) {
+            const photo = gameState.speciesPhotos && gameState.speciesPhotos[species.id];
+            const aiFacts = gameState.speciesAIFacts && gameState.speciesAIFacts[species.id];
+            
+            const modal = document.createElement('div');
+            modal.className = 'discovery-notification';
+            modal.style.animation = 'popIn 0.3s forwards';
+            
+            const photoHTML = photo ? `
+                <div class="discovery-photo">
+                    <img src="${photo.url}" alt="${species.name}" />
+                    <div class="photo-credit">
+                        Photo by <a href="${photo.photographer_url}" target="_blank" rel="noopener">${photo.photographer}</a> 
+                        on ${photo.source === 'unsplash' ? 'Unsplash' : 'Pexels'}
+                    </div>
+                </div>
+            ` : '';
+            
+            const aiFactsHTML = aiFacts ? `
+                <div class="ai-facts-section">
+                    <div class="ai-label">🧠 AI Deep Dive</div>
+                    ${aiFacts.fun_fact ? `<div class="ai-fact"><strong>Fun Fact:</strong> ${aiFacts.fun_fact}</div>` : ''}
+                    ${aiFacts.habitat ? `<div class="ai-fact"><strong>Habitat:</strong> ${aiFacts.habitat}</div>` : ''}
+                    ${aiFacts.diet ? `<div class="ai-fact"><strong>Diet:</strong> ${aiFacts.diet}</div>` : ''}
+                    ${aiFacts.conservation_status ? `<div class="ai-fact"><strong>Conservation:</strong> ${aiFacts.conservation_status}</div>` : ''}
+                    ${aiFacts.interesting_behavior ? `<div class="ai-fact"><strong>Behavior:</strong> ${aiFacts.interesting_behavior}</div>` : ''}
+                </div>
+            ` : '';
+            
+            modal.innerHTML = `
+                ${photoHTML}
+                <div class="discovery-icon">${speciesEmoji[species.name] || '🐟'}</div>
+                <div class="discovery-name">${species.name}</div>
+                <div class="discovery-fact">${species.fact}</div>
+                ${aiFactsHTML}
+                <div class="discovery-stats">
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Zone</div>
+                        <div class="discovery-stat-value">${species.zone}</div>
+                    </div>
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Depth</div>
+                        <div class="discovery-stat-value">${species.depth}</div>
+                    </div>
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Rarity</div>
+                        <div class="discovery-stat-value">${species.rarity}</div>
+                    </div>
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Size</div>
+                        <div class="discovery-stat-value">${species.size}</div>
+                    </div>
+                </div>
+                <button onclick="this.parentElement.remove()" style="margin-top: 20px; padding: 10px 30px; background: #00ffff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;">Close</button>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Render achievements
+        function renderAchievements() {
+            const list = document.getElementById('achievementsList');
+            list.innerHTML = '';
+            
+            gameState.speciesData.achievements.forEach(achievement => {
+                const div = document.createElement('div');
+                div.className = 'achievement';
+                
+                if (gameState.unlockedAchievements.has(achievement.id)) {
+                    div.classList.add('unlocked');
+                } else {
+                    div.classList.add('locked');
+                }
+                
+                let requirementText = '';
+                switch (achievement.type) {
+                    case 'depth':
+                        requirementText = `Reach ${achievement.requirement}m depth`;
+                        break;
+                    case 'species':
+                        requirementText = `Discover ${achievement.requirement} species`;
+                        break;
+                    case 'points':
+                        requirementText = `Earn ${achievement.requirement} points`;
+                        break;
+                    case 'specific':
+                        const sp = gameState.speciesData.species.find(s => s.id === achievement.requirement);
+                        requirementText = sp ? `Discover ${sp.name}` : 'Special discovery';
+                        break;
+                }
+                
+                div.innerHTML = `
+                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-info">
+                        <h4>${achievement.name}</h4>
+                        <p>${requirementText}</p>
+                    </div>
+                `;
+                
+                list.appendChild(div);
+            });
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('depthDisplay').textContent = `${gameState.depth}ft`;
+            document.getElementById('speciesDisplay').textContent = 
+                `${gameState.discoveredSpecies.size}/${gameState.speciesData.species.length}`;
+            document.getElementById('pointsDisplay').textContent = gameState.points;
+            
+            // Update depth meter
+            const maxDepth = 13000; // ~4000m in feet (Mariana Trench depth)
+            const percentage = Math.min((gameState.depth / maxDepth) * 100, 100);
+            document.getElementById('depthFill').style.height = `${percentage}%`;
+            document.getElementById('depthMeterText').textContent = `${gameState.depth}ft`;
+            
+            // Update progress bar
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+            document.getElementById('progressText').textContent = `${gameState.depth} / ${maxDepth}ft`;
+            
+            // Update next discovery hint
+            updateNextDiscoveryHint();
+        }
+
+        // Update the hint text to show progress to next discovery
+        function updateNextDiscoveryHint() {
+            const hint = document.getElementById('nextDiscoveryHint');
+            if (!hint) return;
+            
+            // Calculate next discovery depth (every 1500 feet)
+            const nextDiscoveryDepth = Math.ceil(gameState.depth / 1500) * 1500;
+            const depthNeeded = nextDiscoveryDepth - gameState.depth;
+            const clicksNeeded = Math.ceil(depthNeeded / 30);
+            
+            // How many species discovered vs total
+            const totalSpecies = gameState.speciesData?.species?.length || 30;
+            const discovered = gameState.discoveredSpecies.size;
+            
+            if (discovered >= totalSpecies) {
+                hint.textContent = `🎉 All ${totalSpecies} species discovered! Keep exploring!`;
+                hint.style.color = '#ffd700';
+            } else if (clicksNeeded <= 0) {
+                hint.textContent = `🎯 Next discovery coming up!`;
+                hint.style.color = '#00ff00';
+            } else {
+                hint.textContent = `🐟 Next discovery in ${depthNeeded}ft (${clicksNeeded} clicks) • ${discovered}/${totalSpecies} found`;
+                hint.style.color = '#00ffff';
+            }
+        }
+
+        // Save game
+        function saveGame() {
+            const saveData = {
+                depth: gameState.depth,
+                maxDepth: gameState.maxDepth,
+                points: gameState.points,
+                discoveredSpecies: Array.from(gameState.discoveredSpecies),
+                unlockedAchievements: Array.from(gameState.unlockedAchievements),
+                currentZone: gameState.currentZone
+            };
+            localStorage.setItem('oceanExplorerSave', JSON.stringify(saveData));
+        }
+
+        // Load save data
+        function loadSaveData() {
+            const saveData = localStorage.getItem('oceanExplorerSave');
+            if (saveData) {
+                try {
+                    const data = JSON.parse(saveData);
+                    gameState.depth = data.depth || 0;
+                    gameState.maxDepth = data.maxDepth || 0;
+                    gameState.points = data.points || 0;
+                    gameState.discoveredSpecies = new Set(data.discoveredSpecies || []);
+                    gameState.unlockedAchievements = new Set(data.unlockedAchievements || []);
+                    gameState.currentZone = data.currentZone || 'sunlight';
+                } catch (e) {
+                    console.error('Error loading save data:', e);
+                }
+            }
+        }
+
+        // ==================== SAFE RESET SYSTEM ====================
+        
+        function confirmReset() {
+            const modal = document.createElement('div');
+            modal.className = 'discovery-notification';
+            modal.style.padding = '30px';
+            modal.style.maxWidth = '500px';
+            modal.innerHTML = `
+                <div class="discovery-icon" style="font-size: 60px;">⚠️</div>
+                <div class="discovery-name" style="color: #ff4444; font-size: 24px; margin: 15px 0;">Reset All Progress?</div>
+                <div class="discovery-fact" style="font-size: 16px; line-height: 1.6; margin: 20px 0;">
+                    This will <strong>DELETE</strong> all your discoveries, photos, AI facts, and progress.<br><br>
+                    <span style="color: #ff4444; font-weight: bold;">⚠️ THIS CANNOT BE UNDONE! ⚠️</span>
+                </div>
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
+                    <button id="cancelResetBtn" style="flex: 1; padding: 15px; background: #00ffff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; transition: all 0.3s ease;">
+                        Cancel
+                    </button>
+                    <button id="confirmResetBtn" style="flex: 1; padding: 15px; background: #ff4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; transition: all 0.3s ease;">
+                        Yes, Reset
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Add event listeners
+            document.getElementById('cancelResetBtn').addEventListener('click', () => {
+                modal.remove();
+            });
+            
+            document.getElementById('confirmResetBtn').addEventListener('click', () => {
+                modal.remove();
+                showFinalResetConfirmation();
+            });
+        }
+
+        function showFinalResetConfirmation() {
+            const modal = document.createElement('div');
+            modal.className = 'discovery-notification';
+            modal.style.padding = '30px';
+            modal.style.maxWidth = '500px';
+            modal.innerHTML = `
+                <div class="discovery-icon" style="font-size: 60px;">🚨</div>
+                <div class="discovery-name" style="color: #ff0000; font-size: 26px; margin: 15px 0;">FINAL WARNING!</div>
+                <div class="discovery-fact" style="font-size: 16px; line-height: 1.6; margin: 20px 0;">
+                    You are about to permanently delete:<br><br>
+                    • All ${gameState.discoveredSpecies.size} discovered species<br>
+                    • All photos and AI facts<br>
+                    • ${gameState.points} points<br>
+                    • ${gameState.depth}m of exploration<br><br>
+                    Type <strong style="color: #ff0000;">RESET</strong> to confirm:
+                </div>
+                <input type="text" id="resetInput" placeholder="Type RESET here" style="width: 100%; padding: 15px; font-size: 16px; border: 2px solid #ff4444; border-radius: 8px; background: #1a1a2e; color: white; margin-bottom: 15px; text-align: center; font-weight: bold;">
+                <div style="display: flex; gap: 15px;">
+                    <button id="cancelFinalBtn" style="flex: 1; padding: 15px; background: #00ffff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold;">
+                        Cancel
+                    </button>
+                    <button id="confirmFinalBtn" style="flex: 1; padding: 15px; background: #ff0000; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold;">
+                        DELETE EVERYTHING
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Focus the input
+            setTimeout(() => {
+                document.getElementById('resetInput').focus();
+            }, 100);
+            
+            // Add event listeners
+            document.getElementById('cancelFinalBtn').addEventListener('click', () => {
+                modal.remove();
+            });
+            
+            document.getElementById('confirmFinalBtn').addEventListener('click', () => {
+                const input = document.getElementById('resetInput').value.trim();
+                if (input === 'RESET') {
+                    modal.remove();
+                    resetAllProgress();
+                } else {
+                    // Shake animation for wrong input
+                    const inputField = document.getElementById('resetInput');
+                    inputField.style.animation = 'shake 0.3s';
+                    inputField.value = '';
+                    inputField.placeholder = '❌ Must type RESET exactly!';
+                    setTimeout(() => {
+                        inputField.style.animation = '';
+                        inputField.placeholder = 'Type RESET here';
+                    }, 300);
+                }
+            });
+            
+            // Allow Enter key to confirm
+            document.getElementById('resetInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('confirmFinalBtn').click();
+                }
+            });
+        }
+
+        async function resetAllProgress() {
+            // Show resetting animation
+            const modal = document.createElement('div');
+            modal.className = 'discovery-notification';
+            modal.style.padding = '40px';
+            modal.innerHTML = `
+                <div class="discovery-icon" style="font-size: 60px; animation: spin 1s linear infinite;">🌀</div>
+                <div class="discovery-name" style="font-size: 24px; margin: 15px 0;">Resetting...</div>
+                <div class="discovery-fact">Clearing all data...</div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Clear localStorage
+            localStorage.removeItem('oceanExplorerSave');
+            
+            // Clear Supabase data if user is logged in
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    console.log('🗑️ Deleting database records for user...');
+                    await supabase
+                        .from('ocean_species_discoveries')
+                        .delete()
+                        .eq('user_account_id', user.id);
+                    console.log('✅ Database cleared successfully!');
+                }
+            } catch (error) {
+                console.error('Error clearing database:', error);
+            }
+            
+            // Wait a moment for dramatic effect
+            setTimeout(() => {
+                modal.remove();
+                // Reload the page to start fresh
+                location.reload();
+            }, 1500);
+        }
+
+        // Start the game
+        loadGameData();
+    </script>
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>

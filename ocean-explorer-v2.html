@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Explorer - Deep Dive Discovery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #000428 0%, #004e92 100%);
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #00d9ff;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #00d9ff;
+            text-shadow: 0 0 10px #00d9ff;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        /* Left Panel - Ocean View */
+        .ocean-view {
+            flex: 2;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #oceanCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* Depth Meter */
+        .depth-meter {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            width: 60px;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00d9ff;
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .depth-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(180deg, #ff0044 0%, #9d00ff 50%, #00d9ff 100%);
+            transition: height 0.3s ease;
+        }
+
+        .depth-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 0 0 5px #000;
+            z-index: 1;
+        }
+
+        /* Click Prompt */
+        .click-prompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            animation: pulse 2s infinite;
+        }
+
+        .click-prompt h2 {
+            font-size: 48px;
+            color: #00d9ff;
+            text-shadow: 0 0 20px #00d9ff;
+            margin-bottom: 20px;
+        }
+
+        .click-prompt p {
+            font-size: 24px;
+            color: #ffd700;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        /* Right Panel - Info */
+        .info-panel {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.8);
+            border-left: 2px solid #00d9ff;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .panel-section {
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #00d9ff;
+        }
+
+        .panel-section h3 {
+            color: #00d9ff;
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            background: rgba(0, 0, 0, 0.5);
+            height: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d9ff, #9d00ff);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px #00d9ff;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 0 0 3px #000;
+        }
+
+        /* Species Grid */
+        .species-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .species-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .species-card.discovered {
+            border-color: #00d9ff;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+        }
+
+        .species-card.discovered:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(0, 217, 255, 0.8);
+        }
+
+        .species-icon {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .species-name {
+            font-size: 10px;
+            color: #aaa;
+        }
+
+        .species-card.discovered .species-name {
+            color: #00d9ff;
+        }
+
+        /* Achievements */
+        .achievement-item {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .achievement-item.unlocked {
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .achievement-icon {
+            font-size: 32px;
+        }
+
+        .achievement-info {
+            flex: 1;
+        }
+
+        .achievement-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #00d9ff;
+        }
+
+        .achievement-desc {
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .achievement-item.unlocked .achievement-desc {
+            color: #ffd700;
+        }
+
+        /* Discovery Notification */
+        .discovery-notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 3px solid #00d9ff;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 350px;
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.8);
+            animation: slideIn 0.5s ease;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .discovery-title {
+            font-size: 24px;
+            color: #ffd700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .discovery-species {
+            font-size: 32px;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .discovery-name {
+            font-size: 20px;
+            color: #00d9ff;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .discovery-fact {
+            font-size: 14px;
+            color: #fff;
+            line-height: 1.6;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .discovery-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #00d9ff;
+        }
+
+        .discovery-stat {
+            text-align: center;
+        }
+
+        .discovery-stat-label {
+            font-size: 10px;
+            color: #aaa;
+        }
+
+        .discovery-stat-value {
+            font-size: 14px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* Button */
+        .btn {
+            background: linear-gradient(135deg, #00d9ff, #9d00ff);
+            border: none;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(0, 217, 255, 0.8);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Zone Unlocked Overlay */
+        .zone-unlock-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .zone-unlock-content {
+            text-align: center;
+            animation: zoomIn 0.8s ease;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .zone-unlock-content h1 {
+            font-size: 64px;
+            color: #00d9ff;
+            text-shadow: 0 0 40px #00d9ff;
+            margin-bottom: 20px;
+        }
+
+        .zone-unlock-content h2 {
+            font-size: 48px;
+            color: #ffd700;
+            margin-bottom: 30px;
+        }
+
+        .zone-unlock-content p {
+            font-size: 24px;
+            color: #fff;
+            max-width: 600px;
+        }
+
+        /* Back Button */
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid #00d9ff;
+            color: #00d9ff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .back-link:hover {
+            background: rgba(0, 217, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+        }
+
+        /* Scrollbar */
+        .info-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .info-panel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .info-panel::-webkit-scrollbar-thumb {
+            background: #00d9ff;
+            border-radius: 4px;
+        }
+
+        .info-panel::-webkit-scrollbar-thumb:hover {
+            background: #9d00ff;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Back to Map</a>
+
+    <div class="header">
+        <h1>🌊 Ocean Explorer</h1>
+        <div class="header-stats">
+            <div class="stat">
+                <div class="stat-label">DEPTH</div>
+                <div class="stat-value" id="depthDisplay">0m</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">SPECIES</div>
+                <div class="stat-value" id="speciesDisplay">0/30</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">POINTS</div>
+                <div class="stat-value" id="pointsDisplay">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <!-- Ocean View -->
+        <div class="ocean-view">
+            <canvas id="oceanCanvas"></canvas>
+            
+            <div class="depth-meter">
+                <div class="depth-fill" id="depthFill"></div>
+                <div class="depth-text" id="depthMeterText">0m</div>
+            </div>
+
+            <div class="click-prompt" id="clickPrompt">
+                <h2>⬇️ Click to Dive! ⬇️</h2>
+                <p>Discover marine life at different depths</p>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="info-panel">
+            <!-- Current Zone -->
+            <div class="panel-section">
+                <h3>📍 Current Zone</h3>
+                <div id="currentZone">
+                    <h4 style="color: #00d9ff; font-size: 18px;">Sunlight Zone</h4>
+                    <p style="color: #aaa; font-size: 14px;">0-200m: Where sunlight reaches</p>
+                </div>
+            </div>
+
+            <!-- Dive Progress -->
+            <div class="panel-section">
+                <h3>🎯 Dive Progress</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    <div class="progress-text" id="progressText">0 / 4000m</div>
+                </div>
+            </div>
+
+            <!-- Species Collection -->
+            <div class="panel-section">
+                <h3>🐟 Species Collection</h3>
+                <div class="species-grid" id="speciesGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Achievements -->
+            <div class="panel-section">
+                <h3>🏆 Achievements</h3>
+                <div id="achievementsList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        const gameState = {
+            depth: 0,
+            maxDepth: 0,
+            points: 0,
+            discoveredSpecies: new Set(),
+            unlockedAchievements: new Set(),
+            currentZone: 'sunlight',
+            speciesData: null,
+            clickCount: 0
+        };
+
+        // Load game data
+        async function loadGameData() {
+            try {
+                const response = await fetch('/data/ocean-species.json');
+                gameState.speciesData = await response.json();
+                initializeGame();
+            } catch (error) {
+                console.error('Error loading game data:', error);
+            }
+        }
+
+        // Initialize game
+        function initializeGame() {
+            loadSaveData();
+            setupCanvas();
+            renderSpeciesGrid();
+            renderAchievements();
+            updateUI();
+            
+            // Hide click prompt if already diving
+            if (gameState.depth > 0) {
+                document.getElementById('clickPrompt').style.display = 'none';
+            }
+        }
+
+        // Canvas setup
+        let canvas, ctx;
+        function setupCanvas() {
+            canvas = document.getElementById('oceanCanvas');
+            ctx = canvas.getContext('2d');
+            
+            function resizeCanvas() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                drawOcean();
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Click to dive
+            canvas.addEventListener('click', dive);
+        }
+
+        // Draw ocean background
+        function drawOcean() {
+            const zoneColors = {
+                'sunlight': { top: '#0077be', bottom: '#004e92' },
+                'twilight': { top: '#004e92', bottom: '#001a33' },
+                'midnight': { top: '#001a33', bottom: '#000000' }
+            };
+            
+            const colors = zoneColors[gameState.currentZone];
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, colors.top);
+            gradient.addColorStop(1, colors.bottom);
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw bubbles
+            drawBubbles();
+            
+            // Draw submarine
+            drawSubmarine();
+        }
+
+        // Draw bubbles
+        function drawBubbles() {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            for (let i = 0; i < 20; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const radius = Math.random() * 5 + 2;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Draw submarine
+        function drawSubmarine() {
+            const x = canvas.width / 2;
+            const y = canvas.height / 2;
+            
+            // Submarine body
+            ctx.fillStyle = '#ffd700';
+            ctx.beginPath();
+            ctx.ellipse(x, y, 60, 30, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Window
+            ctx.fillStyle = '#00d9ff';
+            ctx.beginPath();
+            ctx.arc(x, y, 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Propeller
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x + 60, y - 10);
+            ctx.lineTo(x + 80, y);
+            ctx.moveTo(x + 60, y + 10);
+            ctx.lineTo(x + 80, y);
+            ctx.stroke();
+        }
+
+        // Dive function
+        function dive() {
+            gameState.clickCount++;
+            
+            // Hide prompt after first click
+            if (gameState.clickCount === 1) {
+                document.getElementById('clickPrompt').style.display = 'none';
+            }
+            
+            // Increase depth
+            gameState.depth += 10;
+            if (gameState.depth > gameState.maxDepth) {
+                gameState.maxDepth = gameState.depth;
+            }
+            
+            // Award points
+            gameState.points += 1;
+            
+            // Check for zone changes
+            updateZone();
+            
+            // Check for species discovery
+            checkSpeciesDiscovery();
+            
+            // Check achievements
+            checkAchievements();
+            
+            // Update UI
+            updateUI();
+            
+            // Save game
+            saveGame();
+            
+            // Visual feedback
+            createSplash();
+            drawOcean();
+        }
+
+        // Create splash effect
+        function createSplash() {
+            // This could be enhanced with particles
+            canvas.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                canvas.style.transform = 'scale(1)';
+            }, 100);
+        }
+
+        // Update zone based on depth
+        function updateZone() {
+            let newZone = gameState.currentZone;
+            
+            if (gameState.depth >= 1000) {
+                newZone = 'midnight';
+            } else if (gameState.depth >= 200) {
+                newZone = 'twilight';
+            } else {
+                newZone = 'sunlight';
+            }
+            
+            if (newZone !== gameState.currentZone) {
+                gameState.currentZone = newZone;
+                showZoneUnlock(newZone);
+                drawOcean();
+            }
+            
+            // Update zone display
+            const zoneInfo = gameState.speciesData.zones[newZone];
+            document.getElementById('currentZone').innerHTML = `
+                <h4 style="color: ${zoneInfo.color}; font-size: 18px;">${zoneInfo.name}</h4>
+                <p style="color: #aaa; font-size: 14px;">${zoneInfo.depth}: ${zoneInfo.description}</p>
+            `;
+        }
+
+        // Check for species discovery
+        function checkSpeciesDiscovery() {
+            const availableSpecies = gameState.speciesData.species.filter(s => {
+                const depthValue = parseInt(s.depth.split('-')[0]);
+                return gameState.depth >= depthValue && !gameState.discoveredSpecies.has(s.id);
+            });
+            
+            // Random chance to discover based on rarity
+            if (availableSpecies.length > 0 && Math.random() < 0.15) {
+                const rarityWeights = {
+                    'common': 0.5,
+                    'uncommon': 0.3,
+                    'rare': 0.15,
+                    'epic': 0.04,
+                    'legendary': 0.01
+                };
+                
+                // Weighted random selection
+                const species = availableSpecies.sort(() => 
+                    (rarityWeights[availableSpecies[0].rarity] || 0.1) - Math.random()
+                )[0];
+                
+                discoverSpecies(species);
+            }
+        }
+
+        // Discover species
+        function discoverSpecies(species) {
+            gameState.discoveredSpecies.add(species.id);
+            gameState.points += 10; // Bonus points for discovery
+            
+            showDiscoveryNotification(species);
+            renderSpeciesGrid();
+            
+            // Play sound effect (if implemented)
+            playSound('discovery');
+        }
+
+        // Show discovery notification
+        function showDiscoveryNotification(species) {
+            const notification = document.createElement('div');
+            notification.className = 'discovery-notification';
+            notification.innerHTML = `
+                <div class="discovery-title">🎉 NEW DISCOVERY! 🎉</div>
+                <div class="discovery-species">${getSpeciesEmoji(species.name)}</div>
+                <div class="discovery-name">${species.name}</div>
+                <div class="discovery-fact">💡 ${species.fact}</div>
+                <div class="discovery-stats">
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Zone</div>
+                        <div class="discovery-stat-value">${species.zone}</div>
+                    </div>
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Depth</div>
+                        <div class="discovery-stat-value">${species.depth}</div>
+                    </div>
+                    <div class="discovery-stat">
+                        <div class="discovery-stat-label">Size</div>
+                        <div class="discovery-stat-value">${species.size}</div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => notification.remove(), 500);
+            }, 5000);
+        }
+
+        // Get species emoji
+        function getSpeciesEmoji(name) {
+            const emojiMap = {
+                'Dolphin': '🐬', 'Turtle': '🐢', 'Clownfish': '🐠', 'Shark': '🦈',
+                'Ray': '🐠', 'Tang': '🐟', 'Octopus': '🐙', 'Otter': '🦦',
+                'Tuna': '🐟', 'Seahorse': '🦄', 'Jellyfish': '🪼', 'Lanternfish': '🐟',
+                'Squid': '🦑', 'Hatchetfish': '🐟', 'Barreleye': '🐠', 'Dragonfish': '🐉',
+                'Viperfish': '🐟', 'Goblin': '🦈', 'Anglerfish': '🐟', 'Eel': '🐟',
+                'Isopod': '🦞', 'Frilled': '🦈', 'Blobfish': '🐡', 'Dumbo': '🐙',
+                'Fangtooth': '🐟', 'Colossal': '🦑', 'Cookiecutter': '🦈'
+            };
+            
+            for (const [key, emoji] of Object.entries(emojiMap)) {
+                if (name.includes(key)) return emoji;
+            }
+            return '🐟';
+        }
+
+        // Render species grid
+        function renderSpeciesGrid() {
+            const grid = document.getElementById('speciesGrid');
+            grid.innerHTML = '';
+            
+            gameState.speciesData.species.forEach(species => {
+                const card = document.createElement('div');
+                card.className = 'species-card';
+                if (gameState.discoveredSpecies.has(species.id)) {
+                    card.classList.add('discovered');
+                }
+                
+                card.innerHTML = `
+                    <div class="species-icon">${gameState.discoveredSpecies.has(species.id) ? getSpeciesEmoji(species.name) : '?'}</div>
+                    <div class="species-name">${gameState.discoveredSpecies.has(species.id) ? species.name : '???'}</div>
+                `;
+                
+                if (gameState.discoveredSpecies.has(species.id)) {
+                    card.onclick = () => showSpeciesInfo(species);
+                }
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Show species info (modal)
+        function showSpeciesInfo(species) {
+            alert(`${species.name}\n\n${species.fact}\n\nZone: ${species.zone}\nDepth: ${species.depth}\nDiet: ${species.diet}\nSize: ${species.size}`);
+        }
+
+        // Render achievements
+        function renderAchievements() {
+            const list = document.getElementById('achievementsList');
+            list.innerHTML = '';
+            
+            gameState.speciesData.achievements.forEach(achievement => {
+                const item = document.createElement('div');
+                item.className = 'achievement-item';
+                if (gameState.unlockedAchievements.has(achievement.id)) {
+                    item.classList.add('unlocked');
+                }
+                
+                item.innerHTML = `
+                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-info">
+                        <div class="achievement-name">${achievement.name}</div>
+                        <div class="achievement-desc">${achievement.description}</div>
+                    </div>
+                `;
+                
+                list.appendChild(item);
+            });
+        }
+
+        // Check achievements
+        function checkAchievements() {
+            gameState.speciesData.achievements.forEach(achievement => {
+                if (gameState.unlockedAchievements.has(achievement.id)) return;
+                
+                let unlocked = false;
+                
+                if (achievement.type === 'depth') {
+                    unlocked = gameState.maxDepth >= achievement.requirement;
+                } else if (achievement.type === 'species') {
+                    unlocked = gameState.discoveredSpecies.size >= achievement.requirement;
+                } else if (achievement.type === 'specific_species') {
+                    unlocked = gameState.discoveredSpecies.has(achievement.requirement);
+                }
+                
+                if (unlocked) {
+                    gameState.unlockedAchievements.add(achievement.id);
+                    showAchievementUnlock(achievement);
+                    renderAchievements();
+                }
+            });
+        }
+
+        // Show achievement unlock
+        function showAchievementUnlock(achievement) {
+            // Similar to discovery notification but for achievements
+            console.log('🏆 Achievement Unlocked:', achievement.name);
+        }
+
+        // Show zone unlock
+        function showZoneUnlock(zone) {
+            const zoneInfo = gameState.speciesData.zones[zone];
+            const overlay = document.createElement('div');
+            overlay.className = 'zone-unlock-overlay';
+            overlay.innerHTML = `
+                <div class="zone-unlock-content">
+                    <h1>🌊 ZONE UNLOCKED! 🌊</h1>
+                    <h2>${zoneInfo.name}</h2>
+                    <p>${zoneInfo.description}</p>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.remove(), 500);
+            }, 3000);
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('depthDisplay').textContent = `${gameState.depth}m`;
+            document.getElementById('speciesDisplay').textContent = `${gameState.discoveredSpecies.size}/30`;
+            document.getElementById('pointsDisplay').textContent = gameState.points;
+            
+            // Update depth meter
+            const maxDisplayDepth = 4000;
+            const percentage = Math.min((gameState.depth / maxDisplayDepth) * 100, 100);
+            document.getElementById('depthFill').style.height = `${percentage}%`;
+            document.getElementById('depthMeterText').textContent = `${gameState.depth}m`;
+            
+            // Update progress bar
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+            document.getElementById('progressText').textContent = `${gameState.depth} / ${maxDisplayDepth}m`;
+        }
+
+        // Save game
+        function saveGame() {
+            const saveData = {
+                depth: gameState.depth,
+                maxDepth: gameState.maxDepth,
+                points: gameState.points,
+                discoveredSpecies: Array.from(gameState.discoveredSpecies),
+                unlockedAchievements: Array.from(gameState.unlockedAchievements),
+                currentZone: gameState.currentZone
+            };
+            localStorage.setItem('oceanExplorerSave', JSON.stringify(saveData));
+        }
+
+        // Load save data
+        function loadSaveData() {
+            const saved = localStorage.getItem('oceanExplorerSave');
+            if (saved) {
+                const data = JSON.parse(saved);
+                gameState.depth = data.depth || 0;
+                gameState.maxDepth = data.maxDepth || 0;
+                gameState.points = data.points || 0;
+                gameState.discoveredSpecies = new Set(data.discoveredSpecies || []);
+                gameState.unlockedAchievements = new Set(data.unlockedAchievements || []);
+                gameState.currentZone = data.currentZone || 'sunlight';
+            }
+        }
+
+        // Play sound (placeholder)
+        function playSound(type) {
+            // Could implement Web Audio API sounds here
+            console.log('🔊', type);
+        }
+
+        // Initialize when page loads
+        loadGameData();
+    </script>
+</body>
+</html>
