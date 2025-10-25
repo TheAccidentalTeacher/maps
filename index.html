@@ -3842,6 +3842,9 @@
         // Collection system - stores explored locations
         let exploredLocations = [];
         
+        // Ocean API cache - prevents duplicate API calls for same ocean basin
+        let oceanAPICache = new Set();
+        
         // Style mode: 'gen-alpha' or 'classic'
         let locationStyleMode = 'classic';
         
@@ -4142,13 +4145,25 @@
                     ? geocodeData.oceanBasin  // For oceans, use basin as "country" 
                     : (countryData?.name || geocodeData.country || 'Unknown');
                 
-                // NEW FLOW: Fetch AI facts → Match photos to facts → Display together!
-                console.log('🧠 Fetching AI facts + matching photos...');
+                // Check if this is an ocean and if we've already fetched data for it
+                const isOcean = geocodeData.isWater || geocodeData.ocean || geocodeData.oceanBasin;
+                const oceanCacheKey = isOcean ? (geocodeData.oceanBasin || geocodeData.ocean || 'Open Ocean') : null;
+                const shouldFetchAPIs = !isOcean || !oceanAPICache.has(oceanCacheKey);
                 
-                // Show Gen Alpha loading animation!
-                showGenAlphaLoading();
-                
-                fetchLocationFacts(locationName, countryName, geocodeData)
+                if (shouldFetchAPIs) {
+                    // Add to cache if ocean
+                    if (isOcean && oceanCacheKey) {
+                        oceanAPICache.add(oceanCacheKey);
+                        console.log(`🌊 Added ${oceanCacheKey} to API cache`);
+                    }
+                    
+                    // NEW FLOW: Fetch AI facts → Match photos to facts → Display together!
+                    console.log('🧠 Fetching AI facts + matching photos...');
+                    
+                    // Show Gen Alpha loading animation!
+                    showGenAlphaLoading();
+                    
+                    fetchLocationFacts(locationName, countryName, geocodeData)
                     .then(async facts => {
                         if (facts && facts.length > 0) {
                             console.log(`✅ Got ${facts.length} facts, now matching photos...`);
@@ -4190,6 +4205,14 @@
                         console.log('ℹ️ Weather not available yet (needs deployment)');
                         populateWeather(null);
                     });
+                } else {
+                    // Ocean data already cached - skip API calls to save costs
+                    console.log(`💰 Skipping API calls for ${oceanCacheKey} (already cached)`);
+                    populateAIFacts([]);
+                    populatePhotos([]);
+                    populateWeather(null);
+                    hideGenAlphaLoading();
+                }
                 
                 // Step 7: Add to collection (if new location)
                 const locationData = {
