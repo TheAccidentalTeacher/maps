@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Millionaire City Builder</title>
+    
+    <!-- Math-themed favicon (using emoji) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>�️</text></svg>">
+    
+    <link rel="stylesheet" href="city-builder.css">
+    
+    <!-- Babylon.js Core + Loaders (LOCAL FILES - no CDN dependency) -->
+    <script src="babylon.max.js"></script>
+    <script src="babylonjs.loaders.min.js"></script>
+</head>
+<body>
+    <!-- Top HUD (Cash & Progress) -->
+    <div id="topHUD" class="hud-top">
+        <div class="cash-display">
+            💰 <span id="cashAmount">$1,000</span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-label">
+                🏆 City Value: <span id="cityValue">$0</span> / $1,000,000
+            </div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="progress-percent">0.0%</div>
+        </div>
+        <button id="genAlphaToggle" class="toggle-btn">
+            Gen Alpha Mode: <span id="genAlphaStatus">OFF</span>
+        </button>
+    </div>
+    
+    <!-- Main 3D Viewport -->
+    <canvas id="renderCanvas"></canvas>
+    
+    <!-- Bottom Action Bar -->
+    <div id="bottomBar" class="hud-bottom">
+        <button id="buildBtn" class="action-btn primary">
+            🏗️ Build
+        </button>
+        <button id="earnCashBtn" class="action-btn success">
+            💵 Earn Cash (Do Math!)
+        </button>
+        <button id="deleteBtn" class="action-btn danger">
+            🗑️ Delete
+        </button>
+        <button id="statsBtn" class="action-btn info">
+            📊 Stats
+        </button>
+        <button id="minimapToggle" class="action-btn">
+            🗺️ Mini-Map
+        </button>
+        <button id="resetBtn" class="action-btn danger" style="margin-left: auto;">
+            🔄 Reset City
+        </button>
+    </div>
+    
+    <!-- Mini-Map (toggleable) -->
+    <div id="minimap" class="minimap hidden">
+        <canvas id="minimapCanvas" width="200" height="200"></canvas>
+    </div>
+    
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading City Builder...</div>
+            <div class="loading-progress">
+                <div id="loadingBar" class="loading-bar"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Building Menu Modal (Phase 2) -->
+    <div id="buildingMenu" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>🏗️ Building Menu</h2>
+                <button class="close-btn" onclick="closeBuildingMenu()">✕</button>
+            </div>
+            <div class="modal-body">
+                <!-- Category Tabs -->
+                <div class="category-tabs">
+                    <button id="tab-roads" class="category-tab active" onclick="switchCategory('roads')">🛣️ Roads</button>
+                    <button id="tab-residential" class="category-tab" onclick="switchCategory('residential')">🏠 Residential</button>
+                    <button id="tab-commercial" class="category-tab" onclick="switchCategory('commercial')">🏢 Commercial</button>
+                    <button id="tab-industrial" class="category-tab" onclick="switchCategory('industrial')">🏭 Industrial</button>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <input type="text" id="buildingSearch" placeholder="🔍 Search buildings..." oninput="searchBuildings(this.value)">
+                    <span id="buildingCount" class="building-count">0 buildings</span>
+                </div>
+                
+                <!-- Building Grid -->
+                <div id="buildingGrid" class="building-grid">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Earn Cash Modal (Phase 3) -->
+    <div id="earnCashModal" class="modal hidden">
+        <div class="modal-content medium">
+            <div class="modal-header">
+                <h2>💵 Earn Cash - Solve Math!</h2>
+                <button class="close-btn" onclick="closeEarnCashModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Math problem system will be implemented in Phase 3!</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Modal (Phase 4) -->
+    <div id="statsModal" class="modal hidden">
+        <div class="modal-content medium">
+            <div class="modal-header">
+                <h2>📊 City Statistics</h2>
+                <button class="close-btn" onclick="closeStatsModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Stats system will be implemented in Phase 4!</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Milestone Celebration Overlay (Phase 4) -->
+    <div id="milestoneOverlay" class="milestone-overlay hidden">
+        <div class="milestone-content">
+            <div class="milestone-icon">🏆</div>
+            <div class="milestone-title">MILESTONE REACHED!</div>
+            <div class="milestone-message">Small Town Status Unlocked!</div>
+            <div class="milestone-reward">Bonus: +$5,000</div>
+        </div>
+    </div>
+    
+    <!-- 67 Glitch Overlay (Phase 5) -->
+    <div id="glitchOverlay" class="glitch-overlay hidden">
+        <div class="glitch-text">67</div>
+    </div>
+    
+    <!-- Scripts (load order matters!) -->
+    <script src="math-engine.js"></script>
+    <script src="shared-state.js"></script>
+    <script src="building-menu.js"></script>
+    <script src="city-builder.js"></script>
+</body>
+</html>

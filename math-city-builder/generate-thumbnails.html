@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thumbnail Generator</title>
+    <script src="https://cdn.babylonjs.com/babylon.max.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a202c;
+            color: white;
+            padding: 20px;
+        }
+        #renderCanvas {
+            display: none;
+        }
+        #progress {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        #thumbnailGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .thumbnail-item {
+            text-align: center;
+            background: #2d3748;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .thumbnail-item img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            background: #4a5568;
+            border-radius: 4px;
+        }
+        .thumbnail-name {
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        button {
+            background: #9f7aea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #805ad5;
+        }
+        #downloadAll {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 GLB Thumbnail Generator</h1>
+    <p>This tool renders 3D thumbnails from all 189 building models.</p>
+    
+    <button onclick="generateAllThumbnails()">Generate All Thumbnails</button>
+    <button id="downloadAll" onclick="downloadAllThumbnails()">Download All as ZIP</button>
+    
+    <div id="progress">Ready to generate...</div>
+    <canvas id="renderCanvas" width="300" height="300"></canvas>
+    <div id="thumbnailGrid"></div>
+
+    <script>
+        let structures = [];
+        let thumbnails = [];
+        let currentIndex = 0;
+        
+        async function generateAllThumbnails() {
+            document.getElementById('progress').textContent = 'Loading structures.json...';
+            
+            // Load structures
+            const response = await fetch('structures.json');
+            structures = await response.json();
+            
+            // Initialize Babylon.js
+            const canvas = document.getElementById('renderCanvas');
+            const engine = new BABYLON.Engine(canvas, true);
+            const scene = new BABYLON.Scene(engine);
+            
+            // Camera setup - angled view for better 3D perspective
+            const camera = new BABYLON.ArcRotateCamera(
+                "thumbnailCamera",
+                -Math.PI / 4,
+                Math.PI / 3,
+                5,
+                BABYLON.Vector3.Zero(),
+                scene
+            );
+            
+            // Lighting - multiple lights for good visibility
+            const light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
+            light1.intensity = 0.7;
+            const light2 = new BABYLON.HemisphericLight("light2", new BABYLON.Vector3(-1, -1, 0), scene);
+            light2.intensity = 0.3;
+            
+            // Background color
+            scene.clearColor = new BABYLON.Color4(0.29, 0.42, 0.53, 1); // Match card background
+            
+            // Generate thumbnails
+            for (let i = 0; i < structures.length; i++) {
+                currentIndex = i;
+                const structure = structures[i];
+                
+                document.getElementById('progress').textContent = 
+                    `Generating ${i + 1} of ${structures.length}: ${structure.name}`;
+                
+                try {
+                    const thumbnail = await generateThumbnail(structure, scene, engine);
+                    thumbnails.push({
+                        name: structure.id,
+                        data: thumbnail,
+                        displayName: structure.name
+                    });
+                    
+                    // Display thumbnail
+                    displayThumbnail(structure.name, thumbnail);
+                } catch (error) {
+                    console.error(`Failed to generate ${structure.name}:`, error);
+                }
+                
+                // Small delay to prevent overwhelming the browser
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            document.getElementById('progress').textContent = 
+                `✅ Complete! Generated ${thumbnails.length} thumbnails.`;
+            document.getElementById('downloadAll').style.display = 'inline-block';
+        }
+        
+        async function generateThumbnail(structure, scene, engine) {
+            return new Promise((resolve, reject) => {
+                // Clear scene
+                scene.meshes.slice().forEach(mesh => {
+                    if (!mesh.name.includes('Camera') && !mesh.name.includes('light')) {
+                        mesh.dispose();
+                    }
+                });
+                
+                // Load model
+                BABYLON.SceneLoader.ImportMesh(
+                    "",
+                    "",
+                    structure.modelPath,
+                    scene,
+                    (meshes) => {
+                        if (meshes.length === 0) {
+                            reject(new Error('No meshes loaded'));
+                            return;
+                        }
+                        
+                        // Center and scale model
+                        const boundingInfo = meshes[0].getHierarchyBoundingVectors();
+                        const size = boundingInfo.max.subtract(boundingInfo.min);
+                        const maxDimension = Math.max(size.x, size.y, size.z);
+                        const scale = 3 / maxDimension;
+                        
+                        meshes.forEach(mesh => {
+                            mesh.scaling = new BABYLON.Vector3(scale, scale, scale);
+                            mesh.position = BABYLON.Vector3.Zero();
+                        });
+                        
+                        // Render frame
+                        scene.render();
+                        
+                        // Capture as image
+                        BABYLON.Tools.CreateScreenshot(engine, engine.getRenderingCanvas(), {
+                            width: 300,
+                            height: 300
+                        }, (data) => {
+                            resolve(data);
+                        });
+                    },
+                    null,
+                    (scene, message, exception) => {
+                        reject(exception || new Error(message));
+                    }
+                );
+            });
+        }
+        
+        function displayThumbnail(name, dataUrl) {
+            const grid = document.getElementById('thumbnailGrid');
+            const item = document.createElement('div');
+            item.className = 'thumbnail-item';
+            item.innerHTML = `
+                <img src="${dataUrl}" alt="${name}">
+                <div class="thumbnail-name">${name}</div>
+            `;
+            grid.appendChild(item);
+        }
+        
+        function downloadAllThumbnails() {
+            thumbnails.forEach(thumb => {
+                const link = document.createElement('a');
+                link.download = `${thumb.name}.png`;
+                link.href = thumb.data;
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>

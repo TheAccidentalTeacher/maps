@@ -1,0 +1,12 @@
+# Godot executables (too large for GitHub)
+godot/*.exe
+godot/*.zip
+Godot_*.exe
+Godot_*.zip
+
+# Node modules (can be restored via npm install)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db

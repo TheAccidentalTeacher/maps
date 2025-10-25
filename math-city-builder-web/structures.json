@@ -1,0 +1,1336 @@
+{
+  "version": "1.0",
+  "total_structures": 164,
+  "categories": {
+    "city-roads": {
+      "name": "Roads & Infrastructure",
+      "price_range": 50
+    },
+    "suburban": {
+      "name": "Residential",
+      "price_range": 250
+    },
+    "commercial": {
+      "name": "Commercial",
+      "price_range": 300
+    },
+    "industrial": {
+      "name": "Industrial",
+      "price_range": 350
+    }
+  },
+  "structures": [
+    {
+      "id": 0,
+      "name": "Bridge Pillar Wide",
+      "filename": "bridge-pillar-wide",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/bridge-pillar-wide.glb"
+    },
+    {
+      "id": 1,
+      "name": "Bridge Pillar",
+      "filename": "bridge-pillar",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/bridge-pillar.glb"
+    },
+    {
+      "id": 2,
+      "name": "Building A",
+      "filename": "building-a",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-a.glb"
+    },
+    {
+      "id": 3,
+      "name": "Building B",
+      "filename": "building-b",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-b.glb"
+    },
+    {
+      "id": 4,
+      "name": "Building C",
+      "filename": "building-c",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-c.glb"
+    },
+    {
+      "id": 5,
+      "name": "Building D",
+      "filename": "building-d",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-d.glb"
+    },
+    {
+      "id": 6,
+      "name": "Building E",
+      "filename": "building-e",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-e.glb"
+    },
+    {
+      "id": 7,
+      "name": "Building F",
+      "filename": "building-f",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-f.glb"
+    },
+    {
+      "id": 8,
+      "name": "Building G",
+      "filename": "building-g",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-g.glb"
+    },
+    {
+      "id": 9,
+      "name": "Building H",
+      "filename": "building-h",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-h.glb"
+    },
+    {
+      "id": 10,
+      "name": "Building I",
+      "filename": "building-i",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-i.glb"
+    },
+    {
+      "id": 11,
+      "name": "Building J",
+      "filename": "building-j",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-j.glb"
+    },
+    {
+      "id": 12,
+      "name": "Building K",
+      "filename": "building-k",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-k.glb"
+    },
+    {
+      "id": 13,
+      "name": "Building L",
+      "filename": "building-l",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-l.glb"
+    },
+    {
+      "id": 14,
+      "name": "Building M",
+      "filename": "building-m",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-m.glb"
+    },
+    {
+      "id": 15,
+      "name": "Building N",
+      "filename": "building-n",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-n.glb"
+    },
+    {
+      "id": 16,
+      "name": "Building O",
+      "filename": "building-o",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-o.glb"
+    },
+    {
+      "id": 17,
+      "name": "Building P",
+      "filename": "building-p",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-p.glb"
+    },
+    {
+      "id": 18,
+      "name": "Building Q",
+      "filename": "building-q",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-q.glb"
+    },
+    {
+      "id": 19,
+      "name": "Building R",
+      "filename": "building-r",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-r.glb"
+    },
+    {
+      "id": 20,
+      "name": "Building S",
+      "filename": "building-s",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-s.glb"
+    },
+    {
+      "id": 21,
+      "name": "Building Skyscraper A",
+      "filename": "building-skyscraper-a",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/building-skyscraper-a.glb"
+    },
+    {
+      "id": 22,
+      "name": "Building Skyscraper B",
+      "filename": "building-skyscraper-b",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/building-skyscraper-b.glb"
+    },
+    {
+      "id": 23,
+      "name": "Building Skyscraper C",
+      "filename": "building-skyscraper-c",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/building-skyscraper-c.glb"
+    },
+    {
+      "id": 24,
+      "name": "Building Skyscraper D",
+      "filename": "building-skyscraper-d",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/building-skyscraper-d.glb"
+    },
+    {
+      "id": 25,
+      "name": "Building Skyscraper E",
+      "filename": "building-skyscraper-e",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/building-skyscraper-e.glb"
+    },
+    {
+      "id": 26,
+      "name": "Building T",
+      "filename": "building-t",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/building-t.glb"
+    },
+    {
+      "id": 27,
+      "name": "Building Type A",
+      "filename": "building-type-a",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-a.glb"
+    },
+    {
+      "id": 28,
+      "name": "Building Type B",
+      "filename": "building-type-b",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-b.glb"
+    },
+    {
+      "id": 29,
+      "name": "Building Type C",
+      "filename": "building-type-c",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-c.glb"
+    },
+    {
+      "id": 30,
+      "name": "Building Type D",
+      "filename": "building-type-d",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-d.glb"
+    },
+    {
+      "id": 31,
+      "name": "Building Type E",
+      "filename": "building-type-e",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-e.glb"
+    },
+    {
+      "id": 32,
+      "name": "Building Type F",
+      "filename": "building-type-f",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-f.glb"
+    },
+    {
+      "id": 33,
+      "name": "Building Type G",
+      "filename": "building-type-g",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-g.glb"
+    },
+    {
+      "id": 34,
+      "name": "Building Type H",
+      "filename": "building-type-h",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-h.glb"
+    },
+    {
+      "id": 35,
+      "name": "Building Type I",
+      "filename": "building-type-i",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-i.glb"
+    },
+    {
+      "id": 36,
+      "name": "Building Type J",
+      "filename": "building-type-j",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-j.glb"
+    },
+    {
+      "id": 37,
+      "name": "Building Type K",
+      "filename": "building-type-k",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-k.glb"
+    },
+    {
+      "id": 38,
+      "name": "Building Type L",
+      "filename": "building-type-l",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-l.glb"
+    },
+    {
+      "id": 39,
+      "name": "Building Type M",
+      "filename": "building-type-m",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-m.glb"
+    },
+    {
+      "id": 40,
+      "name": "Building Type N",
+      "filename": "building-type-n",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-n.glb"
+    },
+    {
+      "id": 41,
+      "name": "Building Type O",
+      "filename": "building-type-o",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-o.glb"
+    },
+    {
+      "id": 42,
+      "name": "Building Type P",
+      "filename": "building-type-p",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-p.glb"
+    },
+    {
+      "id": 43,
+      "name": "Building Type Q",
+      "filename": "building-type-q",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-q.glb"
+    },
+    {
+      "id": 44,
+      "name": "Building Type R",
+      "filename": "building-type-r",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-r.glb"
+    },
+    {
+      "id": 45,
+      "name": "Building Type S",
+      "filename": "building-type-s",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-s.glb"
+    },
+    {
+      "id": 46,
+      "name": "Building Type T",
+      "filename": "building-type-t",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-t.glb"
+    },
+    {
+      "id": 47,
+      "name": "Building Type U",
+      "filename": "building-type-u",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/building-type-u.glb"
+    },
+    {
+      "id": 48,
+      "name": "Chimney Basic",
+      "filename": "chimney-basic",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/chimney-basic.glb"
+    },
+    {
+      "id": 49,
+      "name": "Chimney Large",
+      "filename": "chimney-large",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/chimney-large.glb"
+    },
+    {
+      "id": 50,
+      "name": "Chimney Medium",
+      "filename": "chimney-medium",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/chimney-medium.glb"
+    },
+    {
+      "id": 51,
+      "name": "Chimney Small",
+      "filename": "chimney-small",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/chimney-small.glb"
+    },
+    {
+      "id": 52,
+      "name": "Construction Barrier",
+      "filename": "construction-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/construction-barrier.glb"
+    },
+    {
+      "id": 53,
+      "name": "Construction Cone",
+      "filename": "construction-cone",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/construction-cone.glb"
+    },
+    {
+      "id": 54,
+      "name": "Construction Light",
+      "filename": "construction-light",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/construction-light.glb"
+    },
+    {
+      "id": 55,
+      "name": "Detail Awning Wide",
+      "filename": "detail-awning-wide",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/detail-awning-wide.glb"
+    },
+    {
+      "id": 56,
+      "name": "Detail Awning",
+      "filename": "detail-awning",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/detail-awning.glb"
+    },
+    {
+      "id": 57,
+      "name": "Detail Overhang Wide",
+      "filename": "detail-overhang-wide",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/detail-overhang-wide.glb"
+    },
+    {
+      "id": 58,
+      "name": "Detail Overhang",
+      "filename": "detail-overhang",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/detail-overhang.glb"
+    },
+    {
+      "id": 59,
+      "name": "Detail Parasol A",
+      "filename": "detail-parasol-a",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/detail-parasol-a.glb"
+    },
+    {
+      "id": 60,
+      "name": "Detail Parasol B",
+      "filename": "detail-parasol-b",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/detail-parasol-b.glb"
+    },
+    {
+      "id": 61,
+      "name": "Detail Tank",
+      "filename": "detail-tank",
+      "category": "industrial",
+      "price": 350,
+      "model_path": "assets/kenney-city-builder/models/Textures/industrial/Models/GLB format/detail-tank.glb"
+    },
+    {
+      "id": 62,
+      "name": "Driveway Long",
+      "filename": "driveway-long",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/driveway-long.glb"
+    },
+    {
+      "id": 63,
+      "name": "Driveway Short",
+      "filename": "driveway-short",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/driveway-short.glb"
+    },
+    {
+      "id": 64,
+      "name": "Fence 1X2",
+      "filename": "fence-1x2",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/fence-1x2.glb"
+    },
+    {
+      "id": 65,
+      "name": "Fence 1X3",
+      "filename": "fence-1x3",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/fence-1x3.glb"
+    },
+    {
+      "id": 66,
+      "name": "Fence 1X4",
+      "filename": "fence-1x4",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/fence-1x4.glb"
+    },
+    {
+      "id": 67,
+      "name": "Fence 2X2",
+      "filename": "fence-2x2",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/fence-2x2.glb"
+    },
+    {
+      "id": 68,
+      "name": "Fence 2X3",
+      "filename": "fence-2x3",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/fence-2x3.glb"
+    },
+    {
+      "id": 69,
+      "name": "Fence 3X2",
+      "filename": "fence-3x2",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/fence-3x2.glb"
+    },
+    {
+      "id": 70,
+      "name": "Fence 3X3",
+      "filename": "fence-3x3",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/fence-3x3.glb"
+    },
+    {
+      "id": 71,
+      "name": "Fence Low",
+      "filename": "fence-low",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/fence-low.glb"
+    },
+    {
+      "id": 72,
+      "name": "Fence",
+      "filename": "fence",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/fence.glb"
+    },
+    {
+      "id": 73,
+      "name": "Light Curved Cross",
+      "filename": "light-curved-cross",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/light-curved-cross.glb"
+    },
+    {
+      "id": 74,
+      "name": "Light Curved Double",
+      "filename": "light-curved-double",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/light-curved-double.glb"
+    },
+    {
+      "id": 75,
+      "name": "Light Curved",
+      "filename": "light-curved",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/light-curved.glb"
+    },
+    {
+      "id": 76,
+      "name": "Light Square Cross",
+      "filename": "light-square-cross",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/light-square-cross.glb"
+    },
+    {
+      "id": 77,
+      "name": "Light Square Double",
+      "filename": "light-square-double",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/light-square-double.glb"
+    },
+    {
+      "id": 78,
+      "name": "Light Square",
+      "filename": "light-square",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/light-square.glb"
+    },
+    {
+      "id": 79,
+      "name": "Low Detail Building A",
+      "filename": "low-detail-building-a",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-a.glb"
+    },
+    {
+      "id": 80,
+      "name": "Low Detail Building B",
+      "filename": "low-detail-building-b",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-b.glb"
+    },
+    {
+      "id": 81,
+      "name": "Low Detail Building C",
+      "filename": "low-detail-building-c",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-c.glb"
+    },
+    {
+      "id": 82,
+      "name": "Low Detail Building D",
+      "filename": "low-detail-building-d",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-d.glb"
+    },
+    {
+      "id": 83,
+      "name": "Low Detail Building E",
+      "filename": "low-detail-building-e",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-e.glb"
+    },
+    {
+      "id": 84,
+      "name": "Low Detail Building F",
+      "filename": "low-detail-building-f",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-f.glb"
+    },
+    {
+      "id": 85,
+      "name": "Low Detail Building G",
+      "filename": "low-detail-building-g",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-g.glb"
+    },
+    {
+      "id": 86,
+      "name": "Low Detail Building H",
+      "filename": "low-detail-building-h",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-h.glb"
+    },
+    {
+      "id": 87,
+      "name": "Low Detail Building I",
+      "filename": "low-detail-building-i",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-i.glb"
+    },
+    {
+      "id": 88,
+      "name": "Low Detail Building J",
+      "filename": "low-detail-building-j",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-j.glb"
+    },
+    {
+      "id": 89,
+      "name": "Low Detail Building K",
+      "filename": "low-detail-building-k",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-k.glb"
+    },
+    {
+      "id": 90,
+      "name": "Low Detail Building L",
+      "filename": "low-detail-building-l",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-l.glb"
+    },
+    {
+      "id": 91,
+      "name": "Low Detail Building M",
+      "filename": "low-detail-building-m",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-m.glb"
+    },
+    {
+      "id": 92,
+      "name": "Low Detail Building N",
+      "filename": "low-detail-building-n",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-n.glb"
+    },
+    {
+      "id": 93,
+      "name": "Low Detail Building Wide A",
+      "filename": "low-detail-building-wide-a",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-wide-a.glb"
+    },
+    {
+      "id": 94,
+      "name": "Low Detail Building Wide B",
+      "filename": "low-detail-building-wide-b",
+      "category": "commercial",
+      "price": 300,
+      "model_path": "assets/kenney-city-builder/models/Textures/commercial/Models/GLB format/low-detail-building-wide-b.glb"
+    },
+    {
+      "id": 95,
+      "name": "Path Long",
+      "filename": "path-long",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/path-long.glb"
+    },
+    {
+      "id": 96,
+      "name": "Path Short",
+      "filename": "path-short",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/path-short.glb"
+    },
+    {
+      "id": 97,
+      "name": "Path Stones Long",
+      "filename": "path-stones-long",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/path-stones-long.glb"
+    },
+    {
+      "id": 98,
+      "name": "Path Stones Messy",
+      "filename": "path-stones-messy",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/path-stones-messy.glb"
+    },
+    {
+      "id": 99,
+      "name": "Path Stones Short",
+      "filename": "path-stones-short",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/path-stones-short.glb"
+    },
+    {
+      "id": 100,
+      "name": "Planter",
+      "filename": "planter",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/planter.glb"
+    },
+    {
+      "id": 101,
+      "name": "Road Bend Barrier",
+      "filename": "road-bend-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-bend-barrier.glb"
+    },
+    {
+      "id": 102,
+      "name": "Road Bend Sidewalk",
+      "filename": "road-bend-sidewalk",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-bend-sidewalk.glb"
+    },
+    {
+      "id": 103,
+      "name": "Road Bend Square Barrier",
+      "filename": "road-bend-square-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-bend-square-barrier.glb"
+    },
+    {
+      "id": 104,
+      "name": "Road Bend Square",
+      "filename": "road-bend-square",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-bend-square.glb"
+    },
+    {
+      "id": 105,
+      "name": "Road Bend",
+      "filename": "road-bend",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-bend.glb"
+    },
+    {
+      "id": 106,
+      "name": "Road Bridge",
+      "filename": "road-bridge",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-bridge.glb"
+    },
+    {
+      "id": 107,
+      "name": "Road Crossing",
+      "filename": "road-crossing",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-crossing.glb"
+    },
+    {
+      "id": 108,
+      "name": "Road Crossroad Barrier",
+      "filename": "road-crossroad-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-crossroad-barrier.glb"
+    },
+    {
+      "id": 109,
+      "name": "Road Crossroad Line",
+      "filename": "road-crossroad-line",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-crossroad-line.glb"
+    },
+    {
+      "id": 110,
+      "name": "Road Crossroad Path",
+      "filename": "road-crossroad-path",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-crossroad-path.glb"
+    },
+    {
+      "id": 111,
+      "name": "Road Crossroad",
+      "filename": "road-crossroad",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-crossroad.glb"
+    },
+    {
+      "id": 112,
+      "name": "Road Curve Barrier",
+      "filename": "road-curve-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-curve-barrier.glb"
+    },
+    {
+      "id": 113,
+      "name": "Road Curve Intersection Barrier",
+      "filename": "road-curve-intersection-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-curve-intersection-barrier.glb"
+    },
+    {
+      "id": 114,
+      "name": "Road Curve Intersection",
+      "filename": "road-curve-intersection",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-curve-intersection.glb"
+    },
+    {
+      "id": 115,
+      "name": "Road Curve Pavement",
+      "filename": "road-curve-pavement",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-curve-pavement.glb"
+    },
+    {
+      "id": 116,
+      "name": "Road Curve",
+      "filename": "road-curve",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-curve.glb"
+    },
+    {
+      "id": 117,
+      "name": "Road Driveway Double Barrier",
+      "filename": "road-driveway-double-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-driveway-double-barrier.glb"
+    },
+    {
+      "id": 118,
+      "name": "Road Driveway Double",
+      "filename": "road-driveway-double",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-driveway-double.glb"
+    },
+    {
+      "id": 119,
+      "name": "Road Driveway Single Barrier",
+      "filename": "road-driveway-single-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-driveway-single-barrier.glb"
+    },
+    {
+      "id": 120,
+      "name": "Road Driveway Single",
+      "filename": "road-driveway-single",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-driveway-single.glb"
+    },
+    {
+      "id": 121,
+      "name": "Road End Barrier",
+      "filename": "road-end-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-end-barrier.glb"
+    },
+    {
+      "id": 122,
+      "name": "Road End Round Barrier",
+      "filename": "road-end-round-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-end-round-barrier.glb"
+    },
+    {
+      "id": 123,
+      "name": "Road End Round",
+      "filename": "road-end-round",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-end-round.glb"
+    },
+    {
+      "id": 124,
+      "name": "Road End",
+      "filename": "road-end",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-end.glb"
+    },
+    {
+      "id": 125,
+      "name": "Road Intersection Barrier",
+      "filename": "road-intersection-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-intersection-barrier.glb"
+    },
+    {
+      "id": 126,
+      "name": "Road Intersection Line",
+      "filename": "road-intersection-line",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-intersection-line.glb"
+    },
+    {
+      "id": 127,
+      "name": "Road Intersection Path",
+      "filename": "road-intersection-path",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-intersection-path.glb"
+    },
+    {
+      "id": 128,
+      "name": "Road Intersection",
+      "filename": "road-intersection",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-intersection.glb"
+    },
+    {
+      "id": 129,
+      "name": "Road Roundabout Barrier",
+      "filename": "road-roundabout-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-roundabout-barrier.glb"
+    },
+    {
+      "id": 130,
+      "name": "Road Roundabout",
+      "filename": "road-roundabout",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-roundabout.glb"
+    },
+    {
+      "id": 131,
+      "name": "Road Side Barrier",
+      "filename": "road-side-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-side-barrier.glb"
+    },
+    {
+      "id": 132,
+      "name": "Road Side Entry Barrier",
+      "filename": "road-side-entry-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-side-entry-barrier.glb"
+    },
+    {
+      "id": 133,
+      "name": "Road Side Entry",
+      "filename": "road-side-entry",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-side-entry.glb"
+    },
+    {
+      "id": 134,
+      "name": "Road Side Exit Barrier",
+      "filename": "road-side-exit-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-side-exit-barrier.glb"
+    },
+    {
+      "id": 135,
+      "name": "Road Side Exit",
+      "filename": "road-side-exit",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-side-exit.glb"
+    },
+    {
+      "id": 136,
+      "name": "Road Side",
+      "filename": "road-side",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-side.glb"
+    },
+    {
+      "id": 137,
+      "name": "Road Slant Barrier",
+      "filename": "road-slant-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-slant-barrier.glb"
+    },
+    {
+      "id": 138,
+      "name": "Road Slant Curve Barrier",
+      "filename": "road-slant-curve-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-slant-curve-barrier.glb"
+    },
+    {
+      "id": 139,
+      "name": "Road Slant Curve",
+      "filename": "road-slant-curve",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-slant-curve.glb"
+    },
+    {
+      "id": 140,
+      "name": "Road Slant Flat Curve",
+      "filename": "road-slant-flat-curve",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-slant-flat-curve.glb"
+    },
+    {
+      "id": 141,
+      "name": "Road Slant Flat High",
+      "filename": "road-slant-flat-high",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-slant-flat-high.glb"
+    },
+    {
+      "id": 142,
+      "name": "Road Slant Flat",
+      "filename": "road-slant-flat",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-slant-flat.glb"
+    },
+    {
+      "id": 143,
+      "name": "Road Slant High Barrier",
+      "filename": "road-slant-high-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-slant-high-barrier.glb"
+    },
+    {
+      "id": 144,
+      "name": "Road Slant High",
+      "filename": "road-slant-high",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-slant-high.glb"
+    },
+    {
+      "id": 145,
+      "name": "Road Slant",
+      "filename": "road-slant",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-slant.glb"
+    },
+    {
+      "id": 146,
+      "name": "Road Split Barrier",
+      "filename": "road-split-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-split-barrier.glb"
+    },
+    {
+      "id": 147,
+      "name": "Road Split",
+      "filename": "road-split",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-split.glb"
+    },
+    {
+      "id": 148,
+      "name": "Road Square Barrier",
+      "filename": "road-square-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-square-barrier.glb"
+    },
+    {
+      "id": 149,
+      "name": "Road Square",
+      "filename": "road-square",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-square.glb"
+    },
+    {
+      "id": 150,
+      "name": "Road Straight Barrier End",
+      "filename": "road-straight-barrier-end",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-straight-barrier-end.glb"
+    },
+    {
+      "id": 151,
+      "name": "Road Straight Barrier Half",
+      "filename": "road-straight-barrier-half",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-straight-barrier-half.glb"
+    },
+    {
+      "id": 152,
+      "name": "Road Straight Barrier",
+      "filename": "road-straight-barrier",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-straight-barrier.glb"
+    },
+    {
+      "id": 153,
+      "name": "Road Straight Half",
+      "filename": "road-straight-half",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-straight-half.glb"
+    },
+    {
+      "id": 154,
+      "name": "Road Straight",
+      "filename": "road-straight",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/road-straight.glb"
+    },
+    {
+      "id": 155,
+      "name": "Sign Highway Detailed",
+      "filename": "sign-highway-detailed",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/sign-highway-detailed.glb"
+    },
+    {
+      "id": 156,
+      "name": "Sign Highway Wide",
+      "filename": "sign-highway-wide",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/sign-highway-wide.glb"
+    },
+    {
+      "id": 157,
+      "name": "Sign Highway",
+      "filename": "sign-highway",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/sign-highway.glb"
+    },
+    {
+      "id": 158,
+      "name": "Tile High",
+      "filename": "tile-high",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/tile-high.glb"
+    },
+    {
+      "id": 159,
+      "name": "Tile Low",
+      "filename": "tile-low",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/tile-low.glb"
+    },
+    {
+      "id": 160,
+      "name": "Tile Slant",
+      "filename": "tile-slant",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/tile-slant.glb"
+    },
+    {
+      "id": 161,
+      "name": "Tile Slanthigh",
+      "filename": "tile-slantHigh",
+      "category": "city-roads",
+      "price": 50,
+      "model_path": "assets/kenney-city-builder/models/Textures/city-roads/Models/GLB format/tile-slantHigh.glb"
+    },
+    {
+      "id": 162,
+      "name": "Tree Large",
+      "filename": "tree-large",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/tree-large.glb"
+    },
+    {
+      "id": 163,
+      "name": "Tree Small",
+      "filename": "tree-small",
+      "category": "suburban",
+      "price": 250,
+      "model_path": "assets/kenney-city-builder/models/Textures/suburban/Models/GLB format/tree-small.glb"
+    }
+  ]
+}
