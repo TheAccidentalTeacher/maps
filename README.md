@@ -1,323 +1,154 @@
-# Geographic Detective Academy - Documentation Index
+# Geographic Detective Academy & Math City Builder
 
-**Version:** 2.0  
-**Status:** Active Development  
-**Primary Users:** Middle school students (ages 11-14)  
-**Current Deployment:** Local testing (Alaska classroom)  
-**Goal:** SaaS educational platform for geography learning
+**Version:** 3.0  
+**Last Updated:** October 29, 2025  
+**Projects Covered:** Geography Detective Academy (web app) & Math City Builder (canvas game)
 
-> **New here?** Start with **[00_START_HERE_FIRST.md](./00_START_HERE_FIRST.md)** for quick navigation
+This repository now serves two tightly related classroom experiences. The geography web app is live with students in Alaska, while the Math City Builder is a rapidly maturing canvas-based city-planning game that teaches math through building. This README is the front door for both initiatives.
+
+> **First-time here?** Open `00_START_HERE_FIRST.md`. That file explains the workspace layout and sends you to the right project-specific index.
 
 ---
 
 ## Quick Navigation
 
-### 🎯 WHAT'S NEXT?
-- **[NEXT_STEPS.md](./NEXT_STEPS.md)** - 🚀 Your roadmap for what to build next! (NEW)
+- `00_START_HERE_FIRST.md` – Mandatory entry point for AI assistants and new contributors.
+- `DOCUMENTATION_INDEX.md` – Living table of contents for the entire repository.
+- `MASTER_DOCUMENTATION_INDEX.md` – Deep index for the Geography Detective Academy web app.
+- `WORKSPACE_MASTER_INDEX.md` – Cross-project map, including Math City Builder docs.
+- `MATH_CITY_BUILDER_ACTUAL_STATUS.md` – Current technical status of the canvas game.
 
-### 🚀 Getting Started
-- **[00_START_HERE_FIRST.md](./00_START_HERE_FIRST.md)** - Quick navigation for AI assistants and developers
-- **[USER_INSTRUCTIONS.md](./USER_INSTRUCTIONS.md)** - How to use the application
-
-### 📊 Project Overview
-- **[EXECUTIVE_SUMMARY.md](./EXECUTIVE_SUMMARY.md)** - High-level project overview
-- **[REALISTIC_ASSESSMENT.md](./REALISTIC_ASSESSMENT.md)** - Current status and capabilities
-- **[ACTION_PLAN.md](./ACTION_PLAN.md)** - Development roadmap and timeline
-
-### 🔧 Technical Documentation
-- **[CODE_ARCHITECTURE.md](./CODE_ARCHITECTURE.md)** - Complete code map with line numbers (NEW)
-- **[NETLIFY_FUNCTIONS_REFERENCE.md](./NETLIFY_FUNCTIONS_REFERENCE.md)** - API documentation for all 7 serverless functions (NEW)
-- **[CODE_DOCUMENTATION_AUDIT.md](./CODE_DOCUMENTATION_AUDIT.md)** - Documentation quality review (NEW)
-- **[CODE_REVIEW_SUMMARY.md](./CODE_REVIEW_SUMMARY.md)** - Architecture and code analysis
-- **[COORDINATE_FINDER_SPEC.md](./COORDINATE_FINDER_SPEC.md)** - Progressive reveal feature specification (technical)
-- **[COORDINATE_FINDER_IMPLEMENTATION.md](./COORDINATE_FINDER_IMPLEMENTATION.md)** - Developer implementation guide
-- **[COORDINATE_FINDER_EXPLAINED.md](./COORDINATE_FINDER_EXPLAINED.md)** - Plain English explanation (12th grade reading level)
-
-### 💰 SaaS Transformation
-
-#### 🎓 Teacher Dashboard (PRODUCTION READY!)
-- **[TEACHER_DASHBOARD_COMPLETE.md](./TEACHER_DASHBOARD_COMPLETE.md)** - ✅ Complete implementation guide (READY!) ⭐ NEW ⭐
-- **[SECURITY_AND_ENV_DOCUMENTATION.md](./SECURITY_AND_ENV_DOCUMENTATION.md)** - API keys and security audit ⭐ UPDATED
-- **[SUPABASE_QUICK_REFERENCE.md](./SUPABASE_QUICK_REFERENCE.md)** - Database schema and RLS policies ⭐ UPDATED
-
-#### 🚀 Implementation (START HERE!)
-- **[TODAY_CHECKLIST_DAY1.md](./TODAY_CHECKLIST_DAY1.md)** - Day 1: Supabase setup checklist ⭐ NEW ⭐
-- **[SUPABASE_CONNECTION_TEST.md](./SUPABASE_CONNECTION_TEST.md)** - Test your Supabase connection ⭐ NEW ⭐
-- **[SAAS_IMPLEMENTATION_WEEK_BY_WEEK.md](./SAAS_IMPLEMENTATION_WEEK_BY_WEEK.md)** - Week-by-week action plan (12 weeks) ⭐
-
-#### 📋 Planning Documents
-- **[PRODUCTION_SAFETY_QUICK_REFERENCE.md](./PRODUCTION_SAFETY_QUICK_REFERENCE.md)** - Never break production (3-min read) ⭐ NEW
-- **[SAFE_DEPLOYMENT_STRATEGY.md](./SAFE_DEPLOYMENT_STRATEGY.md)** - Complete deployment guide ⭐ NEW
-- **[DASHBOARD_QUICK_REFERENCE.md](./DASHBOARD_QUICK_REFERENCE.md)** - Quick summary for teachers ⭐ NEW
-- **[SAAS_TRANSFORMATION_ROADMAP.md](./SAAS_TRANSFORMATION_ROADMAP.md)** - Complete SaaS transformation guide ⭐ UPDATED
-- **[TEACHER_PARENT_DASHBOARD_SPEC.md](./TEACHER_PARENT_DASHBOARD_SPEC.md)** - Complete dashboard specification ⭐ NEW
-- **[FERPA_QUICK_START.md](./FERPA_QUICK_START.md)** - Essential FERPA compliance actions (5-min read) ⭐ NEW
-- **[FERPA_COMPLIANCE_GUIDE.md](./FERPA_COMPLIANCE_GUIDE.md)** - 100% FERPA compliance framework (complete) ⭐ NEW
-- **[SAAS_AUTH_ARCHITECTURE.md](./SAAS_AUTH_ARCHITECTURE.md)** - Authentication architecture (Supabase + Stripe)
-- **[SAAS_IMPLEMENTATION_READY.md](./SAAS_IMPLEMENTATION_READY.md)** - Step-by-step implementation (1,292 lines)
-- **[STUDENT_AUTH_PLAN.md](./STUDENT_AUTH_PLAN.md)** - Interim classroom authentication
-
-### 🎮 Feature Documentation
-- **[ALASKA_EXPANSION_COMPLETE.md](./ALASKA_EXPANSION_COMPLETE.md)** - 5-round Alaska Adventure game
-- **[MYSTERY_CHALLENGE_OVERHAUL.md](./MYSTERY_CHALLENGE_OVERHAUL.md)** - Coordinate-based challenge game
-- **[LOCATION_EXPLORER_SIDEBAR_PLAN.md](./LOCATION_EXPLORER_SIDEBAR_PLAN.md)** - Interactive sidebar with 8 cards
-- **[NUCLEAR_SAFETY_SYSTEM.md](./NUCLEAR_SAFETY_SYSTEM.md)** - 3-layer content filtering system
-- **[VISION_AI_PHOTO_MATCHING.md](./VISION_AI_PHOTO_MATCHING.md)** - AI-powered photo-fact validation
-- **[GEN_ALPHA_CULTURE_RESEARCH.md](./GEN_ALPHA_CULTURE_RESEARCH.md)** - Cultural research for Fun Mode
-- **[ACHIEVEMENTS_IMPLEMENTATION.md](./ACHIEVEMENTS_IMPLEMENTATION.md)** - Achievement system with 45 achievements
-
-### 🐛 Maintenance
-- **[BUGS_DETAILED.md](./BUGS_DETAILED.md)** - Known issues and fixes
-- **[QUICK_FIXES.md](./QUICK_FIXES.md)** - Common problems and solutions
-- **[test_results.md](./test_results.md)** - Testing logs and results
-
-### 📈 Planning
-- **[IMPROVEMENT_PLAN.md](./IMPROVEMENT_PLAN.md)** - Future enhancements and features
-- **[ACTION_PLAN.md](./ACTION_PLAN.md)** - Development roadmap and timeline
-- **[IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md)** - Feature implementation order
-
-### 📂 Archives
-- **[01_CODE_REVIEW_ARCHIVE.md](./01_CODE_REVIEW_ARCHIVE.md)** - Original code review documentation
-- **[DOCUMENTATION_COMPLETE_SUMMARY.md](./DOCUMENTATION_COMPLETE_SUMMARY.md)** - October 2025 documentation audit results ⭐ NEW
+Need an at-a-glance view by role? Jump to **[Documentation Index](./DOCUMENTATION_INDEX.md)** and follow the persona-based guides.
 
 ---
 
-## About This Project
+## Project Overview
 
-### What is Geographic Detective Academy?
+### Geography Detective Academy (Web App)
 
-Geographic Detective Academy is an interactive web-based geography learning application designed for middle school students. The app transforms traditional geography education into an engaging, game-like experience where students explore the world through seven different game modes:
+- **Status:** Classroom-ready; actively used by 15 middle school students (ages 11–14).
+- **Core Tech:** HTML5, CSS3, vanilla JS, Leaflet 1.9.4, Netlify Functions (Node.js), Claude 3.5 Sonnet & GPT-4o-mini for AI features.
+- **Key Features:**
+	- Explore Mode with eight-card Location Explorer sidebar (facts, weather, nearby POIs, AI insights, verified photos).
+	- Seven fully playable game modes (Explore, Mystery Challenge, Scavenger Hunt, Guess the Location, Missions, Create a Heist, Alaska Adventure).
+	- Nuclear Safety System with layered prompt filtering, post-generation validation, and Vision AI photo checks.
+	- Achievement + XP progression (45 achievements) with cleanup for timers, markers, and race conditions completed in October 2025.
+	- Supabase integration scaffolded; localStorage remains the primary persistence for students while SaaS features are staged.
+- **Where to go next:** `MASTER_DOCUMENTATION_INDEX.md` → `CODE_ARCHITECTURE.md` → `CODE_REVIEW_SUMMARY.md` for deep technical context.
 
-1. **Free Explore** - Open exploration with custom markers and notes
-2. **Mystery Challenge** - Find locations using coordinate clues
-3. **Scavenger Hunt** - Timed location-finding challenges
-4. **Guess the Location** - Identify places from satellite views
-5. **Missions** - Structured learning objectives
-6. **Create Heist** - Student-created location challenges
-7. **Alaska Adventure** - 5-round journey through Alaskan geography
+### Math City Builder (Canvas Game)
 
-### Current Status (October 2025)
-
-- ✅ **Working with 15 students** in Alaska classroom
-- ✅ **7 game modes** fully functional
-- ✅ **Location Explorer Sidebar** with 8 interactive cards
-- ✅ **Nuclear Safety System** with 3-layer content filtering
-- ✅ **AI-powered photo matching** using Vision AI
-- ✅ **Gen Alpha loading animations** with cultural engagement
-### Technology Stack
-
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript (single-file architecture)
-- **Mapping:** Leaflet.js 1.9.4 with OpenStreetMap tiles
-- **APIs:** Nominatim, REST Countries, Unsplash, Pexels, OpenWeatherMap
-- **AI Integration:** Claude 3.5 Sonnet, GPT-4o-mini, Perplexity, Vision AI
-- **Serverless:** Netlify Functions for API proxying
-- **Data Storage:** Browser localStorage (client-side persistence)
-- **Development:** Node.js local dev server for testing
-- **Deployment:** Netlify (production-ready)aScript (single-file architecture)
-- **Mapping:** Leaflet.js 1.9.4 with OpenStreetMap tiles
-- **Data Storage:** Browser localStorage (client-side persistence)
-- **Development:** Python http.server for local testing
-- **Deployment:** GitHub Pages (planned)
+- **Status:** ~70% feature-complete; roads aligned, tiered building catalog wired, math quiz economy functional; awaiting sprite-layering polish.
+- **Core Tech:** HTML5 Canvas, vanilla JS modules (`grid.js`, `canvas.js`, `game.js`, `quiz.js`), Kenney City Builder assets.
+- **Recent Highlights:**
+	- Grid scaled to 128×64 isometric diamonds; screen/grid transforms audited.
+	- Roads rescaled and depth-sorted beneath buildings; offsets tuned to eliminate gaps.
+	- Base cash increased to $500,000 for rapid testing; economy tiers (1–5) and decoration catalog curated.
+	- Building manifest updated with roof-base composite mapping to enable layered rendering work.
+- **Where to go next:** Read `MATH_CITY_BUILDER_ACTUAL_STATUS.md` then `MATH_CITY_BUILDER_MASTER_PLAN.md`. Sonnet 4.5’s execution handoff lives in `math-city-builder/ROADMAP_LAYERED_BUILDINGS.md` (new planning doc referenced below).
 
 ---
 
-## Documentation Guide
+## Development Setup
 
-### For Teachers
+### Geography Detective Academy
 
-**Start here if you're an educator wanting to use the application:**
+- **Prerequisites:** Node 18+ (for Netlify functions), Python 3 (for quick static hosting), modern browser (Chromium/Safari/Firefox).
+- **Local server (static):**
+	```powershell
+	cd C:\Users\scoso\WEBSITES\Mrsomersmaps
+	python -m http.server 8000
+	```
+- **Local server (API-ready):**
+	```powershell
+	node local-dev-server.js
+	```
+- **URLs:**
+	- App root: `http://localhost:8000/index.html`
+	- Debug utilities: `debug-location-explorer.html`, `clear-cache.html`
+- **Environment:** Copy `.env.example` → `.env.local`, populate Supabase + API keys per `NETLIFY_FUNCTIONS_SETUP.md`.
 
-1. Read **[USER_INSTRUCTIONS.md](./USER_INSTRUCTIONS.md)** to learn how to use each game mode
-2. Read **[COORDINATE_FINDER_EXPLAINED.md](./COORDINATE_FINDER_EXPLAINED.md)** to understand the new feature in plain English
-3. Review **[REALISTIC_ASSESSMENT.md](./REALISTIC_ASSESSMENT.md)** to understand current capabilities
-4. Check **[GEN_ALPHA_CULTURE_RESEARCH.md](./GEN_ALPHA_CULTURE_RESEARCH.md)** to understand Fun Mode
+### Math City Builder
 
-**Teaching Tips:**
-- Fun Mode can be toggled per student preference
-- Coordinate Finder teaches geographic scale (hemisphere → continent → region)
-- Alaska Adventure works best for Alaska students but can be adapted
-- Create Heist mode lets students make challenges for classmates
-
-### For Developers
-
-**Start here if you're implementing new features or fixing bugs:**
-
-1. Read **[CODE_ARCHITECTURE.md](./CODE_ARCHITECTURE.md)** for complete code map with line numbers ⭐ NEW
-2. Review **[NETLIFY_FUNCTIONS_REFERENCE.md](./NETLIFY_FUNCTIONS_REFERENCE.md)** for API documentation ⭐ NEW
-3. Read **[CODE_REVIEW_SUMMARY.md](./CODE_REVIEW_SUMMARY.md)** for architecture overview
-4. Review **[COORDINATE_FINDER_SPEC.md](./COORDINATE_FINDER_SPEC.md)** for technical specification
-5. Read **[COORDINATE_FINDER_EXPLAINED.md](./COORDINATE_FINDER_EXPLAINED.md)** for user experience context
-6. Follow **[COORDINATE_FINDER_IMPLEMENTATION.md](./COORDINATE_FINDER_IMPLEMENTATION.md)** for step-by-step coding
-7. Check **[BUGS_DETAILED.md](./BUGS_DETAILED.md)** for known issues
-
-**Development Workflow:**
-1. Test locally using `python -m http.server 8000`
-2. Make changes to `index.html` (single-file architecture)
-3. Test in browser at `http://localhost:8000`
-4. Commit only when thoroughly tested
-5. Document changes in relevant .md files
-
-### For Students
-
-**Start here if you're using the application:**
-
-1. Read **[USER_INSTRUCTIONS.md](./USER_INSTRUCTIONS.md)** to learn the games
-2. Try **Free Explore** mode first to learn the interface
-3. Progress to **Mystery Challenge** or **Alaska Adventure**
-4. Toggle **Fun Mode** if you want gaming-style celebrations
-5. Use **Coordinate Finder** to learn about geographic coordinates
-
-**Learning Path:**
-- Beginner: Free Explore → Alaska Adventure (Round 1)
-- Intermediate: Mystery Challenge → Scavenger Hunt
-- Advanced: Guess the Location → Create Heist
+- **Prerequisites:** Same as above (vanilla stack).
+- **Run it:**
+	```powershell
+	cd C:\Users\scoso\WEBSITES\Mrsomersmaps
+	python -m http.server 8000
+	# open http://localhost:8000/math-city-builder/index.html
+	```
+- **Key entry files:**
+	- `math-city-builder/js/game.js` – state, economy, achievements.
+	- `math-city-builder/js/canvas.js` – rendering, depth sorting, grid conversions.
+	- `math-city-builder/js/buildings.js` – manifest of 50 buildings + decorations.
+	- `math-city-builder/js/quiz.js` & `mathTypes.js` – question bank + modal logic.
 
 ---
 
-## Key Features
+## Documentation Map
 
-### Progressive Reveal Coordinate Finder
+| If you need… | Go here |
+| --- | --- |
+| Workspace orientation | `00_START_HERE_FIRST.md` |
+| Persona-based jumps (teacher/dev/student/manager) | `DOCUMENTATION_INDEX.md` |
+| Geography Detective deep docs | `MASTER_DOCUMENTATION_INDEX.md` |
+| Math City Builder navigation | `WORKSPACE_MASTER_INDEX.md` → Math section |
+| Detailed math builder status | `MATH_CITY_BUILDER_ACTUAL_STATUS.md` |
+| Current action plan | `ACTION_PLAN.md` |
+| Bug triage history | `BUGS_DETAILED.md` & `CRITICAL_BUGS_FIXED.md` |
+| Supabase / SaaS notes | `SUPABASE_QUICK_REFERENCE.md`, `SAAS_TRANSFORMATION_ROADMAP.md` |
 
-**Status:** Planning Phase  
-**Documentation:** [COORDINATE_FINDER_SPEC.md](./COORDINATE_FINDER_SPEC.md)
-
-The Coordinate Finder teaches students how latitude and longitude work by making them "work for it." Instead of instantly showing a location, the system:
-
-1. **Stage 1 (20s):** Highlights which hemisphere the coordinates are in
-2. **Stage 2 (20s):** Zooms to show the continent
-3. **Stage 3 (20s):** Zooms to show the regional area
-4. **Stage 4:** Drops a pin at the exact location
-
-**Educational Value:** Students learn geographic scale and context before seeing the precise location.
-
-**Features:**
-- ✅ User can skip by clicking map
-- ✅ Only available in Free Explore mode (no cheating in games)
-- ✅ Fun Mode adds gaming aesthetics and cultural references
-- ✅ Academic Mode keeps it professional
-
-### Fun Mode System
-
-**Status:** Planning Phase  
-**Documentation:** [GEN_ALPHA_CULTURE_RESEARCH.md](./GEN_ALPHA_CULTURE_RESEARCH.md)
-
-Fun Mode is an optional layer that adds cultural engagement for middle school students:
-
-**When Fun Mode = OFF (Academic):**
-- Clean, professional interface
-- Simple success messages: "Location found!"
-- Standard blue/gray colors
-- Minimal animations
-
-**When Fun Mode = ON (Gaming):**
-- Neon colors (cyan, magenta, yellow)
-- Gaming-style messages: "W!", "Slay!", "Locked in!"
-- 4-5% chance of "six seven" meme references
-- Sound effects: "boom", "sheesh", "woosh"
-- Confetti and particle effects
-
-**Important:** Fun Mode is designed based on extensive cultural research to be authentic to Gen Alpha student culture without being cringe. See research document for full context.
-
-### Alaska Adventure 5-Round System
-
-**Status:** Complete and Functional  
-**Documentation:** [ALASKA_EXPANSION_COMPLETE.md](./ALASKA_EXPANSION_COMPLETE.md)
-
-A structured geography game with 50 locations across 5 rounds:
-
-- **Round 1:** Coastal Cities (Juneau, Sitka, Kodiak, etc.)
-- **Round 2:** Interior Alaska (Fairbanks, Denali, Tok, etc.)
-- **Round 3:** Northern Region (Barrow, Prudhoe Bay, Kotzebue, etc.)
-- **Round 4:** Western Alaska (Nome, Bethel, Dillingham, etc.)
-- **Round 5:** Grand Tour (Mixed locations from all regions)
-
-**Features:**
-- ✅ Geographical clues for each location
-- ✅ Distance calculation from home base
-- ✅ Achievement badges (Explorer, Navigator, Master)
-- ✅ Progress tracking across rounds
-- ✅ Celebration screens between rounds
+Every index and status doc was refreshed on October 29, 2025. If you spot drift, run the documentation checklist in `DOCUMENTATION_CROSS_REFERENCE_MAP.md` before editing.
 
 ---
 
-## Development Roadmap
+## Recent Highlights (October 2025)
 
-### Phase 1: Core Enhancements (Current)
-- 🚧 Implement Coordinate Finder with progressive reveal
-- 🚧 Add Fun Mode toggle system
-- 🚧 Test with student focus group
-
-### Phase 2: Polish and Testing (Next 2 Months)
-- ⏳ Cross-browser testing (Chrome, Firefox, Safari, Edge)
-- ⏳ Mobile device optimization
-- ⏳ Accessibility improvements
-- ⏳ Performance optimization
-
-### Phase 3: SaaS Platform (6-12 Months)
-- ⏳ Multi-user system (teacher dashboard)
-- ⏳ Student progress tracking
-- ⏳ Custom coordinate lists per class
-- ⏳ Subscription system
-- ⏳ Analytics and reporting
-
-### Phase 4: Advanced Features (12+ Months)
-- ⏳ Mobile app (iOS/Android)
-- ⏳ Offline mode
-- ⏳ Augmented reality features
-- ⏳ Multiplayer competitions
-- ⏳ Custom map themes
-
-See **[ACTION_PLAN.md](./ACTION_PLAN.md)** for detailed timeline.
+- **Geography Detective:**
+	- Timer, marker, and fetch controller cleanup complete; “ghost timers” and race conditions eliminated.
+	- Explore mode achievements wired into the new location fetch throttling logic.
+	- Supabase client consolidation; local save still supported for offline classrooms.
+- **Math City Builder:**
+	- Road sprites scaled to 128 px width and depth-sorted under structures; y-offset tuned.
+	- Building manifest normalized to reference roof/base composites; groundwork laid for layered roofs.
+	- Starting funds bumped to $500k for sandbox testing; UI updated to reflect large balances.
+- **Documentation:**
+	- Top-level indexes rewritten for clarity (this README, `DOCUMENTATION_INDEX.md`, `00_START_HERE_FIRST.md`).
+	- Executive and action summaries synchronized with current codebase metrics.
+	- New Sonnet 4.5 execution plan generated for building layering (see new roadmap file referenced below).
 
 ---
 
-## Contributing
+## What’s Next
 
-### For Teachers
-- Provide feedback on game modes
-- Suggest new locations for Alaska Adventure
-- Report bugs or usability issues
-- Share student success stories
-
-### For Developers
-- Follow implementation guides
-- Document all changes
-- Test thoroughly before committing
-- Maintain single-file architecture
-- Update relevant .md files
-
-### For Students
-- Report bugs you encounter
-- Suggest new features
-- Share what you learn
-- Be honest about what's fun vs. what's boring
+1. **Finalize layered building rendering in Math City Builder.** Plan documented in `math-city-builder/BUILDING_LAYER_EXECUTION_PLAN.md` (added in this update).
+2. **Harden Geography Detective input validations** (Create-a-Heist sanitization, storage quota checks) per `BUGS_DETAILED.md` open items.
+3. **Align README & indexes after every feature sprint.** When a feature lands, update the relevant persona path in `DOCUMENTATION_INDEX.md` and log the change in `DOCUMENTATION_UPDATE_SUMMARY.md`.
 
 ---
 
-## Support and Contact
+## Contribution Guidelines
 
-**Issues:** Check [BUGS_DETAILED.md](./BUGS_DETAILED.md) first  
-**Questions:** Review [USER_INSTRUCTIONS.md](./USER_INSTRUCTIONS.md)  
-**Feature Requests:** See [IMPROVEMENT_PLAN.md](./IMPROVEMENT_PLAN.md)  
-**Repository:** [github.com/TheAccidentalTeacher/maps](https://github.com/TheAccidentalTeacher/maps)
-
----
-
-## License
-
-This project is currently in development for educational use. Licensing terms will be determined before SaaS launch.
+- Follow the navigation flow in `00_START_HERE_FIRST.md` before editing either project.
+- Keep code comments focused and informative (avoid redundant narration).
+- Prefer updating existing docs instead of spawning duplicates; if you create new material, add it to `DOCUMENTATION_INDEX.md`.
+- Cache-bust documentation by updating the “Last Updated” field with ISO-ish timestamps (month and day) when you touch a file.
 
 ---
 
-## Acknowledgments
+## Support & Contact
 
-- **Students:** 15 middle schoolers in Alaska providing valuable feedback
-- **Leaflet.js:** Open-source mapping library
-- **OpenStreetMap:** Community-created map data
-- **Gen Alpha Research:** Cultural insights from education researchers and TikTok analytics
+- **Technical issues:** Review `BUGS_DETAILED.md` and `QUICK_FIXES.md` before escalating.
+- **Teacher onboarding:** See `USER_INSTRUCTIONS.md`, `DASHBOARD_QUICK_REFERENCE.md`.
+- **Deployments:** Start with `DEPLOYMENT_GUIDE.md` and `NETLIFY_DEPLOYMENT_CHECKLIST.md`.
+- **Repository:** [github.com/TheAccidentalTeacher/maps](https://github.com/TheAccidentalTeacher/maps)
 
 ---
 
-**Last Updated:** October 2025  
-**Maintained By:** TheAccidentalTeacher  
-**Version:** 2.0 (Planning Phase for Coordinate Finder)
+## License & Credits
+
+Educational use only for now; formal licensing will be defined prior to SaaS launch. Built by TheAccidentalTeacher with support from GitHub Copilot and Claude Sonnet for AI-assisted workflows. Asset packs courtesy of Kenney.nl (see `CITY_ASSETS_INVENTORY.md`).
+
+---
+
+If you improve functionality or docs, update this README’s highlights section and the master indexes. Keeping the documentation truthful is just as important as shipping the feature.

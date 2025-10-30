@@ -1,26 +1,130 @@
-# � START HERE FIRST - Quick Navigation for AI Assistants
+# 📍 START HERE FIRST - Quick Navigation for AI Assistants
 
-**For: GitHub Copilot, Claude, ChatGPT, or any AI coding assistant helping with this project**  
-**Version:** 2.0  
-**Last Updated:** October 2025
+**For:** GitHub Copilot, Claude, ChatGPT, or any AI coding assistant helping with this project  
+**Version:** 4.1  
+**Last Updated:** October 29, 2025, 9:10 PM (AKDT)
+
+---
+
+## 🚨 MANDATORY READING FOR AI ASSISTANTS
+
+**Before doing ANYTHING with Math City Builder, you MUST read these files IN ORDER:**
+
+1. **This file** (you're reading it now)
+2. 👉 **[00_START_HERE_MATH_CITY_BUILDER.md](./00_START_HERE_MATH_CITY_BUILDER.md)** ⭐ **REQUIRED!**
+3. 👉 **[MATH_CITY_BUILDER_ACTUAL_STATUS.md](./MATH_CITY_BUILDER_ACTUAL_STATUS.md)** (detailed status)
+4. 👉 **[MATH_CITY_BUILDER_QUICK_REFERENCE.md](./MATH_CITY_BUILDER_QUICK_REFERENCE.md)** (quick ref card)
+
+**DO NOT skip these or rely on old documentation. They contain critical information about what actually exists vs. what old docs claim.**
 
 ---
 
 ## 📍 YOU ARE HERE
 
-This is **Geographic Detective Academy** - an educational geography web app for middle school students.
+This workspace contains **TWO separate projects:**
 
-**Current State:**
-- ✅ Working app with 15 students in Alaska
-- ✅ 7 game modes functional
-- 🚧 New Coordinate Finder feature in planning phase
-- 📚 Comprehensive documentation (208+ KB)
+1. **Geography Detective Academy** (existing web app) - STABLE, 15 active students
+2. **Math City Builder** (2D Canvas game) - 70% COMPLETE ✅
+
+**⚠️ ALWAYS ASK which project the user is referring to before making changes!**
 
 ---
 
-## 🎯 WHAT DO YOU NEED?
+## 🎯 MASTER INDEXES (READ THESE NEXT)
 
-### **Quick Orientation (5 min)**
+### For Math City Builder (2D Canvas Game):
+👉 **[00_START_HERE_MATH_CITY_BUILDER.md](./00_START_HERE_MATH_CITY_BUILDER.md)** ⭐ **MUST READ FIRST!**
+- What actually exists (working game in `math-city-builder/` folder)
+- Built Oct 26, 2025, 9:37 PM
+- Status: ~70% complete after October canvas/render updates
+- **CRITICAL:** We never used GDevelop despite old docs saying we did!
+
+👉 **[MATH_CITY_BUILDER_ACTUAL_STATUS.md](./MATH_CITY_BUILDER_ACTUAL_STATUS.md)** (Detailed Technical Status)
+- Complete file structure
+- Working features with code examples  
+- Blocker analysis
+- Completion percentages
+
+👉 **[MATH_CITY_BUILDER_QUICK_REFERENCE.md](./MATH_CITY_BUILDER_QUICK_REFERENCE.md)** (One-Page Cheat Sheet)
+- Quick start commands
+- What works vs. what's broken
+- Common mistakes to avoid
+
+👉 **[WORKSPACE_MASTER_INDEX.md](./WORKSPACE_MASTER_INDEX.md)** (Full Navigation)
+- All Math City Builder documentation
+- Engine evaluation history
+- Asset inventory links
+
+### For Geography Detective Academy (Web App):
+👉 **[MASTER_DOCUMENTATION_INDEX.md](./MASTER_DOCUMENTATION_INDEX.md)** 📚 COMPLETE NAVIGATION
+- All Geography project documentation
+- Feature guides
+- Code architecture
+- Deployment info
+
+---
+
+## 🎯 QUICK DECISIONS
+
+---
+
+### **🎮 MATH CITY BUILDER (2D Canvas Game Project)**
+
+**🚨 STOP! Before reading below, go read these files:**
+1. 👉 **[00_START_HERE_MATH_CITY_BUILDER.md](./00_START_HERE_MATH_CITY_BUILDER.md)** ⭐ REQUIRED
+2. 👉 **[MATH_CITY_BUILDER_ACTUAL_STATUS.md](./MATH_CITY_BUILDER_ACTUAL_STATUS.md)** (Technical details)
+3. 👉 **[MATH_CITY_BUILDER_QUICK_REFERENCE.md](./MATH_CITY_BUILDER_QUICK_REFERENCE.md)** (Quick reference)
+
+**Quick Summary (Read full docs above for details!):**
+- ✅ Working 2D Canvas game built Oct 26, 2025, 9:37 PM
+- 📂 Location: `math-city-builder/` folder (NOT math-city-builder.html!)
+- 📊 Status: ~70% complete, layering polish + QA remaining
+- ⚠️ We NEVER used GDevelop (old docs are wrong!)
+- 🎯 8-12 hours to completion
+
+**Engine History (Full details in GAME_ENGINE_EVALUATION_SUMMARY.md):**
+- ❌ Three.js (20+ hours) - FAILED: Images wouldn't render
+- ❌ Construct 3 (4+ hours, $168) - FAILED: Can't import GLB models (addon deprecated)
+- ❌ GDevelop - Account created but NEVER ACTUALLY USED
+- ✅ Custom Canvas/JavaScript - Built Oct 26, 2025 (THIS IS WHAT WE'RE USING!)
+
+**Related Documentation (Read main docs above FIRST):**
+👉 **[WORKSPACE_MASTER_INDEX.md](./WORKSPACE_MASTER_INDEX.md)** - See "Math City Builder" section  
+👉 **[math-city-builder/BUILDING_LAYER_EXECUTION_PLAN.md](./math-city-builder/BUILDING_LAYER_EXECUTION_PLAN.md)** - Phase-by-phase instructions for Sonnet 4.5 (roofs & layers)
+
+**Construct 3 Documentation (Archived - May be useful for 2D games):**
+👉 **[CONSTRUCT3_ADVANCED_FEATURES.md](./CONSTRUCT3_ADVANCED_FEATURES.md)** - 1,968 lines of research
+- Z-elevation and 3D Camera features
+- Isometric techniques
+- ⚠️ WARNING: 3DObject addon is DEPRECATED (cannot import GLB)
+- ✅ USEFUL FOR: 2D games, primitive 3D shapes only
+
+👉 **[CONSTRUCT3_PROGRESS_TRACKER.md](./CONSTRUCT3_PROGRESS_TRACKER.md)** - Implementation log
+- Phases 1-3 completed (project setup, 3D test, visual polish)
+- Phase 4 BLOCKED (addon incompatibility)
+- STATUS: Refund requested ($168)
+
+👉 **[CONSTRUCT3_REFUND_REQUEST.md](./CONSTRUCT3_REFUND_REQUEST.md)** - Refund letter
+- Professional letter to Scirra Ltd
+- Documents dealbreaker issue
+- STATUS: Pending (October 25, 2025)
+
+**Universal Asset Documentation:**
+👉 **[CITY_ASSETS_INVENTORY.md](./CITY_ASSETS_INVENTORY.md)** - 200+ Kenney GLB models
+- Commercial buildings (70+)
+- Industrial buildings (40+)
+- Suburban buildings (42+)
+- Roads and infrastructure (50+)
+- ✅ VALID FOR: Any game engine that supports GLB
+
+**GDevelop Documentation (Historical Only):**
+👉 `GDEVELOP_PROGRESS_TRACKER.md` (account created, engine never adopted) – keep as archive
+
+---
+
+### **🌍 GEOGRAPHY DETECTIVE ACADEMY (Existing Web App)**
+
+**Quick Orientation (5 min)**
 👉 **[README.md](./README.md)** - Main documentation index
 - Project overview
 - Navigation to all docs
@@ -96,38 +200,56 @@ This is **Geographic Detective Academy** - an educational geography web app for 
 00_START_HERE_FIRST.md ← YOU ARE HERE
 README.md ← Main index
 
-📁 For Users:
-  - USER_INSTRUCTIONS.md
-  - COORDINATE_FINDER_EXPLAINED.md
+📁 MATH CITY BUILDER (3D Game Project):
+  ⭐ GAME_ENGINE_EVALUATION_SUMMARY.md ← MASTER REFERENCE
+  - CONSTRUCT3_ADVANCED_FEATURES.md (archived, 2D games only)
+  - CONSTRUCT3_PROGRESS_TRACKER.md (failed attempt log)
+  - CONSTRUCT3_REFUND_REQUEST.md (refund letter)
+  - CITY_ASSETS_INVENTORY.md (200+ Kenney GLB models)
+  - math-city-builder.html (Three.js failed attempt)
   
-📁 For Developers:
-  - COORDINATE_FINDER_IMPLEMENTATION.md
-  - COORDINATE_FINDER_SPEC.md
-  - CODE_REVIEW_SUMMARY.md
+📁 GEOGRAPHY DETECTIVE ACADEMY (Web App):
+  📁 For Users:
+    - USER_INSTRUCTIONS.md
+    - COORDINATE_FINDER_EXPLAINED.md
   
-📁 Feature Docs:
-  - ALASKA_EXPANSION_COMPLETE.md
-  - MYSTERY_CHALLENGE_OVERHAUL.md
-  - GEN_ALPHA_CULTURE_RESEARCH.md
+  📁 For Developers:
+    - COORDINATE_FINDER_IMPLEMENTATION.md
+    - COORDINATE_FINDER_SPEC.md
+    - CODE_REVIEW_SUMMARY.md
   
-📁 Project Management:
-  - REALISTIC_ASSESSMENT.md
-  - ACTION_PLAN.md
-  - IMPROVEMENT_PLAN.md
+  📁 Feature Docs:
+    - ALASKA_EXPANSION_COMPLETE.md
+    - MYSTERY_CHALLENGE_OVERHAUL.md
+    - GEN_ALPHA_CULTURE_RESEARCH.md
   
-📁 Maintenance:
-  - BUGS_DETAILED.md
-  - QUICK_FIXES.md
+  📁 Project Management:
+    - REALISTIC_ASSESSMENT.md
+    - ACTION_PLAN.md
+    - IMPROVEMENT_PLAN.md
   
-📁 Archive:
-  - 01_CODE_REVIEW_ARCHIVE.md
+  📁 Maintenance:
+    - BUGS_DETAILED.md
+    - QUICK_FIXES.md
+  
+  📁 Archive:
+    - 01_CODE_REVIEW_ARCHIVE.md
 ```
 
 ---
 
 ## ⚡ QUICK DECISIONS FOR AI ASSISTANTS
 
-**If user says...**
+**MATH CITY BUILDER Questions:**
+
+- **"What game engines did we try?"** → GAME_ENGINE_EVALUATION_SUMMARY.md
+- **"Why didn't Construct 3 work?"** → GAME_ENGINE_EVALUATION_SUMMARY.md
+- **"Can we use Construct 3 for anything?"** → Yes, 2D games; see CONSTRUCT3_ADVANCED_FEATURES.md
+- **"What are the Kenney assets?"** → CITY_ASSETS_INVENTORY.md
+- **"Should I try Three.js?"** → NO! Already failed 20+ hours; see GAME_ENGINE_EVALUATION_SUMMARY.md
+- **"What's next?"** → GDevelop testing (30-min verification)
+
+**GEOGRAPHY DETECTIVE Questions:**
 
 - **"How do I play this?"** → USER_INSTRUCTIONS.md
 - **"Explain the Coordinate Finder"** → COORDINATE_FINDER_EXPLAINED.md
@@ -143,7 +265,19 @@ README.md ← Main index
 
 ## 🧠 CONTEXT FOR AI ASSISTANTS
 
-**Important Details:**
+**Two Projects in This Workspace:**
+
+### Math City Builder (3D Game)
+- **Status:** Engine evaluation phase (GDevelop testing)
+- **Goal:** K-5 times tables educational game
+- **Tech:** TBD (testing GDevelop)
+- **Assets:** 200+ Kenney GLB 3D buildings
+- **Budget:** $168 at risk (Construct 3 refund pending)
+- **⚠️ DO NOT:** Recommend Three.js or Construct 3 for GLB import
+- **✅ DO:** Follow 30-minute verification protocol
+
+### Geography Detective Academy (Web App)
+- **Status:** Working with 15 students
 - Single-file architecture: ALL code in `index.html` (2,398 lines)
 - Tech stack: Vanilla JS, Leaflet.js, HTML5, CSS3
 - Storage: localStorage (client-side)

@@ -1,0 +1,500 @@
+/* MATH CITY BUILDER - MAKE IT PRETTY! 🎨 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* TOP UI BAR - THE MONEY DISPLAY 💵 */
+#ui-bar {
+    background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    border-bottom: 3px solid #f39c12;
+}
+
+.ui-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ui-label {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.ui-value {
+    background: rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #f39c12;
+    min-width: 80px;
+    text-align: center;
+    border: 2px solid rgba(243, 156, 18, 0.5);
+}
+
+#dollars {
+    color: #2ecc71;
+    font-size: 1.5rem;
+    border-color: rgba(46, 204, 113, 0.5);
+}
+
+/* BUTTONS - MAKE 'EM POP! */
+.action-btn {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+.secondary-btn {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.secondary-btn:hover {
+    background: #7f8c8d;
+}
+
+.danger-btn {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 5px;
+}
+
+.danger-btn:hover {
+    background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+}
+
+/* MAIN GAME CONTAINER */
+#game-container {
+    display: flex;
+    height: calc(100vh - 80px);
+}
+
+/* SIDEBAR - BUILDING SELECTION 🏗️ */
+#sidebar {
+    width: 320px;
+    background: rgba(255,255,255,0.95);
+    overflow-y: auto;
+    padding: 20px;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.2);
+}
+
+#sidebar h2 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    border-bottom: 3px solid #f39c12;
+    padding-bottom: 10px;
+}
+
+#sidebar h3 {
+    color: #34495e;
+    font-size: 1.1rem;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+/* Math Type Selector */
+.math-selector {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    border: 3px solid #5a67d8;
+}
+
+.math-selector label {
+    display: block;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+#math-type-select {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: 3px solid #ffd700;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+#math-type-select:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    border-color: #ffed4e;
+}
+
+#math-type-select:focus {
+    outline: none;
+    border-color: #ffa500;
+    box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.3);
+}
+
+/* Building Grid */
+.building-tier {
+    margin-bottom: 20px;
+}
+
+.building-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.building-card {
+    background: white;
+    border: 2px solid #bdc3c7;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.building-card:hover {
+    border-color: #3498db;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.building-card.selected {
+    border-color: #2ecc71;
+    background: #d5f4e6;
+    border-width: 3px;
+}
+
+.building-card.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #ecf0f1;
+}
+
+.building-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 5px;
+}
+
+.building-name {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 3px;
+}
+
+.building-cost {
+    font-size: 0.9rem;
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.building-cost.expensive {
+    color: #e67e22;
+}
+
+.controls {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* CANVAS CONTAINER - WHERE THE CITY LIVES! 🏙️ */
+#canvas-container {
+    flex: 1;
+    position: relative;
+    background: linear-gradient(135deg, #89CFF0 0%, #5DADE2 100%);
+}
+
+#game-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+}
+
+#canvas-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#canvas-controls button {
+    background: rgba(255,255,255,0.9);
+    border: 2px solid #3498db;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+#canvas-controls button:hover {
+    background: white;
+    transform: scale(1.05);
+}
+
+/* QUIZ MODAL - THE MATH CHALLENGE! 📝 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.quiz-problem {
+    background: #ecf0f1;
+    padding: 30px;
+    border-radius: 12px;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    border: 3px solid #3498db;
+}
+
+.quiz-input-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#quiz-answer {
+    flex: 1;
+    padding: 15px;
+    font-size: 1.2rem;
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    text-align: center;
+}
+
+#quiz-answer:focus {
+    outline: none;
+    border-color: #2ecc71;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+}
+
+.quiz-feedback {
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.quiz-feedback.hidden {
+    display: none;
+}
+
+.quiz-feedback.correct {
+    background: #d5f4e6;
+    color: #27ae60;
+    border: 2px solid #27ae60;
+}
+
+.quiz-feedback.wrong {
+    background: #fadbd8;
+    color: #e74c3c;
+    border: 2px solid #e74c3c;
+}
+
+.quiz-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px;
+    background: #ecf0f1;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.quiz-stats span {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* ACHIEVEMENT POPUP - CELEBRATE! 🎉 */
+#achievement-popup {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    z-index: 999;
+    animation: slideInRight 0.5s ease;
+}
+
+#achievement-popup.hidden {
+    display: none;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.achievement-content h2 {
+    margin-bottom: 10px;
+}
+
+/* MILESTONE CELEBRATION - BIG WINS! 🎊 */
+.modal-content.celebration {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+}
+
+.modal-content.celebration h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+#milestone-message {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+#milestone-reward {
+    background: rgba(255,255,255,0.2);
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* SCROLLBAR STYLING */
+#sidebar::-webkit-scrollbar {
+    width: 10px;
+}
+
+#sidebar::-webkit-scrollbar-track {
+    background: #ecf0f1;
+}
+
+#sidebar::-webkit-scrollbar-thumb {
+    background: #3498db;
+    border-radius: 5px;
+}
+
+#sidebar::-webkit-scrollbar-thumb:hover {
+    background: #2980b9;
+}
+
+/* RESPONSIVE DESIGN (mobile later) */
+@media (max-width: 768px) {
+    #game-container {
+        flex-direction: column;
+    }
+    
+    #sidebar {
+        width: 100%;
+        max-height: 300px;
+    }
+}

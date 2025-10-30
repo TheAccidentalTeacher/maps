@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math City Builder - Build Your Million Dollar City! 💵🏙️</title>
+    <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+    <!-- TOP UI BAR - THE MONEY COUNTER! -->
+    <div id="ui-bar">
+        <div class="ui-section">
+            <span class="ui-label">💵 Dollars:</span>
+            <span id="dollars" class="ui-value">100</span>
+        </div>
+        <div class="ui-section">
+            <span class="ui-label">⭐ XP:</span>
+            <span id="xp" class="ui-value">0</span>
+        </div>
+        <div class="ui-section">
+            <span class="ui-label">📊 Level:</span>
+            <span id="level" class="ui-value">1</span>
+        </div>
+        <div class="ui-section">
+            <span class="ui-label">🏙️ City Value:</span>
+            <span id="city-value" class="ui-value">$0</span>
+        </div>
+        <div class="ui-section">
+            <button id="earn-dollars-btn" class="action-btn">💰 Earn Dollars (Solve Math!)</button>
+        </div>
+    </div>
+
+    <!-- MAIN GAME CONTAINER -->
+    <div id="game-container">
+        
+        <!-- LEFT SIDEBAR - BUILDING SELECTION -->
+        <div id="sidebar">
+            <h2>🏗️ Buildings</h2>
+            
+            <!-- Math Type Selector -->
+            <div class="math-selector">
+                <label for="math-type-select">📚 Math Type:</label>
+                <select id="math-type-select">
+                    <optgroup label="⭐ Elementary">
+                        <option value="mult-1-12" selected>Multiplication 1-12 ($10)</option>
+                        <option value="addition-single">Single Digit Addition ($8)</option>
+                        <option value="subtraction-basic">Basic Subtraction ($8)</option>
+                    </optgroup>
+                    <optgroup label="⭐⭐ Middle School">
+                        <option value="addition-double">Double Digit Addition ($15)</option>
+                        <option value="division-basic">Basic Division ($12)</option>
+                    </optgroup>
+                    <optgroup label="⭐⭐⭐ Advanced Middle">
+                        <option value="mult-2x1">2×1 Multiplication ($25)</option>
+                        <option value="mult-2x2">2×2 Multiplication ($50)</option>
+                        <option value="fractions-basic">Basic Fractions ($40)</option>
+                    </optgroup>
+                    <optgroup label="⭐⭐⭐⭐⭐ High School">
+                        <option value="algebra-linear">Algebra: Linear Equations ($100)</option>
+                        <option value="geometry-area">Geometry: Area & Perimeter ($100)</option>
+                    </optgroup>
+                    <optgroup label="⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ BOSS MODE">
+                        <option value="geometry-proofs">Geometry: Two-Column Proofs ($500)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- Building Tiers -->
+            <div class="building-tier">
+                <h3>Tier 1: Starter ($10-$50)</h3>
+                <div id="tier1-buildings" class="building-grid">
+                    <!-- Buildings loaded by JS -->
+                </div>
+            </div>
+            
+            <div class="building-tier">
+                <h3>Tier 2: Growing ($75-$200)</h3>
+                <div id="tier2-buildings" class="building-grid">
+                    <!-- Buildings loaded by JS -->
+                </div>
+            </div>
+            
+            <div class="building-tier">
+                <h3>Tier 3: Established ($300-$1K)</h3>
+                <div id="tier3-buildings" class="building-grid">
+                    <!-- Buildings loaded by JS -->
+                </div>
+            </div>
+            
+            <div class="building-tier">
+                <h3>Tier 4: Major City ($1.5K-$5K)</h3>
+                <div id="tier4-buildings" class="building-grid">
+                    <!-- Buildings loaded by JS -->
+                </div>
+            </div>
+            
+            <div class="building-tier">
+                <h3>Tier 5: METROPOLIS! ($10K-$100K)</h3>
+                <div id="tier5-buildings" class="building-grid">
+                    <!-- Buildings loaded by JS -->
+                </div>
+            </div>
+
+            <div class="building-tier" style="border-top: 3px dashed #27ae60; margin-top: 15px; padding-top: 15px;">
+                <h3>🌳 Decorations: Roads & Parks 🛣️</h3>
+                <p style="font-size: 12px; color: #666; margin: 5px 0;">Roads are FREE! Trees $5, Parks $10-50</p>
+                <div id="decorations-buildings" class="building-grid">
+                    <!-- Decorations loaded by JS -->
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="demolish-btn" class="danger-btn">🔨 Demolish Mode (50% refund)</button>
+                <button id="save-btn" class="action-btn">💾 Save Game</button>
+                <button id="reset-btn" class="danger-btn">🔄 Reset Game</button>
+            </div>
+        </div>
+
+        <!-- CENTER - THE CANVAS WHERE DREAMS ARE BUILT -->
+        <div id="canvas-container">
+            <canvas id="game-canvas"></canvas>
+            
+            <!-- Canvas Controls Overlay -->
+            <div id="canvas-controls">
+                <button id="zoom-in-btn">🔍 +</button>
+                <button id="zoom-out-btn">🔍 -</button>
+                <button id="pan-reset-btn">🎯 Reset View</button>
+                <button id="toggle-labels-btn">🏷️ Labels: OFF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUIZ MODAL - WHERE THE MATH HAPPENS! -->
+    <div id="quiz-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>💰 Solve This Problem to Earn Dollars!</h2>
+            
+            <div id="quiz-problem" class="quiz-problem">
+                <!-- Problem text goes here -->
+            </div>
+            
+            <div class="quiz-input-section">
+                <input type="text" id="quiz-answer" placeholder="Your answer..." autofocus>
+                <button id="submit-answer-btn" class="action-btn">✅ Submit Answer</button>
+            </div>
+            
+            <div id="quiz-feedback" class="quiz-feedback hidden">
+                <!-- Feedback appears here -->
+            </div>
+            
+            <div class="quiz-stats">
+                <span>Streak: <span id="streak-count">0</span> 🔥</span>
+                <span>Correct: <span id="correct-count">0</span></span>
+                <span>Wrong: <span id="wrong-count">0</span></span>
+            </div>
+            
+            <button id="close-quiz-btn" class="secondary-btn">Close</button>
+        </div>
+    </div>
+
+    <!-- ACHIEVEMENT POPUP - CELEBRATE WINS! -->
+    <div id="achievement-popup" class="hidden">
+        <div class="achievement-content">
+            <h2>🎉 ACHIEVEMENT UNLOCKED! 🎉</h2>
+            <div id="achievement-text"></div>
+        </div>
+    </div>
+
+    <!-- MILESTONE CELEBRATION - BIG WINS! -->
+    <div id="milestone-modal" class="modal hidden">
+        <div class="modal-content celebration">
+            <h1 id="milestone-title">🎊 MILESTONE REACHED! 🎊</h1>
+            <div id="milestone-message"></div>
+            <div id="milestone-reward"></div>
+            <button id="close-milestone-btn" class="action-btn">AWESOME! 🚀</button>
+        </div>
+    </div>
+
+    <!-- RESET CONFIRMATION MODAL - DOUBLE CHECK! -->
+    <div id="reset-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>⚠️ RESET GAME? ⚠️</h2>
+            <p style="font-size: 1.1rem; margin: 20px 0; color: #e74c3c;">
+                This will DELETE your entire city, all buildings, dollars, and progress!
+            </p>
+            <p style="font-size: 1rem; margin-bottom: 30px; color: #7f8c8d;">
+                Are you ABSOLUTELY SURE you want to start over?
+            </p>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button id="confirm-reset-btn" class="danger-btn" style="font-size: 1.1rem; padding: 15px 30px;">
+                    YES, DELETE EVERYTHING! 💥
+                </button>
+                <button id="cancel-reset-btn" class="action-btn" style="font-size: 1.1rem; padding: 15px 30px;">
+                    NO, KEEP MY CITY! 🏙️
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load all the JavaScript magic -->
+    <script src="js/mathTypes.js?v=2"></script>
+    <script src="js/canvas.js?v=2"></script>
+    <script src="js/grid.js?v=2"></script>
+    <script src="js/buildings.js?v=2"></script>
+    <script src="js/quiz.js?v=2"></script>
+    <script src="js/game.js?v=2"></script>
+</body>
+</html>
