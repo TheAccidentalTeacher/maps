@@ -11,6 +11,7 @@ let isMouseOverCanvas = false;
 
 // Settings
 let showBuildingLabels = false; // Toggle building name labels
+let debugMode = false; // Toggle debug overlay with 'D' key
 
 // Image cache for building sprites
 const imageCache = {};
@@ -139,6 +140,11 @@ function renderCanvas() {
     
     // Restore context
     ctx.restore();
+    
+    // Draw debug overlay (if enabled) - AFTER restore so it's not affected by zoom/pan
+    if (debugMode) {
+        renderDebugOverlay();
+    }
 }
 
 // Render all placed buildings
@@ -571,5 +577,132 @@ function setupMouseTracking() {
         renderCanvas();
     });
 }
+
+// ============================================
+// DEBUG OVERLAY SYSTEM (Toggle with 'D' key)
+// ============================================
+
+function renderDebugOverlay() {
+    ctx.save();
+    
+    // Semi-transparent dark background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+    ctx.fillRect(10, 10, 400, 350);
+    
+    // Title
+    ctx.fillStyle = '#00ff00';
+    ctx.font = 'bold 16px monospace';
+    ctx.fillText('🐛 DEBUG MODE (Press D to toggle)', 20, 30);
+    
+    // Divider
+    ctx.strokeStyle = '#00ff00';
+    ctx.beginPath();
+    ctx.moveTo(20, 35);
+    ctx.lineTo(400, 35);
+    ctx.stroke();
+    
+    // Stats
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '13px monospace';
+    let y = 55;
+    const lineHeight = 20;
+    
+    // Canvas info
+    ctx.fillText(`Canvas: ${canvas.width}x${canvas.height}`, 20, y);
+    y += lineHeight;
+    ctx.fillText(`Camera: (${cameraX.toFixed(0)}, ${cameraY.toFixed(0)})`, 20, y);
+    y += lineHeight;
+    ctx.fillText(`Zoom: ${zoom.toFixed(2)}x`, 20, y);
+    y += lineHeight;
+    ctx.fillText(`Mouse Grid: (${mouseGridX}, ${mouseGridY})`, 20, y);
+    y += lineHeight;
+    
+    // Divider
+    y += 5;
+    ctx.strokeStyle = '#444';
+    ctx.beginPath();
+    ctx.moveTo(20, y);
+    ctx.lineTo(400, y);
+    ctx.stroke();
+    y += 15;
+    
+    // Sprite loading stats
+    const totalSprites = Object.keys(imageCache).length;
+    const loadedSprites = Object.values(imageCache).filter(img => img.complete && img.naturalHeight !== 0).length;
+    ctx.fillStyle = loadedSprites === totalSprites ? '#00ff00' : '#ffaa00';
+    ctx.fillText(`Sprites: ${loadedSprites}/${totalSprites} loaded`, 20, y);
+    y += lineHeight;
+    
+    // Building count
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(`Buildings placed: ${gameState.placedBuildings.length}`, 20, y);
+    y += lineHeight;
+    
+    // Selected building info
+    if (gameState.selectedBuilding) {
+        y += 5;
+        ctx.fillStyle = '#ffff00';
+        ctx.fillText('Selected Building:', 20, y);
+        y += lineHeight;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '12px monospace';
+        ctx.fillText(`  Name: ${gameState.selectedBuilding.name}`, 20, y);
+        y += lineHeight;
+        ctx.fillText(`  Tier: ${gameState.selectedBuilding.tier}`, 20, y);
+        y += lineHeight;
+        ctx.fillText(`  Sprite: ${gameState.selectedBuilding.sprite}`, 20, y);
+        y += lineHeight;
+        
+        // Check if sprite uses composite (base + roof)
+        const spriteNum = gameState.selectedBuilding.sprite.replace('buildingTiles_', '').replace('.png', '');
+        if (BUILDING_COMPOSITES && BUILDING_COMPOSITES[spriteNum]) {
+            ctx.fillStyle = '#00ffff';
+            ctx.fillText(`  ⚡ Composite: base_${BUILDING_COMPOSITES[spriteNum]}`, 20, y);
+            y += lineHeight;
+        }
+        
+        ctx.font = '13px monospace';
+    }
+    
+    // Hovered building info
+    const hoveredBuilding = gameState.placedBuildings.find(b => b.x === mouseGridX && b.y === mouseGridY);
+    if (hoveredBuilding) {
+        y += 5;
+        ctx.fillStyle = '#00ffff';
+        ctx.fillText('Hovered Building:', 20, y);
+        y += lineHeight;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '12px monospace';
+        ctx.fillText(`  Pos: (${hoveredBuilding.x}, ${hoveredBuilding.y})`, 20, y);
+        y += lineHeight;
+        ctx.fillText(`  Sprite: ${hoveredBuilding.sprite}`, 20, y);
+        y += lineHeight;
+        
+        const img = imageCache[hoveredBuilding.sprite];
+        if (img) {
+            const status = img.complete && img.naturalHeight !== 0 ? '✅ Loaded' : '⏳ Loading';
+            ctx.fillStyle = img.complete && img.naturalHeight !== 0 ? '#00ff00' : '#ffaa00';
+            ctx.fillText(`  ${status}`, 20, y);
+            y += lineHeight;
+            if (img.complete && img.naturalHeight !== 0) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(`  Size: ${img.naturalWidth}x${img.naturalHeight}`, 20, y);
+                y += lineHeight;
+            }
+        }
+        ctx.font = '13px monospace';
+    }
+    
+    ctx.restore();
+}
+
+// Keyboard shortcut for debug mode
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'd' || e.key === 'D') {
+        debugMode = !debugMode;
+        console.log(`🐛 Debug mode: ${debugMode ? 'ON' : 'OFF'}`);
+        renderCanvas();
+    }
+});
 
 console.log('🎨 Canvas system loaded! Ready to RENDER! 💎');

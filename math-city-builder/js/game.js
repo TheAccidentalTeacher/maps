@@ -367,7 +367,7 @@ function showResetConfirmation() {
 // RESET GAME - Nuclear option! 💥
 function resetGame() {
     // Reset ALL game state to defaults
-    gameState.dollars = 100;
+    gameState.dollars = 500000;  // 💰 MATCH THE INITIAL TEST AMOUNT!
     gameState.xp = 0;
     gameState.level = 1;
     gameState.cityValue = 0;
