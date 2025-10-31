@@ -381,18 +381,21 @@ function screenToGrid(screenX, screenY) {
     const adjustedX = (screenX - canvas.width / 2 - cameraX) / zoom;
     const adjustedY = (screenY - canvas.height / 2 - cameraY) / zoom;
     
-    // Standard isometric conversion - 128x64 diamond (64x32 steps)
-    const gridX = Math.floor((adjustedX / 64) + (adjustedY / 32));
-    const gridY = Math.floor((adjustedY / 32) - (adjustedX / 64));
+    // Standard isometric conversion - 128x64 diamond
+    // Each tile: width=128px, height=64px
+    // For 2:1 isometric: use TILE_WIDTH/2 and TILE_HEIGHT/2
+    const gridX = Math.round((adjustedX / (TILE_WIDTH/2)) + (adjustedY / (TILE_HEIGHT/2)));
+    const gridY = Math.round((adjustedY / (TILE_HEIGHT/2)) - (adjustedX / (TILE_WIDTH/2)));
     
     return { x: gridX, y: gridY };
 }
 
 // Convert grid coordinates to screen coordinates (isometric projection)
 function gridToScreen(gridX, gridY) {
-    // Standard isometric: 128x64 diamond (64 x 32 steps)
-    const screenX = (gridX - gridY) * 64;
-    const screenY = (gridX + gridY) * 32;
+    // Standard isometric: Each tile is TILE_WIDTH x TILE_HEIGHT diamond
+    // Use half-width and half-height for proper centering
+    const screenX = (gridX - gridY) * (TILE_WIDTH / 2);
+    const screenY = (gridX + gridY) * (TILE_HEIGHT / 2);
     
     return { x: screenX, y: screenY };
 }
