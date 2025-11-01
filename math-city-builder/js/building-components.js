@@ -1,6 +1,30 @@
 // BUILDING COMPONENTS SYSTEM 🏗️
 // Proper fucking categorization of 129 building sprites
 
+// TIER LOCATIONS - Maps sprite IDs to their tier folder locations
+// This is needed because the assets are spread across tier1-tier5 folders
+const SPRITE_TIER_MAP = {
+    // Parse number from ID and map to tier
+    // For simplicity, most floor/roof pieces are in multiple tiers, so we'll check tier2-5
+};
+
+// Helper function to get the correct path for any building sprite
+function getSpriteImagePath(spriteId) {
+    // Extract the number from buildingTiles_XXX
+    const match = spriteId.match(/buildingTiles_(\d+)/);
+    if (!match) return null;
+    
+    const num = parseInt(match[1]);
+    
+    // Tier mapping based on sprite number ranges
+    // This matches how the assets were actually organized
+    if (num <= 25) return `../assets/math-city-builder/buildings/tier1/${spriteId}.png`;
+    if (num <= 56) return `../assets/math-city-builder/buildings/tier2/${spriteId}.png`;
+    if (num <= 92) return `../assets/math-city-builder/buildings/tier3/${spriteId}.png`;
+    if (num <= 106) return `../assets/math-city-builder/buildings/tier4/${spriteId}.png`;
+    return `../assets/math-city-builder/buildings/tier5/${spriteId}.png`;
+}
+
 // ==========================================================================
 // COMPLETE BUILDINGS (20 sprites) - Already have roofs, just place them!
 // ==========================================================================
@@ -27,109 +51,103 @@ const COMPLETE_BUILDINGS = [
 ];
 
 // ==========================================================================
-// FLOOR PIECES (50 sprites) - Need roofs on top!
+// FLOOR PIECES (29 sprites) - USER CURATED! These are confirmed stackable! 🏗️
 // ==========================================================================
 const FLOOR_PIECES = {
-    // SINGLE-LAYER FLOORS (8 sprites)
-    single: [
-        { id: 'buildingTiles_005', material: 'beige', height: 1.0 },
-        { id: 'buildingTiles_006', material: 'beige', height: 1.0 },
-        { id: 'buildingTiles_013', material: 'beige', height: 1.0 },
-        { id: 'buildingTiles_019', material: 'beige', height: 1.0 },
-        { id: 'buildingTiles_020', material: 'green', height: 1.0 },
-        { id: 'buildingTiles_026', material: 'red_brick', height: 1.0 },
-        { id: 'buildingTiles_027', material: 'beige', height: 1.0 },
-        { id: 'buildingTiles_028', material: 'beige', height: 1.0 }
-    ],
-    
-    // 2-LAYER STACKS (35 sprites) - Pre-assembled 2-story sections
-    twoLayer: [
-        { id: 'buildingTiles_029', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_030', material: 'red_brick', height: 2.0 },
-        { id: 'buildingTiles_031', material: 'blue', height: 2.0 },
-        { id: 'buildingTiles_032', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_033', material: 'red_brick', height: 2.0 },
-        { id: 'buildingTiles_034', material: 'blue', height: 2.0 },
-        { id: 'buildingTiles_035', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_036', material: 'blue', height: 2.0 },
-        { id: 'buildingTiles_037', material: 'blue', height: 2.0 },
-        { id: 'buildingTiles_038', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_039', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_040', material: 'red_brick', height: 2.0 },
-        { id: 'buildingTiles_041', material: 'red_brick', height: 2.0 },
-        { id: 'buildingTiles_042', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_043', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_044', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_045', material: 'red_brick', height: 2.0 },
-        { id: 'buildingTiles_046', material: 'red_brick', height: 2.0 },
-        { id: 'buildingTiles_047', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_048', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_049', material: 'red_brick', height: 2.0 },
-        { id: 'buildingTiles_050', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_051', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_052', material: 'red_brick', height: 2.0 },
-        { id: 'buildingTiles_053', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_054', material: 'red_brick', height: 2.0 },
-        { id: 'buildingTiles_055', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_056', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_107', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_108', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_111', material: 'red_brick', height: 2.0 },
-        { id: 'buildingTiles_112', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_113', material: 'blue', height: 2.0 },
-        { id: 'buildingTiles_114', material: 'beige', height: 2.0 },
-        { id: 'buildingTiles_118', material: 'red_brick', height: 2.0 }
-    ],
-    
-    // 3-LAYER TOWERS (3 sprites) - Holy shit, instant 3-story buildings!
-    threeLayer: [
-        { id: 'buildingTiles_112', material: 'multi', height: 3.0, combo: 'green/tan/brown' }, // The legendary triple stack!
-        { id: 'buildingTiles_119', material: 'brown', height: 3.0 },
-        { id: 'buildingTiles_120', material: 'beige', height: 3.0 }
-    ],
-    
-    // L-SHAPED CORNERS (4 sprites) - For fancy corner buildings
-    corners: [
-        { id: 'buildingTiles_107', material: 'beige', height: 2.0, shape: 'L' },
-        { id: 'buildingTiles_118', material: 'red_brick', height: 2.0, shape: 'L' },
-        { id: 'buildingTiles_121', material: 'red_brick', height: 2.0, shape: 'L' },
-        { id: 'buildingTiles_123', material: 'red_brick', height: 2.0, shape: 'L' }
+    // All stackable floor pieces - different colors, window placements, etc.
+    all: [
+        { id: 'buildingTiles_000', material: 'beige', description: 'Beige with windows' },
+        { id: 'buildingTiles_002', material: 'blue', description: 'Blue with windows' },
+        { id: 'buildingTiles_007', material: 'beige', description: 'Beige variant' },
+        { id: 'buildingTiles_008', material: 'blue', description: 'Blue variant' },
+        { id: 'buildingTiles_015', material: 'beige', description: 'Beige multi-window' },
+        { id: 'buildingTiles_016', material: 'red_brick', description: 'Red brick' },
+        { id: 'buildingTiles_023', material: 'beige', description: 'Beige wide' },
+        { id: 'buildingTiles_024', material: 'blue', description: 'Blue wide' },
+        { id: 'buildingTiles_031', material: 'blue', description: 'Blue corner' },
+        { id: 'buildingTiles_032', material: 'beige', description: 'Beige corner' },
+        { id: 'buildingTiles_038', material: 'beige', description: 'Beige section' },
+        { id: 'buildingTiles_039', material: 'beige', description: 'Beige section alt' },
+        { id: 'buildingTiles_040', material: 'red_brick', description: 'Red brick section' },
+        { id: 'buildingTiles_043', material: 'beige', description: 'Beige multi-section' },
+        { id: 'buildingTiles_044', material: 'beige', description: 'Beige large' },
+        { id: 'buildingTiles_045', material: 'red_brick', description: 'Red brick large' },
+        { id: 'buildingTiles_047', material: 'beige', description: 'Beige tower section' },
+        { id: 'buildingTiles_048', material: 'beige', description: 'Beige tower alt' },
+        { id: 'buildingTiles_049', material: 'red_brick', description: 'Red brick tower' },
+        { id: 'buildingTiles_050', material: 'beige', description: 'Beige apartment section' },
+        { id: 'buildingTiles_051', material: 'beige', description: 'Beige apartment alt' },
+        { id: 'buildingTiles_052', material: 'red_brick', description: 'Red brick apartment' },
+        { id: 'buildingTiles_053', material: 'beige', description: 'Beige office section' },
+        { id: 'buildingTiles_054', material: 'red_brick', description: 'Red brick office' },
+        { id: 'buildingTiles_055', material: 'beige', description: 'Beige commercial' },
+        { id: 'buildingTiles_056', material: 'beige', description: 'Beige commercial alt' },
+        { id: 'buildingTiles_067', material: 'terracotta', description: 'Terracotta roof section' },
+        { id: 'buildingTiles_069', material: 'red', description: 'Red angled section' },
+        { id: 'buildingTiles_091', material: 'pink', description: 'Pink variant' }
     ]
 };
 
 // ==========================================================================
-// ROOF PIECES (59 sprites) - Put these fuckers on top!
+// ROOF PIECES (54 sprites) - USER CURATED! Top off your buildings! 🎩
 // ==========================================================================
 const ROOF_PIECES = {
-    // BEIGE FLAT ROOFS (28 sprites) - Most common
-    beigeFlat: [
-        'buildingTiles_057', 'buildingTiles_058', 'buildingTiles_059', 'buildingTiles_060',
-        'buildingTiles_061', 'buildingTiles_063', 'buildingTiles_064', 'buildingTiles_067',
-        'buildingTiles_068', 'buildingTiles_072', 'buildingTiles_073', 'buildingTiles_078',
-        'buildingTiles_083', 'buildingTiles_084', 'buildingTiles_085', 'buildingTiles_093',
-        'buildingTiles_094', 'buildingTiles_100', 'buildingTiles_101', 'buildingTiles_103',
-        'buildingTiles_104', 'buildingTiles_105', 'buildingTiles_106', 'buildingTiles_109',
-        'buildingTiles_110', 'buildingTiles_115', 'buildingTiles_116', 'buildingTiles_117'
-    ],
-    
-    // ORANGE TERRACOTTA ROOFS (12 sprites) - Mediterranean style!
-    terracotta: [
-        'buildingTiles_062', 'buildingTiles_065', 'buildingTiles_066', 'buildingTiles_070',
-        'buildingTiles_071', 'buildingTiles_076', 'buildingTiles_077', 'buildingTiles_082',
-        'buildingTiles_099'
-    ],
-    
-    // RED/PINK ANGLED ROOFS (11 sprites) - Traditional houses
-    redAngled: [
-        'buildingTiles_069', 'buildingTiles_074', 'buildingTiles_075', 'buildingTiles_080',
-        'buildingTiles_081', 'buildingTiles_088', 'buildingTiles_089', 'buildingTiles_090',
-        'buildingTiles_091', 'buildingTiles_097', 'buildingTiles_098', 'buildingTiles_102'
-    ],
-    
-    // GREY FLAT ROOFS (8 sprites) - Modern/industrial
-    greyFlat: [
-        'buildingTiles_079', 'buildingTiles_086', 'buildingTiles_087', 'buildingTiles_095',
-        'buildingTiles_096'
+    // All roof pieces - your hand-picked selection!
+    all: [
+        { id: 'buildingTiles_005', style: 'flat', color: 'beige', description: 'Beige flat roof' },
+        { id: 'buildingTiles_006', style: 'flat', color: 'beige', description: 'Beige flat variant' },
+        { id: 'buildingTiles_013', style: 'flat', color: 'beige', description: 'Beige flat large' },
+        { id: 'buildingTiles_057', style: 'flat', color: 'beige', description: 'Beige flat section' },
+        { id: 'buildingTiles_058', style: 'flat', color: 'beige', description: 'Beige flat section 2' },
+        { id: 'buildingTiles_059', style: 'flat', color: 'beige', description: 'Beige flat section 3' },
+        { id: 'buildingTiles_060', style: 'flat', color: 'beige', description: 'Beige flat section 4' },
+        { id: 'buildingTiles_061', style: 'flat', color: 'beige', description: 'Beige flat section 5' },
+        { id: 'buildingTiles_062', style: 'terracotta', color: 'orange', description: 'Orange terracotta' },
+        { id: 'buildingTiles_063', style: 'flat', color: 'beige', description: 'Beige flat 6' },
+        { id: 'buildingTiles_064', style: 'flat', color: 'beige', description: 'Beige flat 7' },
+        { id: 'buildingTiles_065', style: 'terracotta', color: 'orange', description: 'Orange terracotta 2' },
+        { id: 'buildingTiles_066', style: 'terracotta', color: 'orange', description: 'Orange terracotta 3' },
+        { id: 'buildingTiles_067', style: 'flat', color: 'beige', description: 'Beige flat 8' },
+        { id: 'buildingTiles_068', style: 'flat', color: 'beige', description: 'Beige flat 9' },
+        { id: 'buildingTiles_069', style: 'angled', color: 'red', description: 'Red angled roof' },
+        { id: 'buildingTiles_070', style: 'terracotta', color: 'orange', description: 'Orange terracotta 4' },
+        { id: 'buildingTiles_071', style: 'terracotta', color: 'orange', description: 'Orange terracotta 5' },
+        { id: 'buildingTiles_072', style: 'flat', color: 'beige', description: 'Beige flat 10' },
+        { id: 'buildingTiles_073', style: 'flat', color: 'beige', description: 'Beige flat 11' },
+        { id: 'buildingTiles_074', style: 'angled', color: 'red', description: 'Red angled 2' },
+        { id: 'buildingTiles_075', style: 'angled', color: 'red', description: 'Red angled 3' },
+        { id: 'buildingTiles_076', style: 'terracotta', color: 'orange', description: 'Orange terracotta 6' },
+        { id: 'buildingTiles_077', style: 'terracotta', color: 'orange', description: 'Orange terracotta 7' },
+        { id: 'buildingTiles_079', style: 'flat', color: 'grey', description: 'Grey flat modern' },
+        { id: 'buildingTiles_080', style: 'angled', color: 'red', description: 'Red angled 4' },
+        { id: 'buildingTiles_081', style: 'angled', color: 'red', description: 'Red angled 5' },
+        { id: 'buildingTiles_082', style: 'terracotta', color: 'orange', description: 'Orange terracotta 8' },
+        { id: 'buildingTiles_083', style: 'flat', color: 'beige', description: 'Beige flat 12' },
+        { id: 'buildingTiles_084', style: 'flat', color: 'beige', description: 'Beige flat 13' },
+        { id: 'buildingTiles_086', style: 'flat', color: 'grey', description: 'Grey flat 2' },
+        { id: 'buildingTiles_087', style: 'flat', color: 'grey', description: 'Grey flat 3' },
+        { id: 'buildingTiles_088', style: 'angled', color: 'red', description: 'Red angled 6' },
+        { id: 'buildingTiles_089', style: 'angled', color: 'red', description: 'Red angled 7' },
+        { id: 'buildingTiles_090', style: 'angled', color: 'red', description: 'Red angled 8' },
+        { id: 'buildingTiles_091', style: 'angled', color: 'pink', description: 'Pink angled' },
+        { id: 'buildingTiles_094', style: 'flat', color: 'beige', description: 'Beige flat 14' },
+        { id: 'buildingTiles_095', style: 'flat', color: 'grey', description: 'Grey flat 4' },
+        { id: 'buildingTiles_096', style: 'flat', color: 'grey', description: 'Grey flat 5' },
+        { id: 'buildingTiles_097', style: 'angled', color: 'red', description: 'Red angled 9' },
+        { id: 'buildingTiles_098', style: 'angled', color: 'red', description: 'Red angled 10' },
+        { id: 'buildingTiles_103', style: 'flat', color: 'beige', description: 'Beige flat 15' },
+        { id: 'buildingTiles_104', style: 'flat', color: 'beige', description: 'Beige flat 16' },
+        { id: 'buildingTiles_105', style: 'flat', color: 'beige', description: 'Beige flat 17' },
+        { id: 'buildingTiles_110', style: 'flat', color: 'beige', description: 'Beige flat 18' },
+        { id: 'buildingTiles_111', style: 'flat', color: 'beige', description: 'Beige flat 19' },
+        { id: 'buildingTiles_112', style: 'flat', color: 'beige', description: 'Beige flat 20' },
+        { id: 'buildingTiles_118', style: 'flat', color: 'beige', description: 'Beige flat corner' },
+        { id: 'buildingTiles_119', style: 'flat', color: 'brown', description: 'Brown flat' },
+        { id: 'buildingTiles_120', style: 'flat', color: 'beige', description: 'Beige flat tower' },
+        { id: 'buildingTiles_121', style: 'flat', color: 'beige', description: 'Beige flat corner 2' },
+        { id: 'buildingTiles_126', style: 'flat', color: 'beige', description: 'Beige flat special' },
+        { id: 'buildingTiles_127', style: 'flat', color: 'beige', description: 'Beige flat special 2' },
+        { id: 'buildingTiles_128', style: 'flat', color: 'beige', description: 'Beige flat special 3' }
     ]
 };
 
@@ -145,73 +163,41 @@ function getRandomCompleteBuilding() {
 }
 
 /**
- * Build a custom building by stacking floors + roof
- * @param {number} stories - How many stories (1-5)
- * @param {string} material - 'beige', 'red_brick', 'blue', etc.
- * @param {string} roofStyle - 'flat', 'terracotta', 'angled'
+ * Check if a sprite is a floor piece
  */
-function buildCustomBuilding(stories, material = 'beige', roofStyle = 'flat') {
-    const components = [];
-    
-    // Build floors based on height
-    if (stories === 1) {
-        // Use single floor
-        const floor = FLOOR_PIECES.single.find(f => f.material === material) || FLOOR_PIECES.single[0];
-        components.push(floor);
-    } else if (stories === 2) {
-        // Use 2-layer stack
-        const floor = FLOOR_PIECES.twoLayer.find(f => f.material === material) || FLOOR_PIECES.twoLayer[0];
-        components.push(floor);
-    } else if (stories === 3) {
-        // Try 3-layer tower first, or stack 2+1
-        const tower = FLOOR_PIECES.threeLayer.find(f => f.material === material);
-        if (tower) {
-            components.push(tower);
-        } else {
-            const floor2 = FLOOR_PIECES.twoLayer.find(f => f.material === material) || FLOOR_PIECES.twoLayer[0];
-            const floor1 = FLOOR_PIECES.single.find(f => f.material === material) || FLOOR_PIECES.single[0];
-            components.push(floor2, floor1);
-        }
-    } else if (stories === 4) {
-        // Stack two 2-layer pieces
-        const floor = FLOOR_PIECES.twoLayer.find(f => f.material === material) || FLOOR_PIECES.twoLayer[0];
-        components.push(floor, floor);
-    } else if (stories >= 5) {
-        // Stack 3-layer + 2-layer
-        const tower = FLOOR_PIECES.threeLayer[0];
-        const floor = FLOOR_PIECES.twoLayer.find(f => f.material === material) || FLOOR_PIECES.twoLayer[0];
-        components.push(tower, floor);
-    }
-    
-    // Add roof based on style
-    let roofId;
-    if (roofStyle === 'terracotta') {
-        roofId = ROOF_PIECES.terracotta[0];
-    } else if (roofStyle === 'angled') {
-        roofId = ROOF_PIECES.redAngled[0];
-    } else if (roofStyle === 'grey') {
-        roofId = ROOF_PIECES.greyFlat[0];
-    } else {
-        roofId = ROOF_PIECES.beigeFlat[0];
-    }
-    
-    components.push({ id: roofId, type: 'roof' });
-    
-    return components;
+function isFloorPiece(spriteId) {
+    return FLOOR_PIECES.all.some(f => f.id === spriteId);
 }
 
 /**
- * Get all available materials
+ * Check if a sprite is a roof piece
+ */
+function isRoofPiece(spriteId) {
+    return ROOF_PIECES.all.some(r => r.id === spriteId);
+}
+
+/**
+ * Get all available materials from floor pieces
  */
 function getAvailableMaterials() {
-    return ['beige', 'red_brick', 'blue', 'green', 'orange', 'grey', 'brown', 'multi'];
+    const materials = [...new Set(FLOOR_PIECES.all.map(f => f.material))];
+    return materials;
 }
 
 /**
  * Get all available roof styles
  */
 function getAvailableRoofStyles() {
-    return ['flat', 'terracotta', 'angled', 'grey'];
+    const styles = [...new Set(ROOF_PIECES.all.map(r => r.style))];
+    return styles;
+}
+
+/**
+ * Get all available roof colors
+ */
+function getAvailableRoofColors() {
+    const colors = [...new Set(ROOF_PIECES.all.map(r => r.color))];
+    return colors;
 }
 
 /**

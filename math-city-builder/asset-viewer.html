@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math City Builder - Asset Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .controls label {
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .controls select {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 2px solid #667eea;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .stats {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .asset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .asset-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .asset-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .asset-image-container {
+            width: 100%;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .asset-image {
+            max-width: 100%;
+            max-height: 100%;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+
+        .asset-info {
+            text-align: center;
+        }
+
+        .asset-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+
+        .asset-id {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .asset-size {
+            color: #666;
+            font-size: 10px;
+        }
+
+        .error-indicator {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .loading-indicator {
+            color: #f39c12;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .back-link {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .tier-section {
+            margin-bottom: 40px;
+        }
+
+        .tier-header {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 15px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Game</a>
+        
+        <h1>🏙️ Math City Builder - Asset Viewer</h1>
+        <p class="subtitle">All Kenney Isometric Building Sprites</p>
+
+        <div class="controls">
+            <label for="viewMode">View Mode:</label>
+            <select id="viewMode" onchange="updateView()">
+                <option value="all">All Assets (129 sprites)</option>
+                <option value="tier1">Tier 1 Buildings</option>
+                <option value="tier2">Tier 2 Buildings</option>
+                <option value="tier3">Tier 3 Buildings</option>
+                <option value="tier4">Tier 4 Buildings</option>
+                <option value="tier5">Tier 5 Buildings</option>
+                <option value="errors">Show Errors Only</option>
+            </select>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalAssets">129</div>
+                <div class="stat-label">Total Assets</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="loadedAssets">0</div>
+                <div class="stat-label">Loaded</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="errorAssets">0</div>
+                <div class="stat-label">Errors</div>
+            </div>
+        </div>
+
+        <div id="assetContainer"></div>
+    </div>
+
+    <script>
+        const assetContainer = document.getElementById('assetContainer');
+        const totalCount = 129; // buildingTiles_000.png through buildingTiles_128.png
+        let loadedCount = 0;
+        let errorCount = 0;
+        const assetData = [];
+
+        // Generate all asset cards
+        function generateAssets() {
+            for (let i = 0; i <= 128; i++) {
+                const assetId = String(i).padStart(3, '0');
+                const filename = `buildingTiles_${assetId}.png`;
+                
+                // Determine which tier this belongs to based on buildings.js logic
+                let tier = 1;
+                if (i >= 26 && i <= 50) tier = 2;
+                else if (i >= 51 && i <= 77) tier = 3;
+                else if (i >= 78 && i <= 107) tier = 4;
+                else if (i >= 108) tier = 5;
+
+                assetData.push({
+                    id: assetId,
+                    filename: filename,
+                    tier: tier,
+                    path: `../assets/math-city-builder/buildings/tier${tier}/${filename}`,
+                    loaded: false,
+                    error: false,
+                    size: 0
+                });
+            }
+        }
+
+        function createAssetCard(asset) {
+            const card = document.createElement('div');
+            card.className = 'asset-card';
+            card.dataset.tier = asset.tier;
+            card.dataset.assetId = asset.id;
+            
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'asset-image-container';
+            
+            const img = document.createElement('img');
+            img.className = 'asset-image';
+            img.src = asset.path;
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'loading-indicator';
+            statusDiv.textContent = 'Loading...';
+            imageContainer.appendChild(statusDiv);
+            
+            img.onload = function() {
+                if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(img);
+                    asset.loaded = true;
+                    loadedCount++;
+                    updateStats();
+                } else {
+                    statusDiv.className = 'error-indicator';
+                    statusDiv.textContent = '❌ Empty Image';
+                    asset.error = true;
+                    errorCount++;
+                    updateStats();
+                }
+            };
+            
+            img.onerror = function() {
+                statusDiv.className = 'error-indicator';
+                statusDiv.textContent = '❌ Failed to Load';
+                asset.error = true;
+                errorCount++;
+                updateStats();
+            };
+            
+            const info = document.createElement('div');
+            info.className = 'asset-info';
+            info.innerHTML = `
+                <div class="asset-id">buildingTiles_${asset.id}</div>
+                <div class="asset-name">${asset.filename}</div>
+                <div class="asset-size">Tier ${asset.tier} | ID: ${parseInt(asset.id)}</div>
+            `;
+            
+            card.appendChild(imageContainer);
+            card.appendChild(info);
+            
+            return card;
+        }
+
+        function updateStats() {
+            document.getElementById('loadedAssets').textContent = loadedCount;
+            document.getElementById('errorAssets').textContent = errorCount;
+        }
+
+        function updateView() {
+            const mode = document.getElementById('viewMode').value;
+            const cards = document.querySelectorAll('.asset-card');
+            
+            cards.forEach(card => {
+                const tier = parseInt(card.dataset.tier);
+                const assetId = card.dataset.assetId;
+                const asset = assetData.find(a => a.id === assetId);
+                
+                if (mode === 'all') {
+                    card.style.display = 'block';
+                } else if (mode === 'errors') {
+                    card.style.display = asset.error ? 'block' : 'none';
+                } else if (mode.startsWith('tier')) {
+                    const tierNum = parseInt(mode.replace('tier', ''));
+                    card.style.display = tier === tierNum ? 'block' : 'none';
+                }
+            });
+        }
+
+        function renderAssets() {
+            assetContainer.innerHTML = '';
+            
+            const tierSections = {
+                1: { buildings: [], header: 'Tier 1: Small Houses & Shops' },
+                2: { buildings: [], header: 'Tier 2: Medium Buildings' },
+                3: { buildings: [], header: 'Tier 3: Larger Buildings' },
+                4: { buildings: [], header: 'Tier 4: Major Buildings' },
+                5: { buildings: [], header: 'Tier 5: Skyscrapers & Ultimate Tower' }
+            };
+            
+            assetData.forEach(asset => {
+                tierSections[asset.tier].buildings.push(asset);
+            });
+            
+            for (let tier = 1; tier <= 5; tier++) {
+                const section = document.createElement('div');
+                section.className = 'tier-section';
+                
+                const header = document.createElement('div');
+                header.className = 'tier-header';
+                header.textContent = tierSections[tier].header;
+                section.appendChild(header);
+                
+                const grid = document.createElement('div');
+                grid.className = 'asset-grid';
+                
+                tierSections[tier].buildings.forEach(asset => {
+                    grid.appendChild(createAssetCard(asset));
+                });
+                
+                section.appendChild(grid);
+                assetContainer.appendChild(section);
+            }
+        }
+
+        // Initialize
+        generateAssets();
+        renderAssets();
+    </script>
+</body>
+</html>

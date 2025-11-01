@@ -51,29 +51,22 @@ function loadBuildingImage(building) {
     return imageCache[key];
 }
 
-// Check if a sprite needs a base building (it's just a roof)
-function needsBaseBuilding(spriteFilename) {
-    const spriteNum = spriteFilename.replace('buildingTiles_', '').replace('.png', '');
-    return BUILDING_COMPOSITES && BUILDING_COMPOSITES[spriteNum];
-}
-
-// Load base building sprite for compositing
-function loadBaseSprite(spriteFilename, tier) {
-    const spriteNum = spriteFilename.replace('buildingTiles_', '').replace('.png', '');
-    const baseNum = BUILDING_COMPOSITES[spriteNum];
-    
-    if (!baseNum) return null;
-    
-    const baseSprite = `buildingTiles_${baseNum}.png`;
-    const key = `base_${baseSprite}`;
+// Load a specific building sprite by tier and filename (for composite rendering)
+function loadBuildingImageDirect(tier, spriteFilename) {
+    const key = `tier${tier}_${spriteFilename}`;
     
     if (!imageCache[key]) {
         const img = new Image();
-        img.src = `${ASSET_PATH}tier${tier}/${baseSprite}`;
+        img.src = `../assets/math-city-builder/buildings/tier${tier}/${spriteFilename}`;
         imageCache[key] = img;
         
-        img.onload = () => renderCanvas();
-        img.onerror = () => console.error(`❌ Failed to load base: ${img.src}`);
+        img.onload = () => {
+            renderCanvas();
+        };
+        
+        img.onerror = () => {
+            console.error(`❌ Failed to load base sprite: ${img.src}`);
+        };
     }
     
     return imageCache[key];
@@ -126,11 +119,9 @@ function renderCanvas() {
     ctx.translate(canvas.width / 2 + cameraX, canvas.height / 2 + cameraY);
     ctx.scale(zoom, zoom);
     
-    // Draw the grid
-    renderGrid();
-    
-    // Draw all placed buildings
-    renderBuildings();
+    // Render everything
+    renderGrid();      // Grid lines
+    renderBuildings(); // Buildings
     
     // Draw ghost preview if hovering
     renderGhostPreview();
@@ -167,7 +158,39 @@ function renderBuildings() {
     sortedBuildings.forEach(building => {
         const screenPos = gridToScreen(building.x, building.y);
         
-        // Load the building sprite
+        // NOTE: Composite rendering (base + roof) is prepared but disabled
+        // because we don't have separate base/roof sprites yet
+        // const spriteNum = building.sprite.replace('buildingTiles_', '').replace('.png', '');
+        // const needsBase = BUILDING_COMPOSITES && BUILDING_COMPOSITES[spriteNum];
+        
+        // ============================================================
+        // VERTICAL ALIGNMENT SYSTEM - CRITICAL FOR ISOMETRIC RENDERING
+        // ============================================================
+        // Buildings (tier 1+) need to "float" above the brown base tile
+        // to appear like they're sitting ON TOP of the base platform.
+        // The brown base is ~25px thick, so we lift buildings by -25px.
+        //
+        // Roads/decorations (tier 0) sit closer to ground but still need
+        // vertical adjustment to align with the isometric grid properly.
+        //
+        // IMPORTANT: Negative yOffset = MOVE UP, Positive = MOVE DOWN
+        // These values were calibrated pixel-by-pixel to match grid alignment.
+        // ============================================================
+        
+        let yOffset = -25; // Buildings float 25px above base
+        
+        if (building.tier === 0) {
+            // TIER 0: Roads, trees, decorations
+            // Default: Lift by 18 pixels (was trial-and-errored from 6 -> -9 -> -14 -> -16 -> -18)
+            yOffset = -18; 
+            
+            // Pine trees need extra lift (5 more pixels than default)
+            if (building.sprite === 'coniferTall.png' || building.sprite === 'coniferShort.png') {
+                yOffset = -23; // -18 - 5 = -23
+            }
+        }
+        
+        // SINGLE SPRITE RENDERING (BASE BUILDING)
         const img = loadBuildingImage(building);
         
         // Check if image is loaded
@@ -183,14 +206,6 @@ function renderBuildings() {
                 spriteHeight = img.naturalHeight * scale;
             }
             
-            // Vertical alignment: roads need to sit lower, buildings stay centered
-            let yOffset = 0;
-            if (building.tier === 0) {
-                // Roads/decorations - move down to align with building sidewalk
-                yOffset = 6;
-            }
-            // Buildings stay at natural center (yOffset = 0) to prevent jutting
-            
             ctx.drawImage(
                 img,
                 screenPos.x - spriteWidth / 2,
@@ -198,6 +213,87 @@ function renderBuildings() {
                 spriteWidth,
                 spriteHeight
             );
+            
+            // ============================================================
+            // RENDER STACKED FLOORS (if any)
+            // ============================================================
+            if (building.floors && building.floors.length > 0) {
+                // Each floor adds height - stack vertically with offset
+                // First floor needs to float ~48px above base (3/4 of 64px floor height)
+                // Then each additional floor stacks 32px higher
+                const FIRST_FLOOR_OFFSET = 48; // Initial lift above base building
+                const FLOOR_HEIGHT_OFFSET = 32; // Stack spacing for additional floors
+                
+                building.floors.forEach((floorId, index) => {
+                    const floorSpritePath = getSpriteImagePath(floorId);
+                    
+                    // Use image cache
+                    let floorImg;
+                    if (!imageCache[floorId]) {
+                        floorImg = new Image();
+                        floorImg.src = floorSpritePath;
+                        imageCache[floorId] = floorImg;
+                        floorImg.onload = () => renderCanvas();
+                    } else {
+                        floorImg = imageCache[floorId];
+                    }
+                    
+                    if (floorImg.complete && floorImg.naturalHeight !== 0) {
+                        // First floor lifts higher, then each subsequent floor adds normal offset
+                        const floorYOffset = yOffset - FIRST_FLOOR_OFFSET - (index * FLOOR_HEIGHT_OFFSET);
+                        
+                        ctx.drawImage(
+                            floorImg,
+                            screenPos.x - floorImg.naturalWidth / 2,
+                            screenPos.y - floorImg.naturalHeight / 2 + floorYOffset,
+                            floorImg.naturalWidth,
+                            floorImg.naturalHeight
+                        );
+                    }
+                });
+            }
+            
+            // ============================================================
+            // RENDER ROOF (if present)
+            // ============================================================
+            if (building.hasRoof && building.roofId) {
+                const roofSpritePath = getSpriteImagePath(building.roofId);
+                
+                // Use image cache
+                let roofImg;
+                if (!imageCache[building.roofId]) {
+                    roofImg = new Image();
+                    roofImg.src = roofSpritePath;
+                    imageCache[building.roofId] = roofImg;
+                    roofImg.onload = () => renderCanvas();
+                } else {
+                    roofImg = imageCache[building.roofId];
+                }
+                
+                if (roofImg.complete && roofImg.naturalHeight !== 0) {
+                    // Roof sits on top of all floors or base building
+                    const floorCount = building.floors ? building.floors.length : 0;
+                    const FIRST_FLOOR_OFFSET = 48;
+                    const FLOOR_HEIGHT_OFFSET = 32;
+                    const ROOF_ADJUSTMENT = 12; // Roofs sit 12px lower to snug onto the floor/building
+                    
+                    // If no floors, roof sits on base building; otherwise on top of floor stack
+                    let roofYOffset;
+                    if (floorCount === 0) {
+                        roofYOffset = yOffset - FIRST_FLOOR_OFFSET + ROOF_ADJUSTMENT;
+                    } else {
+                        roofYOffset = yOffset - FIRST_FLOOR_OFFSET - (floorCount * FLOOR_HEIGHT_OFFSET) + ROOF_ADJUSTMENT;
+                    }
+                    
+                    ctx.drawImage(
+                        roofImg,
+                        screenPos.x - roofImg.naturalWidth / 2,
+                        screenPos.y - roofImg.naturalHeight / 2 + roofYOffset,
+                        roofImg.naturalWidth,
+                        roofImg.naturalHeight
+                    );
+                }
+            }
         } else {
             // Fallback: Draw colored isometric placeholder while loading
             drawPlaceholder(screenPos, building.tier);
@@ -225,16 +321,39 @@ function renderGhostPreview() {
     const building = gameState.selectedBuilding;
     const screenPos = gridToScreen(mouseGridX, mouseGridY);
     
-    // Check if spot is occupied
-    const isOccupied = isCellOccupied(mouseGridX, mouseGridY);
+    // Check if spot is occupied (or if it's a floor/roof, check if building exists)
+    let isOccupied = isCellOccupied(mouseGridX, mouseGridY);
     
-    // Load the building sprite
-    const img = loadBuildingImage(building);
+    // For floors/roofs, check if there's a building at this location
+    if (building.type === 'floor' || building.type === 'roof') {
+        const existingBuilding = gameState.placedBuildings.find(
+            b => b.x === mouseGridX && b.y === mouseGridY && b.tier > 0
+        );
+        isOccupied = !existingBuilding; // Red if NO building (invalid), green if building exists
+    }
+    
+    // Load the sprite image
+    let img;
+    if (building.type === 'floor' || building.type === 'roof') {
+        // Floor/roof pieces use getSpriteImagePath
+        const key = building.id;
+        if (!imageCache[key]) {
+            img = new Image();
+            img.src = getSpriteImagePath(building.id);
+            imageCache[key] = img;
+            img.onload = () => renderCanvas();
+        } else {
+            img = imageCache[key];
+        }
+    } else {
+        // Regular buildings use loadBuildingImage
+        img = loadBuildingImage(building);
+    }
     
     // Set ghost transparency
     ctx.globalAlpha = 0.5;
     
-    if (img.complete && img.naturalHeight !== 0) {
+    if (img && img.complete && img.naturalHeight !== 0) {
         // Draw the sprite as ghost
         const spriteWidth = img.naturalWidth;
         const spriteHeight = img.naturalHeight;
@@ -249,7 +368,7 @@ function renderGhostPreview() {
         );
     } else {
         // Draw placeholder ghost
-        drawPlaceholder(screenPos, building.tier);
+        drawPlaceholder(screenPos, building.tier || 1);
     }
     
     // Reset transparency
@@ -274,15 +393,27 @@ function renderGhostPreview() {
     
     ctx.setLineDash([]); // Reset dash
     
-    // Show coordinates and status
+    // Show status message based on mode
     ctx.fillStyle = isOccupied ? '#e74c3c' : '#2ecc71';
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText(
-        isOccupied ? '❌ OCCUPIED' : '✓ PLACE HERE',
-        screenPos.x,
-        screenPos.y - 140
-    );
+    
+    let statusMessage = '✓ PLACE HERE';
+    if (isOccupied) {
+        if (building.type === 'floor' || building.type === 'roof') {
+            statusMessage = '❌ NO BUILDING HERE';
+        } else {
+            statusMessage = '❌ OCCUPIED';
+        }
+    } else {
+        if (building.type === 'floor') {
+            statusMessage = '✓ ADD FLOOR ($50)';
+        } else if (building.type === 'roof') {
+            statusMessage = '✓ ADD ROOF (FREE)';
+        }
+    }
+    
+    ctx.fillText(statusMessage, screenPos.x, screenPos.y - 140);
     
     // Show grid coordinates
     ctx.fillStyle = 'white';
@@ -377,25 +508,32 @@ function resetView() {
 
 // Convert screen coordinates to grid coordinates
 function screenToGrid(screenX, screenY) {
+    // Hardcoded tile dimensions (128x64 isometric diamonds)
+    const tileW = 128;
+    const tileH = 64;
+    
     // Adjust for camera and zoom
     const adjustedX = (screenX - canvas.width / 2 - cameraX) / zoom;
     const adjustedY = (screenY - canvas.height / 2 - cameraY) / zoom;
     
-    // Standard isometric conversion - 128x64 diamond
-    // Each tile: width=128px, height=64px
-    // For 2:1 isometric: use TILE_WIDTH/2 and TILE_HEIGHT/2
-    const gridX = Math.round((adjustedX / (TILE_WIDTH/2)) + (adjustedY / (TILE_HEIGHT/2)));
-    const gridY = Math.round((adjustedY / (TILE_HEIGHT/2)) - (adjustedX / (TILE_WIDTH/2)));
+    // Isometric screen-to-grid conversion (inverse of gridToScreen)
+    const gridX = Math.round((adjustedX / (tileW/2) + adjustedY / (tileH/2)) / 2);
+    const gridY = Math.round((adjustedY / (tileH/2) - adjustedX / (tileW/2)) / 2);
     
+    // Debug logging disabled to reduce console spam
+    // console.log(`🔍 screenToGrid v4: screen(${screenX.toFixed(0)}, ${screenY.toFixed(0)}) adjusted(${adjustedX.toFixed(0)}, ${adjustedY.toFixed(0)}) -> grid(${gridX}, ${gridY})`);
     return { x: gridX, y: gridY };
 }
 
 // Convert grid coordinates to screen coordinates (isometric projection)
 function gridToScreen(gridX, gridY) {
-    // Standard isometric: Each tile is TILE_WIDTH x TILE_HEIGHT diamond
-    // Use half-width and half-height for proper centering
-    const screenX = (gridX - gridY) * (TILE_WIDTH / 2);
-    const screenY = (gridX + gridY) * (TILE_HEIGHT / 2);
+    // Hardcoded tile dimensions (128x64 isometric diamonds)
+    const tileW = 128;
+    const tileH = 64;
+    
+    // Standard isometric projection formula
+    const screenX = (gridX - gridY) * (tileW / 2);
+    const screenY = (gridX + gridY) * (tileH / 2);
     
     return { x: screenX, y: screenY };
 }

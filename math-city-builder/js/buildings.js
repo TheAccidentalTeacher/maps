@@ -78,7 +78,7 @@ const BUILDING_COMPOSITES = {
 const BUILDINGS_DATA = {
     // ========== TIER 1: STARTER BUILDINGS ($10-$50) ==========
     tier1: [
-        { id: 'house-blue-sm', name: 'Small Blue House', cost: 10, value: 10, tier: 1, sprite: 'buildingTiles_000.png' },      // 5.7KB ✅ COMPLETE
+        // REMOVED: Small Blue House (buildingTiles_000.png) - wrong base size, doesn't match grid
         { id: 'house-red-sm', name: 'Small Red House', cost: 15, value: 15, tier: 1, sprite: 'buildingTiles_003.png' },        // 9.6KB ✅ COMPLETE
         { id: 'house-yellow-sm', name: 'Small Yellow House', cost: 20, value: 20, tier: 1, sprite: 'buildingTiles_001.png' },  // 9.7KB ✅ COMPLETE (was 007)
         { id: 'corner-shop', name: 'Corner Shop', cost: 25, value: 25, tier: 1, sprite: 'buildingTiles_009.png' },             // 10.1KB ✅ COMPLETE

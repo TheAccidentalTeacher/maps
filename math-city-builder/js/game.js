@@ -139,6 +139,12 @@ function switchBuildingMode(mode) {
     // Hide/show appropriate building sections based on mode
     const buildingTiers = document.querySelectorAll('.building-tier');
     
+    // Remove any existing floor/roof selectors
+    const existingFloorSelector = document.getElementById('floor-selector');
+    const existingRoofSelector = document.getElementById('roof-selector');
+    if (existingFloorSelector) existingFloorSelector.remove();
+    if (existingRoofSelector) existingRoofSelector.remove();
+    
     if (mode === 'base') {
         // Show all normal building tiers
         buildingTiers.forEach(tier => tier.style.display = 'block');
@@ -160,14 +166,215 @@ function switchBuildingMode(mode) {
 
 // Show floor pieces for adding stories
 function showFloorPieces() {
-    // TODO: Display floor piece selection UI
-    console.log('🏗️ Floor pieces will go here');
+    console.log('🏗️ Building floor piece selector...');
+    
+    // Find the building selector container (where tiers normally go)
+    const sidePanel = document.querySelector('.side-panel');
+    
+    // Remove any existing floor selector
+    const existingSelector = document.getElementById('floor-selector');
+    if (existingSelector) existingSelector.remove();
+    
+    // Create floor selector container
+    const floorSelector = document.createElement('div');
+    floorSelector.id = 'floor-selector';
+    floorSelector.style.padding = '15px';
+    
+    // Add instructions
+    const instructions = document.createElement('div');
+    instructions.style.background = 'rgba(243, 156, 18, 0.1)';
+    instructions.style.padding = '10px';
+    instructions.style.borderRadius = '5px';
+    instructions.style.marginBottom = '15px';
+    instructions.innerHTML = `
+        <h3 style="margin: 0 0 5px 0; color: #e67e22;">📚 Add Floor Pieces ($50 each)</h3>
+        <p style="margin: 0; font-size: 13px; color: #555;">
+            Click a floor piece to select it, then click on an existing building to add a floor!<br>
+            <strong>${FLOOR_PIECES.all.length} stackable floor pieces</strong> - curated by YOU! 🎯
+        </p>
+    `;
+    floorSelector.appendChild(instructions);
+    
+    // ALL FLOOR PIECES section
+    const allSection = createFloorSection(
+        '�️ Stackable Floor Pieces',
+        FLOOR_PIECES.all,
+        'Your hand-picked stackable floors - no brown bases!'
+    );
+    floorSelector.appendChild(allSection);
+    
+    // Insert after the mode tabs
+    const modeTabs = document.querySelector('.building-mode-tabs');
+    modeTabs.after(floorSelector);
+    
+    console.log('✅ Floor selector created with', FLOOR_PIECES.all.length, 'floor pieces!');
+}
+
+// Helper function to create a floor section
+function createFloorSection(title, pieces, description) {
+    const section = document.createElement('div');
+    section.style.marginBottom = '20px';
+    section.style.padding = '10px';
+    section.style.background = 'rgba(255, 255, 255, 0.5)';
+    section.style.borderRadius = '5px';
+    
+    // Section header
+    const header = document.createElement('h4');
+    header.textContent = title;
+    header.style.margin = '0 0 5px 0';
+    header.style.color = '#2c3e50';
+    section.appendChild(header);
+    
+    // Description
+    const desc = document.createElement('p');
+    desc.textContent = description;
+    desc.style.margin = '0 0 10px 0';
+    desc.style.fontSize = '12px';
+    desc.style.color = '#666';
+    section.appendChild(desc);
+    
+    // Grid for floor pieces
+    const grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(80px, 1fr))';
+    grid.style.gap = '8px';
+    
+    // Add each floor piece
+    pieces.forEach(piece => {
+        const card = document.createElement('div');
+        card.className = 'floor-piece-card';
+        card.dataset.floorId = piece.id;
+        card.style.cursor = 'pointer';
+        card.style.padding = '8px';
+        card.style.background = 'white';
+        card.style.border = '2px solid #ddd';
+        card.style.borderRadius = '4px';
+        card.style.textAlign = 'center';
+        card.style.transition = 'all 0.2s';
+        
+        // Image
+        const img = document.createElement('img');
+        img.src = getSpriteImagePath(piece.id);
+        img.style.width = '64px';
+        img.style.height = '64px';
+        img.style.imageRendering = 'pixelated';
+        img.style.display = 'block';
+        img.style.margin = '0 auto';
+        card.appendChild(img);
+        
+        // Material label
+        const label = document.createElement('div');
+        label.textContent = piece.material;
+        label.style.fontSize = '10px';
+        label.style.marginTop = '4px';
+        label.style.color = '#666';
+        label.style.textTransform = 'capitalize';
+        card.appendChild(label);
+        
+        // Height indicator
+        if (piece.height) {
+            const heightLabel = document.createElement('div');
+            heightLabel.textContent = `${piece.height}× height`;
+            heightLabel.style.fontSize = '9px';
+            heightLabel.style.color = '#e67e22';
+            heightLabel.style.fontWeight = 'bold';
+            card.appendChild(heightLabel);
+        }
+        
+        // Click handler
+        card.addEventListener('click', () => selectFloorPiece(piece));
+        
+        // Hover effects
+        card.addEventListener('mouseenter', () => {
+            card.style.borderColor = '#f39c12';
+            card.style.transform = 'scale(1.05)';
+            card.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+        });
+        card.addEventListener('mouseleave', () => {
+            if (!gameState.selectedBuilding || gameState.selectedBuilding.id !== piece.id) {
+                card.style.borderColor = '#ddd';
+                card.style.transform = 'scale(1)';
+                card.style.boxShadow = 'none';
+            }
+        });
+        
+        grid.appendChild(card);
+    });
+    
+    section.appendChild(grid);
+    return section;
+}
+
+// Select a floor piece to place
+function selectFloorPiece(piece) {
+    console.log('� Selected floor piece:', piece.id, piece.material);
+    
+    // Store the floor piece as selectedBuilding
+    gameState.selectedBuilding = {
+        id: piece.id,
+        type: 'floor',
+        material: piece.material,
+        height: piece.height,
+        cost: 50 // Floor pieces cost $50
+    };
+    
+    // Update visual selection
+    document.querySelectorAll('.floor-piece-card').forEach(card => {
+        if (card.dataset.floorId === piece.id) {
+            card.style.borderColor = '#27ae60';
+            card.style.borderWidth = '3px';
+            card.style.background = 'rgba(39, 174, 102, 0.1)';
+        } else {
+            card.style.borderColor = '#ddd';
+            card.style.borderWidth = '2px';
+            card.style.background = 'white';
+        }
+    });
+    
+    console.log('💡 Now click on a building to add this floor!');
 }
 
 // Show roof pieces for topping buildings
 function showRoofPieces() {
-    // TODO: Display roof piece selection UI
-    console.log('🏠 Roof pieces will go here');
+    console.log('🎩 Building roof piece selector...');
+    
+    // Remove any existing roof selector
+    const existingSelector = document.getElementById('roof-selector');
+    if (existingSelector) existingSelector.remove();
+    
+    // Create roof selector container
+    const roofSelector = document.createElement('div');
+    roofSelector.id = 'roof-selector';
+    roofSelector.style.padding = '15px';
+    
+    // Add instructions
+    const instructions = document.createElement('div');
+    instructions.style.background = 'rgba(46, 204, 113, 0.1)';
+    instructions.style.padding = '10px';
+    instructions.style.borderRadius = '5px';
+    instructions.style.marginBottom = '15px';
+    instructions.innerHTML = `
+        <h3 style="margin: 0 0 5px 0; color: #27ae60;">🎩 Add Roof Pieces (FREE!)</h3>
+        <p style="margin: 0; font-size: 13px; color: #555;">
+            Click a roof piece to select it, then click on a building to cap it off!<br>
+            <strong>${ROOF_PIECES.all.length} roof pieces</strong> - curated by YOU! 🎯
+        </p>
+    `;
+    roofSelector.appendChild(instructions);
+    
+    // ALL ROOF PIECES section
+    const allSection = createFloorSection(
+        '🏠 Roof Pieces (Flat, Terracotta, Angled)',
+        ROOF_PIECES.all,
+        'Your hand-picked roofs - top off those buildings in style!'
+    );
+    roofSelector.appendChild(allSection);
+    
+    // Insert after the mode tabs
+    const modeTabs = document.querySelector('.building-mode-tabs');
+    modeTabs.after(roofSelector);
+    
+    console.log('✅ Roof selector created with', ROOF_PIECES.all.length, 'roof pieces!');
 }
 
 // Update all UI elements
@@ -310,7 +517,15 @@ function handleCanvasClick(e) {
     if (gameState.demolishMode) {
         demolishBuilding(gridPos);
     } else if (gameState.selectedBuilding) {
-        placeBuilding(gridPos);
+        // Check building mode to determine action
+        if (gameState.buildingMode === 'floors') {
+            addFloorToBuilding(gridPos);
+        } else if (gameState.buildingMode === 'roofs') {
+            addRoofToBuilding(gridPos);
+        } else {
+            // Normal base building placement
+            placeBuilding(gridPos);
+        }
     }
 }
 
@@ -377,6 +592,104 @@ function demolishBuilding(gridPos) {
     renderCanvas();
     
     console.log(`💥 Demolished: ${building.name}, refunded $${refund}`);
+}
+
+// Add a floor piece to an existing building
+function addFloorToBuilding(gridPos) {
+    if (!gameState.selectedBuilding) return;
+    
+    const floorPiece = gameState.selectedBuilding;
+    const FLOOR_COST = 50;
+    
+    // Check if can afford
+    if (gameState.dollars < FLOOR_COST) {
+        showAchievement('❌ Not enough dollars! Floors cost $50', 2000);
+        return;
+    }
+    
+    // Find existing building at this location
+    const existingBuilding = gameState.placedBuildings.find(
+        b => b.x === gridPos.x && b.y === gridPos.y && b.tier > 0
+    );
+    
+    if (!existingBuilding) {
+        showAchievement('❌ No building here! Place a floor on an existing building', 2000);
+        return;
+    }
+    
+    // Check if building already has a roof
+    if (existingBuilding.hasRoof) {
+        showAchievement('❌ This building has a roof! Remove it first', 2000);
+        return;
+    }
+    
+    // Add the floor!
+    gameState.dollars -= FLOOR_COST;
+    
+    // Initialize floors array if it doesn't exist
+    if (!existingBuilding.floors) {
+        existingBuilding.floors = [];
+    }
+    
+    // Add this floor piece ID (canvas.js expects just the string ID)
+    existingBuilding.floors.push(floorPiece.id);
+    
+    // Increase building value
+    const addedValue = FLOOR_COST * 1.5; // Floors add 1.5x their cost in value
+    gameState.cityValue += addedValue;
+    existingBuilding.value += addedValue;
+    
+    // Add XP
+    addXP(5);
+    
+    showAchievement(`✅ Added floor to ${existingBuilding.name}! (-$${FLOOR_COST})`, 2000);
+    
+    updateUI();
+    renderCanvas();
+}
+
+// Add a roof piece to an existing building
+function addRoofToBuilding(gridPos) {
+    if (!gameState.selectedBuilding) return;
+    
+    const roofPiece = gameState.selectedBuilding;
+    
+    // Find existing building at this location
+    const existingBuilding = gameState.placedBuildings.find(
+        b => b.x === gridPos.x && b.y === gridPos.y && b.tier > 0
+    );
+    
+    if (!existingBuilding) {
+        showAchievement('❌ No building here! Place a roof on an existing building', 2000);
+        return;
+    }
+    
+    // Check if building already has a roof
+    if (existingBuilding.hasRoof) {
+        showAchievement('❌ This building already has a roof!', 2000);
+        return;
+    }
+    
+    // Add the roof! (FREE!)
+    existingBuilding.hasRoof = true;
+    existingBuilding.roofId = roofPiece.id;
+    existingBuilding.roofStyle = roofPiece.style;
+    existingBuilding.roofColor = roofPiece.color;
+    
+    // Roofs add a small value bonus
+    const addedValue = 25;
+    gameState.cityValue += addedValue;
+    existingBuilding.value += addedValue;
+    
+    // Add XP
+    addXP(3);
+    
+    showAchievement(`✅ Added ${roofPiece.color} ${roofPiece.style} roof! (FREE!)`, 2000);
+    
+    updateUI();
+    renderCanvas();
+    
+    console.log(`🎩 Added roof ${roofPiece.id} to building at (${gridPos.x}, ${gridPos.y})`);
 }
 
 // Check if a grid cell is occupied
