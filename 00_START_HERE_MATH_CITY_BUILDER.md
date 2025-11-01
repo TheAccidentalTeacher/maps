@@ -53,6 +53,7 @@ math-city-builder/          ← THE ACTUAL GAME (Oct 26, 9:37 PM)
 ├── index.html              (200 lines)
 ├── css/game.css
 └── js/
+    ├── building-components.js  ⭐ NEW! Oct 31 - Modular stacking system
     ├── buildings.js        (Building catalog)
     ├── canvas.js           (238 lines - 2D sprite rendering)
     ├── game.js             (412 lines - main game engine)

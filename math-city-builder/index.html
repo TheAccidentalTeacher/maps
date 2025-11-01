@@ -28,6 +28,9 @@
         <div class="ui-section">
             <button id="earn-dollars-btn" class="action-btn">💰 Earn Dollars (Solve Math!)</button>
         </div>
+        <div class="ui-section">
+            <a href="asset-reference.html" target="_blank" style="color: white; text-decoration: none; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 5px; font-size: 14px;">🎨 Asset Gallery</a>
+        </div>
     </div>
 
     <!-- MAIN GAME CONTAINER -->
@@ -35,7 +38,14 @@
         
         <!-- LEFT SIDEBAR - BUILDING SELECTION -->
         <div id="sidebar">
-            <h2>🏗️ Buildings</h2>
+            <h2>🏗️ Build Your City</h2>
+            
+            <!-- BUILDING MODE TABS -->
+            <div class="building-mode-tabs">
+                <button class="mode-tab active" data-mode="base">🏠 Base Buildings</button>
+                <button class="mode-tab" data-mode="floors">📚 Add Floor ($50)</button>
+                <button class="mode-tab" data-mode="roofs">🎩 Add Roof (FREE!)</button>
+            </div>
             
             <!-- Math Type Selector -->
             <div class="math-selector">
@@ -110,6 +120,19 @@
             </div>
 
             <div class="controls">
+                <button id="road-mode-btn" class="action-btn" style="background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);">🛣️ Road Mode</button>
+                <button id="terrain-mode-btn" class="action-btn" style="background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);">🎨 Terrain Mode</button>
+                
+                <!-- Terrain Type Selector (shown when terrain mode active) -->
+                <div id="terrain-selector" class="terrain-selector" style="display: none; margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 5px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Paint Type:</label>
+                    <select id="terrain-type-select" style="width: 100%; padding: 8px; border-radius: 4px; border: 2px solid #27ae60;">
+                        <option value="grass" selected>🟩 Grass</option>
+                        <option value="dirt">🟫 Dirt</option>
+                        <option value="stone">⬛ Stone</option>
+                    </select>
+                </div>
+                
                 <button id="demolish-btn" class="danger-btn">🔨 Demolish Mode (50% refund)</button>
                 <button id="save-btn" class="action-btn">💾 Save Game</button>
                 <button id="reset-btn" class="danger-btn">🔄 Reset Game</button>
@@ -183,26 +206,16 @@
             <p style="font-size: 1.1rem; margin: 20px 0; color: #e74c3c;">
                 This will DELETE your entire city, all buildings, dollars, and progress!
             </p>
-            <p style="font-size: 1rem; margin-bottom: 30px; color: #7f8c8d;">
-                Are you ABSOLUTELY SURE you want to start over?
-            </p>
-            <div style="display: flex; gap: 15px; justify-content: center;">
-                <button id="confirm-reset-btn" class="danger-btn" style="font-size: 1.1rem; padding: 15px 30px;">
-                    YES, DELETE EVERYTHING! 💥
-                </button>
-                <button id="cancel-reset-btn" class="action-btn" style="font-size: 1.1rem; padding: 15px 30px;">
-                    NO, KEEP MY CITY! 🏙️
-                </button>
-            </div>
         </div>
     </div>
 
     <!-- Load all the JavaScript magic -->
-    <script src="js/mathTypes.js?v=3"></script>
-    <script src="js/canvas.js?v=3"></script>
-    <script src="js/grid.js?v=3"></script>
-    <script src="js/buildings.js?v=3"></script>
-    <script src="js/quiz.js?v=3"></script>
-    <script src="js/game.js?v=3"></script>
+    <script src="js/building-components.js?v=11"></script>
+    <script src="js/mathTypes.js?v=11"></script>
+    <script src="js/canvas.js?v=11"></script>
+    <script src="js/grid.js?v=11"></script>
+    <script src="js/buildings.js?v=11"></script>
+    <script src="js/quiz.js?v=11"></script>
+    <script src="js/game.js?v=11"></script>
 </body>
 </html>

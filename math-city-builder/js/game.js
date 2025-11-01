@@ -10,6 +10,7 @@ const gameState = {
     selectedBuilding: null,    // Currently selected building to place
     placedBuildings: [],       // All buildings in the city
     demolishMode: false,       // Demolish mode active?
+    buildingMode: 'base',      // 🆕 Building mode: 'base', 'floors', or 'roofs'
     
     // Quiz stats
     correctAnswers: 0,
@@ -41,6 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Setup all event listeners
 function setupEventListeners() {
+    // Building Mode Tabs - THE NEW HOTNESS! 🔥
+    const modeTabs = document.querySelectorAll('.mode-tab');
+    modeTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const mode = tab.dataset.mode;
+            switchBuildingMode(mode);
+        });
+    });
+    
     // Earn Dollars button - THE MONEY MAKER!
     document.getElementById('earn-dollars-btn').addEventListener('click', () => {
         showQuizModal();
@@ -70,20 +80,15 @@ function setupEventListeners() {
         saveGame();
     });
     
-    // Reset game button - show confirmation modal
-    document.getElementById('reset-btn').addEventListener('click', () => {
-        showResetConfirmation();
-    });
-    
-    // Reset confirmation handlers
-    document.getElementById('confirm-reset-btn').addEventListener('click', () => {
-        resetGame();
-        document.getElementById('reset-modal').classList.add('hidden');
-    });
-    
-    document.getElementById('cancel-reset-btn').addEventListener('click', () => {
-        document.getElementById('reset-modal').classList.add('hidden');
-    });
+    // Reset game button - direct reset (no modal)
+    const resetBtn = document.getElementById('reset-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            if (confirm('⚠️ RESET GAME?\n\nThis will DELETE your entire city, all buildings, dollars, and progress!\n\nAre you sure?')) {
+                resetGame();
+            }
+        });
+    }
     
     // Canvas controls
     document.getElementById('zoom-in-btn').addEventListener('click', () => {
@@ -111,6 +116,58 @@ function setupEventListeners() {
     canvas.addEventListener('click', (e) => {
         handleCanvasClick(e);
     });
+}
+
+// Switch between building modes (base, floors, roofs)
+function switchBuildingMode(mode) {
+    console.log(`🔄 Switching to ${mode} mode`);
+    gameState.buildingMode = mode;
+    
+    // Update tab visual state
+    const modeTabs = document.querySelectorAll('.mode-tab');
+    modeTabs.forEach(tab => {
+        if (tab.dataset.mode === mode) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
+    
+    // Clear current selection
+    gameState.selectedBuilding = null;
+    
+    // Hide/show appropriate building sections based on mode
+    const buildingTiers = document.querySelectorAll('.building-tier');
+    
+    if (mode === 'base') {
+        // Show all normal building tiers
+        buildingTiers.forEach(tier => tier.style.display = 'block');
+        console.log('📦 BASE MODE: Place new buildings');
+    } else if (mode === 'floors') {
+        // Hide tiers, we'll show floor pieces only
+        buildingTiers.forEach(tier => tier.style.display = 'none');
+        console.log('📚 FLOOR MODE: Add second stories ($50 each)');
+        showFloorPieces();
+    } else if (mode === 'roofs') {
+        // Hide tiers, show roof pieces only
+        buildingTiers.forEach(tier => tier.style.display = 'none');
+        console.log('🎩 ROOF MODE: Top off buildings (FREE!)');
+        showRoofPieces();
+    }
+    
+    renderCanvas();
+}
+
+// Show floor pieces for adding stories
+function showFloorPieces() {
+    // TODO: Display floor piece selection UI
+    console.log('🏗️ Floor pieces will go here');
+}
+
+// Show roof pieces for topping buildings
+function showRoofPieces() {
+    // TODO: Display roof piece selection UI
+    console.log('🏠 Roof pieces will go here');
 }
 
 // Update all UI elements
@@ -323,8 +380,10 @@ function demolishBuilding(gridPos) {
 }
 
 // Check if a grid cell is occupied
+// Check if a cell is occupied by a non-decoration building
 function isCellOccupied(x, y) {
-    return gameState.placedBuildings.some(b => b.x === x && b.y === y);
+    // Allow decorations (tier 0) to stack on same cell
+    return gameState.placedBuildings.some(b => b.x === x && b.y === y && b.tier > 0);
 }
 
 // Save game to localStorage
@@ -363,6 +422,19 @@ function showResetConfirmation() {
     document.getElementById('reset-modal').classList.remove('hidden');
     console.log('⚠️ Reset confirmation shown');
 }
+// Initialize terrain with default grass tiles
+function initializeTerrain() {
+    // Fill a 40x40 area with grass (centered on 0,0)
+    for (let x = -20; x < 20; x++) {
+        for (let y = -20; y < 20; y++) {
+            gameState.terrain.set(`${x},${y}`, { 
+                type: 'grass', 
+                elevation: 0 
+            });
+        }
+    }
+    console.log('🌱 Terrain initialized: 1600 grass tiles');
+}
 
 // RESET GAME - Nuclear option! 💥
 function resetGame() {
@@ -385,6 +457,11 @@ function resetGame() {
         million: false
     };
     
+    // NEW: Reset terrain and roads
+    gameState.terrain.clear();
+    gameState.roads.clear();
+    initializeTerrain(); // Refill with default grass
+    
     // Clear localStorage
     localStorage.removeItem('mathCityBuilder_save');
     
@@ -398,6 +475,7 @@ function resetGame() {
     renderCanvas();
     
     // Show confirmation
+    // Show confirmation
     showAchievement('🔄 Game reset! Starting fresh with $100!', 3000);
     
     console.log('💥 GAME RESET! Fresh start!');
@@ -407,7 +485,6 @@ function resetGame() {
 setInterval(() => {
     saveGame(false); // false = don't show notification
 }, 30000);
-
 // Try to load saved game on start
 setTimeout(() => {
     const hasSave = localStorage.getItem('mathCityBuilder_save');
